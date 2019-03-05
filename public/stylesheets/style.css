@@ -1,8 +1,30 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+html, body {
+  margin: 0;
+  height: 100%;
+  /* background-color: #ffc038!important; */
 }
 
-a {
-  color: #00B7FF;
+/* Bulma adjustments below */
+nav.navbar .navbar-brand .navbar-burger {
+  margin-left: 0;
+}
+
+a:hover {
+  color: #5755d9 !important;
+}
+
+.button.is-primary {
+  background-color: #5755d9 !important;
+}
+
+.button.is-primary.is-outlined {
+  background-color: white !important;
+  border-color: #5755d9 !important;
+  color: #5755d9 !important;
+}
+
+.button.is-primary.is-outlined:hover {
+  background-color: #5755d9 !important;
+  color: white !important;
+  transition-duration: 0.25s;
 }

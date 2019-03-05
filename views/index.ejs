@@ -2,10 +2,17 @@
 <html lang="en">
 <% include ./partials/head.ejs %>
 
-<body>
-  <h1><%= title %></h1>
-  <p>Welcome to <%= title %></p>
+<body class="has-background-white-ter has-navbar-fixed-top">
+  <% include ./partials/nav.ejs %>
 
-  <% include ./partials/footer.ejs %>
+  <section class="section">
+    <div class="container">
+      <h1><%= title %></h1>
+      <p>Welcome to <%= title %></p>
+    </div>
+  </section>
+
+
+  <% include partials/script.ejs %>
 </body>
 </html>
