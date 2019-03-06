@@ -8,32 +8,68 @@
       </a>
 
       <a class="navbar-item" href="/">
-        <img src="/images/logo_text.svg" width="115">
+        <img src="/images/logo_text.svg" width="122">
       </a>
     </div>
 
     <div id="navbar-menu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item">
+        <a class="navbar-item has-text-weight-bold <%= path === '/' ? 'is-active' : '' %>" href="/">
           Home
         </a>
-
-        <a class="navbar-item">
-          Explore
+        <a class="navbar-item has-text-weight-bold <%= path === '/events' ? 'is-active' : '' %>">
+          Events
         </a>
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button is-primary is-medium">
+            <a class="button is-primary">
               <strong>Sign up</strong>
             </a>
-            <a class="button is-primary is-outlined is-medium">
+            <a class="button is-primary is-outlined">
               Log in
             </a>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar is-fixed-bottom is-hidden-tablet">
+  <div class="navbar-brand">
+    <div class="columns is-mobile is-gapless is-vcentered">
+      <div class="column">
+        <span class="icon is-large">
+          <span class="iconify" data-icon="ant-design:home" data-inline="false"></span>
+          <!--<span class="iconify" data-icon="ant-design:home-outline" data-inline="false"></span>-->
+        </span>
+      </div>
+      <div class="column">
+        <span class="icon is-large">
+          <span class="iconify" data-icon="ion:ios-search" data-inline="false"></span>
+          <!--<span class="iconify" data-icon="fa-solid:search" data-inline="false"></span>-->
+        </span>
+      </div>
+      <div class="column">
+        <span class="icon is-large">
+          <span class="iconify" data-icon="fa-regular:plus-square" data-inline="false"></span>
+          <!--<span class="iconify" data-icon="entypo:squared-plus" data-inline="false"></span>-->
+        </span>
+      </div>
+      <div class="column">
+        <span class="icon is-large">
+          <span class="iconify" data-icon="zmdi:notifications-none" data-inline="false"></span>
+          <!--<span class="iconify" data-icon="zmdi:notifications" data-inline="false"></span>-->
+        </span>
+      </div>
+      <div class="column">
+        <span class="icon is-large">
+          <span class="iconify" data-icon="fa-regular:user" data-inline="false"></span>
+          <!--<span class="iconify" data-icon="fa-solid:user" data-inline="false"></span>-->
+        </span>
       </div>
     </div>
   </div>
