@@ -2,12 +2,11 @@
 const express = require('express');
 const router = express.Router();
 
-/* GET home page. */
+/* GET user profile. */
 router.get('/', function(req, res, next) {
-  res.render('index', {
-    title: 'Musicbee - enjoy the sweetest moment of music',
-    baseUrl: req.baseUrl
+  res.render('user', {
+    title: 'My profile name',
+    baseUrl: req.baseUrl,
   });
 });
-
 module.exports = router;

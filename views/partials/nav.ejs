@@ -14,10 +14,10 @@
 
     <div id="navbar-menu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item has-text-weight-bold <%= path === '/' ? 'is-active' : '' %>" href="/">
+        <a class="navbar-item has-text-weight-bold <%= baseUrl === '' ? 'is-active' : '' %>" href="/">
           Home
         </a>
-        <a class="navbar-item has-text-weight-bold <%= path === '/events' ? 'is-active' : '' %>">
+        <a class="navbar-item has-text-weight-bold <%= baseUrl === '/events' ? 'is-active' : '' %>">
           Events
         </a>
       </div>
@@ -42,34 +42,43 @@
   <div class="navbar-brand">
     <div class="columns is-mobile is-gapless is-vcentered">
       <div class="column">
-        <span class="icon is-large">
-          <span class="iconify" data-icon="ant-design:home" data-inline="false"></span>
-          <!--<span class="iconify" data-icon="ant-design:home-outline" data-inline="false"></span>-->
-        </span>
+        <a <%= baseUrl === '' ? "class=is-active" : ' ' %> href="/">
+          <span class="icon is-large">
+            <span class="iconify" data-icon="ant-design:home<%= baseUrl !== '' ? '-outline' : '' %>" class=""></span>
+          </span>
+        </a>
       </div>
       <div class="column">
-        <span class="icon is-large">
-          <span class="iconify" data-icon="ion:ios-search" data-inline="false"></span>
-          <!--<span class="iconify" data-icon="fa-solid:search" data-inline="false"></span>-->
-        </span>
+        <a <%= baseUrl === '/search' ? "class=is-active" : '' %> href="/">
+          <span class="icon is-large">
+            <span class="iconify" data-icon="<%= baseUrl === '/search' ? 'fa-solid:search' : 'ion:ios-search' %>">
+            </span>
+          </span>
+        </a>
       </div>
       <div class="column">
-        <span class="icon is-large">
-          <span class="iconify" data-icon="fa-regular:plus-square" data-inline="false"></span>
-          <!--<span class="iconify" data-icon="entypo:squared-plus" data-inline="false"></span>-->
-        </span>
+        <a <%= baseUrl === '/create' ? "class=is-active" : '' %> href="/">
+          <span class="icon is-large">
+            <span class="iconify"
+                  data-icon="<%= baseUrl === '/create' ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
+            </span>
+          </span>
+        </a>
       </div>
       <div class="column">
-        <span class="icon is-large">
-          <span class="iconify" data-icon="zmdi:notifications-none" data-inline="false"></span>
-          <!--<span class="iconify" data-icon="zmdi:notifications" data-inline="false"></span>-->
-        </span>
+        <a <%= baseUrl === '/notifications' ? "class=is-active" : '' %> href="/">
+          <span class="icon is-large">
+            <span class="iconify" data-icon="zmdi:notifications<%= baseUrl !== '/notifications' ? '-none' : '' %>">
+            </span>
+          </span>
+        </a>
       </div>
       <div class="column">
-        <span class="icon is-large">
-          <span class="iconify" data-icon="fa-regular:user" data-inline="false"></span>
-          <!--<span class="iconify" data-icon="fa-solid:user" data-inline="false"></span>-->
-        </span>
+        <a <%= baseUrl === '/user' ? "class=is-active" : '' %> href="/user">
+          <span class="icon is-large">
+            <span class="iconify" data-icon="fa-<%= baseUrl === '/user' ? 'solid' : 'regular' %>:user"></span>
+          </span>
+        </a>
       </div>
     </div>
   </div>

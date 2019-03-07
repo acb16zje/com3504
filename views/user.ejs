@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ./partials/head.ejs %>
+
+<body class="has-background-white-bis has-navbar-fixed-top">
+<% include ./partials/nav.ejs %>
+
+<section class="section">
+  <div class="box container">
+    <div class="columns is-mobile is-vcentered">
+      <div class="column is-4">
+        <figure class="image is-128x128 container">
+          <img class="is-rounded" src="/images/gakki.jpg">
+        </figure>
+      </div>
+
+      <div class="column">
+        <nav class="level">
+          <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Tweets</p>
+              <p class="title">3,456</p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Following</p>
+              <p class="title">123</p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Followers</p>
+              <p class="title">456K</p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Likes</p>
+              <p class="title">789</p>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<% include partials/script.ejs %>
+</body>
+</html>
