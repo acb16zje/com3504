@@ -109,20 +109,3 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     width: 100% !important;
   }
 }
-
-/* Events page */
-/* .columns.is-gapless .event-details {
-  color: black;
-  font-size: 9px;
-  width: 100%;
-  padding: 10px;
-  background-color: aquamarine;
-}
-
-.columns.is-gapless .event-details .event-name {
-  font-size: 12px;
-}
-
-.columns.is-gapless .event-details img {
-  align-items: right;
-} */

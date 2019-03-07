@@ -17,4 +17,11 @@ router.get('/events', function(req, res, next) {
   });
 });
 
+router.get('/notifications', function(req, res, next) {
+  res.render('notifications', {
+    title: 'Musicbee - notifications',
+    baseUrl: req.baseUrl
+  });
+});
+
 module.exports = router;
