@@ -10,4 +10,11 @@ router.get('/', function(req, res, next) {
   });
 });
 
+router.get('/events', function(req, res, next) {
+  res.render('events', {
+    title: 'Musicbee - event',
+    baseUrl: req.baseUrl
+  });
+});
+
 module.exports = router;
