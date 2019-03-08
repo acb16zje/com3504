@@ -6,6 +6,22 @@
   <% include ./partials/nav.ejs %>
 
   <section class="section">
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <div class="tabs is-fullwidth is-centered">
+          <ul>
+            <li <%= originalUrl === '/create' ? "class=is-active" : '' %>>
+              <a href="/create">Stories</a>
+            </li>
+            <li <%= originalUrl === '/create/event' ? "class=is-active" : '' %>>
+              <a href="/create/event">Events</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
     <div class="container">
       <h1><%= title %></h1>
       <p>Welcome to <%= title %></p>

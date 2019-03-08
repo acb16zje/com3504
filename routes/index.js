@@ -6,21 +6,14 @@ const router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', {
     title: 'Musicbee - enjoy the sweetest moment of music',
-    baseUrl: req.baseUrl
-  });
-});
-
-router.get('/events', function(req, res, next) {
-  res.render('events', {
-    title: 'Musicbee - event',
-    baseUrl: req.baseUrl
+    originalUrl: req.originalUrl
   });
 });
 
 router.get('/notifications', function(req, res, next) {
   res.render('notifications', {
     title: 'Musicbee - notifications',
-    baseUrl: req.baseUrl
+    originalUrl: req.originalUrl
   });
 });
 

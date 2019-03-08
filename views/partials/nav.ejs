@@ -1,11 +1,7 @@
-<nav class="navbar is-fixed-top is-spaced" role="navigation" aria-label="main navigation">
+<nav class="navbar is-fixed-top is-spaced">
   <div class="container">
     <div class="navbar-brand">
-      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
+      <a role="button" class="navbar-burger"></a>
 
       <a class="navbar-item" href="/">
         <img src="/images/logo_text.svg" width="122">
@@ -14,10 +10,10 @@
 
     <div id="navbar-menu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item has-text-weight-bold <%= baseUrl === '' ? 'is-active' : '' %>" href="/">
+        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/' ? 'is-active' : '' %>" href="/">
           Home
         </a>
-        <a class="navbar-item has-text-weight-bold <%= baseUrl === '/events' ? 'is-active' : '' %>" href="/events">
+        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/events' ? 'is-active' : '' %>" href="/events">
           Events
         </a>
       </div>
@@ -42,41 +38,41 @@
   <div class="navbar-brand">
     <div class="columns is-mobile is-gapless is-vcentered">
       <div class="column">
-        <a <%= baseUrl === '' ? "class=is-active" : ' ' %> href="/">
+        <a <%= originalUrl === '/' ? "class=is-active" : ' ' %> href="/">
           <span class="icon is-large">
-            <span class="iconify" data-icon="ant-design:home<%= baseUrl !== '' ? '-outline' : '' %>" class=""></span>
+            <span class="iconify" data-icon="ant-design:home<%= originalUrl !== '/' ? '-outline' : '' %>" class=""></span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= baseUrl === '/search' ? "class=is-active" : '' %> href="/">
+        <a <%= originalUrl === '/events' ? "class=is-active" : '' %> href="/events">
           <span class="icon is-large">
-            <span class="iconify" data-icon="<%= baseUrl === '/search' ? 'fa-solid:search' : 'ion:ios-search' %>">
+            <span class="iconify" data-icon="<%= originalUrl === '/events' ? 'fa-solid:search' : 'ion:ios-search' %>">
             </span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= baseUrl === '/create' ? "class=is-active" : '' %> href="/">
+        <a <%= /\/create/.test(originalUrl) ? "class=is-active" : '' %> href="/create">
           <span class="icon is-large">
             <span class="iconify"
-                  data-icon="<%= baseUrl === '/create' ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
+                  data-icon="<%= /\/create/.test(originalUrl) ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
             </span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= baseUrl === '/notifications' ? "class=is-active" : '' %> href="/notifications">
+        <a <%= originalUrl === '/notifications' ? "class=is-active" : '' %> href="/notifications">
           <span class="icon is-large">
-            <span class="iconify" data-icon="zmdi:notifications<%= baseUrl !== '/notifications' ? '-none' : '' %>">
+            <span class="iconify" data-icon="zmdi:notifications<%= originalUrl !== '/notifications' ? '-none' : '' %>">
             </span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= baseUrl === '/user' ? "class=is-active" : '' %> href="/user">
+        <a <%= originalUrl === '/user' ? "class=is-active" : '' %> href="/user">
           <span class="icon is-large">
-            <span class="iconify" data-icon="fa-<%= baseUrl === '/user' ? 'solid' : 'regular' %>:user"></span>
+            <span class="iconify" data-icon="fa-<%= originalUrl === '/user' ? 'solid' : 'regular' %>:user"></span>
           </span>
         </a>
       </div>

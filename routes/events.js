@@ -2,11 +2,12 @@
 const express = require('express');
 const router = express.Router();
 
-/* GET user profile. */
+/* GET events page. */
 router.get('/', function(req, res, next) {
-  res.render('user', {
-    title: 'My profile name',
-    originalUrl: req.originalUrl,
+  res.render('events', {
+    title: 'Musicbee - event',
+    originalUrl: req.originalUrl
   });
 });
+
 module.exports = router;

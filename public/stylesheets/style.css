@@ -15,6 +15,21 @@ html, body {
   --primary-color-hover: #4240d4;
 }
 
+form ::placeholder {
+  color: #81858c !important;
+}
+
+body.has-navbar-fixed-top div.tabs li.is-active a {
+  color: var(--primary-color)
+}
+
+/* Section padding fix on tablet and mobile */
+@media screen and (max-width: 1088px) {
+  body.has-navbar-fixed-top section.section {
+    padding-top: 10px;
+  }
+}
+
 .button.is-primary {
   background-color: var(--primary-color);
   color: white;
@@ -40,10 +55,6 @@ html, body {
 /* Desktop navbar */
 nav.navbar .navbar-brand .navbar-burger {
   margin-left: 0;
-}
-
-nav.navbar .navbar-menu .navbar-start a.navbar-item {
-  color: black;
 }
 
 nav.navbar .navbar-menu .navbar-start a.navbar-item.is-active {
@@ -101,12 +112,20 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 /* Tablet viewport adjustments */
 @media screen and (min-width: 769px) {
   /* Tablet events column */
-  .event-columns {
-    flex-direction: column-reverse !important;
+  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns {
+    flex-direction: column-reverse;
   }
 
-  .event-columns div.is-8, .event-columns div.is-4 {
-    width: 100% !important;
+  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns > div.column.is-8,
+  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns > div.column.is-4 {
+    width: 100%;
+  }
+
+  /* Create form size adjustment */
+  @media screen and (max-width: 1088px) {
+    body > section.section > div.columns > div.column.form-column {
+      width: 80%;
+    }
   }
 }
 
