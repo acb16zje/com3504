@@ -5,47 +5,210 @@
 <body class="has-background-white-bis has-navbar-fixed-top">
 <% include ./partials/nav.ejs %>
 
-<section class="section">
-  <div class="box container">
-    <div class="columns is-mobile is-vcentered">
-      <div class="column is-4">
-        <figure class="image is-128x128 container">
-          <img class="is-rounded" src="/images/gakki.jpg">
-        </figure>
-      </div>
+  <section class="section">
+    <div class="box container">
+      <div class="columns is-mobile is-vcentered">
+        <div class="column is-4">
+          <figure class="image is-128x128 container">
+            <img class="is-rounded" src="/images/gakki.jpg">
+          </figure>
+        </div>
 
-      <div class="column">
-        <nav class="level">
-          <div class="level-item has-text-centered">
-            <div>
-              <p class="heading">Tweets</p>
-              <p class="title">3,456</p>
+        <div class="tile is-ancestor">
+          <div class="tile is-vertical">
+            <div class="tile">
+              <div class="tile is-parent is-vertical">
+                <div class="column">
+                  <article class="tile is-child is-centered has-text-centered">
+                    <p class="title">Gakki
+                      <a <%= baseUrl === '/' ? "class=is-active" : '' %> href="/">
+                        <span class="icon is-large">
+                          <span class="iconify" data-icon="<%= baseUrl === '/user' ? 'uil:edit-alt' : '' %>"
+                            class=""></span>
+                        </span>
+                      </a>
+                    </p>
+                  </article>
+                  <article class="tile is-child">
+                    <nav class="level">
+                      <div class="level-item has-text-centered">
+                        <div>
+                          <p class="heading">Stories</p>
+                          <p class="title">3,456</p>
+                        </div>
+                      </div>
+                      <div class="level-item has-text-centered">
+                        <div>
+                          <p class="heading">Followers</p>
+                          <p class="title">456K</p>
+                        </div>
+                      </div>
+                      <div class="level-item has-text-centered">
+                        <div>
+                          <p class="heading">Following</p>
+                          <p class="title">123</p>
+                        </div>
+                      </div>
+                    </nav>
+                  </article>
+                  <article class="tile is-child is-centered has-text-left">
+                    <p class="heading">Description</p>
+                    <p class="heading">Fav Cities</p>
+                    <p class="heading">Fav Genres</p>
+                  </article>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="level-item has-text-centered">
-            <div>
-              <p class="heading">Following</p>
-              <p class="title">123</p>
-            </div>
-          </div>
-          <div class="level-item has-text-centered">
-            <div>
-              <p class="heading">Followers</p>
-              <p class="title">456K</p>
-            </div>
-          </div>
-          <div class="level-item has-text-centered">
-            <div>
-              <p class="heading">Likes</p>
-              <p class="title">789</p>
-            </div>
-          </div>
-        </nav>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+    <div class="container">
+      <div class="columns is-mobile is-vcentered">
+        <div class="column is-full">
+          <div class="tabs is-centered">
+            <ul>
+              <li class="is-active"><a>Stories</a></li>
+              <li><a>Events</a></li>
+              <li><a>Going</a></li>
+              <li><a>Interested</a></li>
+              <li><a>Attended</a></li>
+            </ul>
+          </div>
+
+          <div class="columns">
+            <div class="column is-4 is-vcentered has-text-centered">
+              <div class="card">
+                <div class="card-image">
+                  <figure class="image is-square">
+                    <img src="/images/gakki.jpg" alt="Story">
+                  </figure>
+                </div>
+                <div class="card-content is-hidden-tablet">
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-48x48">
+                        <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      <p class="title is-4">John Smith</p>
+                      <p class="subtitle is-6">@johnsmith</p>
+                    </div>
+                  </div>
+                  <div class="content">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+                    <a href="#">#css</a> <a href="#">#responsive</a>
+                    <br>
+                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-4 is-vcentered has-text-centered">
+              <div class="card">
+                <div class="card-image">
+                  <figure class="image is-square">
+                    <img src="/images/gakki.jpg" alt="Story">
+                  </figure>
+                </div>
+                <div class="card-content is-hidden-tablet">
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-48x48">
+                        <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      <p class="title is-4">John Smith</p>
+                      <p class="subtitle is-6">@johnsmith</p>
+                    </div>
+                  </div>
+                  <div class="content">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+                    <a href="#">#css</a> <a href="#">#responsive</a>
+                    <br>
+                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-4 is-vcentered has-text-centered">
+              <div class="card">
+                <div class="card-image">
+                  <figure class="image is-square">
+                    <img src="/images/gakki.jpg" alt="Story">
+                  </figure>
+                </div>
+                <div class="card-content is-hidden-tablet">
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-48x48">
+                        <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      <p class="title is-4">John Smith</p>
+                      <p class="subtitle is-6">@johnsmith</p>
+                    </div>
+                  </div>
+                  <div class="content">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+                    <a href="#">#css</a> <a href="#">#responsive</a>
+                    <br>
+                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="box card">
+          <div class="columns is-mobile is-vcentered event-columns">
+            <div class="column is-8">
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-left">
+                    <figure class="image is-48x48">
+                      <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                    </figure>
+                  </div>
+                  <div class="media-content">
+                    <p class="title is-4">John Smith</p>
+                    <p class="subtitle is-6">@johnsmith</p>
+                  </div>
+                </div>
+
+                <div class="content">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+                  <a href="#">#css</a> <a href="#">#responsive</a>
+                  <br>
+                  <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                </div>
+              </div>
+            </div>
+
+            <div class="column is-4">
+              <div class="card-image">
+                <figure class="image is-4by3">
+                  <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div> -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+
 
 <% include partials/script.ejs %>
 </body>
+
 </html>

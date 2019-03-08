@@ -109,3 +109,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     width: 100% !important;
   }
 }
+
+/* user profile */
+.tile.is-parent.is-vertical .column .tile.is-child{
+  padding: 10px;
+}
+
+.title .icon.is-large .iconify{
+  color: black;
+}
