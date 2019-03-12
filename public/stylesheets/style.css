@@ -1,7 +1,11 @@
+/* Fix ghost CSS padding or margin */
 html, body {
-  margin: 0;
+  width: 100%;
   height: 100%;
-  /* background-color: #ffc038!important; */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  /*#ffc038*/
 }
 
 .iconify {
@@ -52,12 +56,42 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   transition-duration: 0.25s;
 }
 
+/**** User profile page adjustments ****/
+.tabs ul {
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#user-profile {
+  margin-bottom: 1.5rem;
+}
+
+#user-profile .card-content {
+  margin: auto;
+}
+
+#user-name {
+  margin-bottom: 0.25em;
+}
+
+#user-follow {
+  max-width: 180px;
+}
+
+/* User stats specific case */
+@media screen and (min-width: 640px) {
+  #user-stats {
+    max-width: 400px;
+  }
+}
+
 /* Desktop navbar */
 nav.navbar .navbar-brand .navbar-burger {
   margin-left: 0;
 }
 
-nav.navbar .navbar-menu .navbar-start a.navbar-item.is-active {
+nav.navbar .navbar-menu a.navbar-item.is-active {
   background-color: var(--primary-color);
   color: white;
 }
@@ -81,6 +115,19 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   color: var(--primary-color);
 }
 
+/* Events card column */
+.host.subtitle, .location.subtitle {
+  margin-bottom: 0.2em;
+}
+
+/* User-name shares the same CSS */
+#user-name, .location.subtitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 /* Desktop viewport adjustments */
 @media screen and (min-width: 1088px) {
   /* Desktop navbar */
@@ -88,20 +135,20 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     margin-right: 10px;
   }
 
-  nav.navbar .navbar-menu .navbar-start a.navbar-item {
+  nav.navbar .navbar-menu a.navbar-item {
     margin-right: 20px;
     margin-left: 20px;
     font-size: 20px;
   }
 
-  nav.navbar .navbar-menu .navbar-start a.navbar-item.is-active {
+  nav.navbar .navbar-menu a.navbar-item.is-active {
     background-color: white;
     color: var(--primary-color-hover);
     border-bottom: 2px solid var(--primary-color);
     border-radius: 0;
   }
 
-  nav.navbar .navbar-menu .navbar-start a.navbar-item:hover {
+  nav.navbar .navbar-menu a.navbar-item:hover {
     background-color: white;
     color: var(--primary-color-hover);
     border-bottom: 2px solid var(--primary-color);
@@ -111,14 +158,9 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 /* Tablet viewport adjustments */
 @media screen and (min-width: 769px) {
-  /* Tablet events column */
-  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns {
-    flex-direction: column-reverse;
-  }
-
-  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns > div.column.is-8,
-  div.event-outer-columns > div.column > div.box.card > div.event-inner-columns > div.column.is-4 {
-    width: 100%;
+  #user-image > figure.image {
+    height: 128px;
+    width: 128px;
   }
 
   /* Create form size adjustment */
@@ -129,11 +171,49 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   }
 }
 
-/* user profile */
-.tile.is-parent.is-vertical .column .tile.is-child{
-  padding: 10px;
-}
+/* Mobile viewport adjustments */
+@media screen and (max-width: 768px) {
+  body.has-navbar-fixed-top section.section {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 
-.title .icon.is-large .iconify{
-  color: black;
+  div.event-content {
+    padding: 1em 1em 0.5em;
+  }
+
+  #user-profile div.card-content:first-child {
+    padding-bottom: 0;
+  }
+
+  #user-stats div.card-footer-item {
+    display: block;
+  }
+  
+  @media screen and (min-width: 420px) {
+    /* Event card column adjustments */
+    div.card-image-content {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+
+    div.event-content {
+      width: 65%;
+    }
+
+    div.card-image {
+      width: 35%;
+      padding-right: 10px;
+    }
+
+    figure.image {
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -moz-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      -o-transform: translateY(-50%);
+      transform: translateY(-50%);
+    }
+  }
 }

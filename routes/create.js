@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('create_story', {
     title: 'Musicbee - create story',
-    originalUrl: req.originalUrl
+    originalUrl: req.originalUrl,
   });
 });
 
@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
 router.get('/event', function(req, res, next) {
   res.render('create_event', {
     title: 'Musicbee - create event',
-    originalUrl: req.originalUrl
+    originalUrl: req.originalUrl,
   });
 });
 

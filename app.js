@@ -1,15 +1,21 @@
 'use strict';
+/**
+ * Main application settings
+ *
+ * @author Zer Jun Eng
+ */
+
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const express = require('express');
-const favicon = require('serve-favicon');
+const expressLayouts = require('express-ejs-layouts');
 const logger = require('morgan');
 const path = require('path');
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
-const eventsRouter = require('./routes/events');
+const exploreRouter = require('./routes/explore');
 const createRouter = require('./routes/create');
 
 const app = express();
@@ -18,8 +24,9 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-// app.use(favicon(path.join(__dirname, 'public', 'favicon', 'favicon.ico')));
+app.set('layout', 'partials/layout');
+app.use(expressLayouts);
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -28,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);
-app.use('/events', eventsRouter);
+app.use('/explore', exploreRouter);
 app.use('/create', createRouter);
 
 // catch 404 and forward to error handler

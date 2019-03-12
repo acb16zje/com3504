@@ -1,7 +1,7 @@
 <nav class="navbar is-fixed-top is-spaced">
   <div class="container">
     <div class="navbar-brand">
-      <a role="button" class="navbar-burger"></a>
+      <a role="button" class="navbar-burger"/>
 
       <a class="navbar-item" href="/">
         <img src="/images/logo_text.svg" width="122">
@@ -13,12 +13,15 @@
         <a class="navbar-item has-text-weight-bold <%= originalUrl === '/' ? 'is-active' : '' %>" href="/">
           Home
         </a>
-        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/events' ? 'is-active' : '' %>" href="/events">
-          Events
+        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/explore' ? 'is-active' : '' %>" href="/explore">
+          Explore
         </a>
       </div>
 
       <div class="navbar-end">
+        <a class="navbar-item has-text-weight-bold <%= /\/create/.test(originalUrl) ? "is-active" : '' %>" href="/create">
+            Create
+        </a>
         <div class="navbar-item">
           <div class="buttons">
             <a class="button is-primary">
@@ -40,14 +43,14 @@
       <div class="column">
         <a <%= originalUrl === '/' ? "class=is-active" : ' ' %> href="/">
           <span class="icon is-large">
-            <span class="iconify" data-icon="ant-design:home<%= originalUrl !== '/' ? '-outline' : '' %>" class=""></span>
+            <span class="iconify" data-icon="ant-design:home<%= originalUrl !== '/' ? '-outline' : '' %>">></span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= originalUrl === '/events' ? "class=is-active" : '' %> href="/events">
+        <a <%= originalUrl === '/explore' ? "class=is-active" : '' %> href="/explore">
           <span class="icon is-large">
-            <span class="iconify" data-icon="<%= originalUrl === '/events' ? 'fa-solid:search' : 'ion:ios-search' %>">
+            <span class="iconify" data-icon="<%= originalUrl === '/explore' ? 'fa-solid:search' : 'ion:ios-search' %>">
             </span>
           </span>
         </a>
@@ -70,9 +73,9 @@
         </a>
       </div>
       <div class="column">
-        <a <%= originalUrl === '/user' ? "class=is-active" : '' %> href="/user">
+        <a <%= /\/user/.test(originalUrl) ? "class=is-active" : '' %> href="/user">
           <span class="icon is-large">
-            <span class="iconify" data-icon="fa-<%= originalUrl === '/user' ? 'solid' : 'regular' %>:user"></span>
+            <span class="iconify" data-icon="fa-<%= /\/user/.test(originalUrl) ? 'solid' : 'regular' %>:user">></span>
           </span>
         </a>
       </div>
