@@ -73,14 +73,25 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
 
 #user-name {
   margin-bottom: 0.25em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 #user-follow {
   max-width: 180px;
 }
 
+/* User description specific case */
+@media screen and (min-width: 500px) {
+  #user-description {
+    padding-left: 0;
+  }
+}
+
 /* User stats specific case */
-@media screen and (min-width: 640px) {
+@media screen and (min-width: 650px) {
   #user-stats {
     max-width: 400px;
   }
@@ -89,6 +100,7 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
 /* Desktop navbar */
 nav.navbar .navbar-brand .navbar-burger {
   margin-left: 0;
+  width: 1.5rem;
 }
 
 nav.navbar .navbar-menu a.navbar-item.is-active {
@@ -120,8 +132,11 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   margin-bottom: 0.2em;
 }
 
-/* User-name shares the same CSS */
-#user-name, .location.subtitle {
+.media-content {
+  overflow-x: auto;
+}
+
+.location.subtitle {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -184,13 +199,13 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   }
 
   #user-profile div.card-content:first-child {
-    padding-bottom: 0;
+    padding: 1rem 1em 0;
   }
 
   #user-stats div.card-footer-item {
     display: block;
   }
-  
+
   @media screen and (min-width: 420px) {
     /* Event card column adjustments */
     div.card-image-content {
