@@ -16,10 +16,11 @@ Iconify.setConfig('localStorage', true)
 
 // JavaScript-based media queries-like
 $(window).on('load resize', () => {
-  const windowWidth = $(this).innerWidth()
+  const windowWidth = $(this).innerWidth();
 
   changeEventsColumnsCSS(windowWidth)
   changeUserProfileCSS(windowWidth)
+  changeUserStoryModalCSS(windowWidth)
 })
 
 /**
@@ -28,8 +29,6 @@ $(window).on('load resize', () => {
  * @param {number} windowWidth The current window inner width
  */
 function changeEventsColumnsCSS (windowWidth) {
-  const FULLHD_WIDTH = 1408
-  const WIDESCREEN_WIDTH = 1216
   const DESKTOP_WIDTH = 1024
   const TABLET_WIDTH = 768
 
@@ -72,21 +71,7 @@ function changeUserProfileCSS (windowWidth) {
   const userFollowers = $('#user-followers')
   const userFollowing = $('#user-following')
 
-  if (windowWidth >= DESC_WIDTH) {
-    userNameFollow.append(userDescription)
-
-    // Remove padding if the stats is displayed above description
-    if (windowWidth >= STATS_WIDTH &&
-      !userDescription.hasClass('is-paddingless')) {
-      userDescription.addClass('is-paddingless')
-    } else if (windowWidth >= DESC_WIDTH && windowWidth < STATS_WIDTH) {
-      userDescription.removeClass('is-paddingless')
-    }
-
-  } else {
-    userDescription.insertBefore(userStats)
-  }
-
+  // User stats DOM manipulation
   if (windowWidth >= STATS_WIDTH) {
     // User stats CSS change and DOM manipulation
     if (!userStats.hasClass('level is-mobile')) {
@@ -125,6 +110,7 @@ function changeUserProfileCSS (windowWidth) {
         '</div>',
       )
 
+      // .columns.is-vcentered.is-mobile has two .column children
       const userNameColumn = userNameFollow.
         children('.columns.is-vcentered.is-mobile').children().first()
 
@@ -139,8 +125,11 @@ function changeUserProfileCSS (windowWidth) {
     }
   } else {
     // Follow button / edit profile button manipulation
-    userNameFollow.prepend(userFollow).prepend(userName)
-    userNameFollow.children('.columns.is-vcentered.is-mobile').remove()
+    if (!userName.parent().is(userNameFollow) &&
+      !userFollow.parent().is(userNameFollow)) {
+      userNameFollow.prepend(userFollow).prepend(userName)
+      userNameFollow.children('.columns.is-vcentered.is-mobile').remove()
+    }
 
     if (!userFollow.hasClass('is-fullwidth')) {
       userFollow.addClass('is-fullwidth')
@@ -176,4 +165,123 @@ function changeUserProfileCSS (windowWidth) {
       }
     }
   }
+
+  // User description DOM manipulation
+  if (windowWidth >= DESC_WIDTH) {
+    if (!userDescription.parent().is(userNameFollow)) {
+      userNameFollow.append(userDescription)
+    }
+
+    // Remove padding if the stats is displayed above description
+    if (windowWidth >= STATS_WIDTH &&
+      !userDescription.hasClass('is-paddingless')) {
+      userDescription.addClass('is-paddingless')
+    } else if (windowWidth >= DESC_WIDTH && windowWidth < STATS_WIDTH) {
+      userDescription.removeClass('is-paddingless')
+    }
+  } else {
+    if (userDescription.parent().is(userNameFollow)) {
+      userDescription.insertAfter('#user-profile-content')
+    }
+
+    if (userDescription.hasClass('is-paddingless')) {
+      userDescription.removeClass('is-paddingless')
+    }
+  }
 }
+
+// Launch and close the user story modal
+const modals = $('.modal')
+const modalButtons = $('.modal-button')
+const modalCloses = $('.modal-close, .modal-background')
+
+// Open the modal
+if (modalButtons.length > 0) {
+  modalButtons.click(function () {
+    const targetID = $(this).data('target')
+    const target = $(`#${targetID}`)
+    target.addClass('is-active')
+
+    // Add the image source
+    const profileImgSrc = $('#user-image img').attr('src')
+    const imgSrc = $(this).find('img').attr('src')
+
+    const imgChild = $(`#${targetID}-image`)
+    imgChild.attr('src', imgSrc)
+
+    const profileImgModal = $('#user-image-modal')
+    profileImgModal.attr('src', profileImgSrc)
+
+    changeUserStoryModalCSS($(window).innerWidth())
+  })
+}
+
+// Close modal when click outside of story
+if (modalCloses.length > 0) {
+  modalCloses.click(() => closeModal())
+}
+
+// Close modal when Esc is pressed or click outside of story
+$(document).keydown(e => {
+  if (e.key === 'Escape') {
+    closeModal()
+  }
+})
+
+/**
+ * Close the user story modal
+ */
+const closeModal = () => modals.removeClass('is-active')
+
+/**
+ * Change the CSS class of user story modal based on viewport width
+ *
+ * @param {number} windowWidth The current window inner width
+ */
+function changeUserStoryModalCSS (windowWidth) {
+  const TABLET_WIDTH = 768
+  const activeModal = $('[id^=story].modal.is-active')
+  const activeModalCard = activeModal.children('.modal-card').children('.card')
+
+  // User story modal DOM manipulation
+  if (windowWidth >= TABLET_WIDTH) {
+    // Optimise performance by manipulating DOM once
+    if (!activeModalCard.children().first().is('div.columns.is-gapless')) {
+      const activeModalCardHeader = activeModalCard.children('header.card-header')
+      const activeModalCardImg = activeModalCard.children('div.card-image')
+      const activeModalCardContent = activeModalCard.children('div.card-content')
+
+      activeModalCard.prepend(
+        '<div class="columns is-gapless">' +
+        '<div class="column"></div>' +
+        '<div class="column"></div>' +
+        '</div>'
+      )
+
+      // .columns.is-vcentered.is-mobile has two .column children
+      const cardImageColumn = activeModalCard.
+        children('.columns.is-gapless').children().first()
+
+      const cardContentColumn = cardImageColumn.next()
+
+      cardImageColumn.append(activeModalCardImg)
+      cardContentColumn.append(activeModalCardHeader)
+      cardContentColumn.append(activeModalCardContent)
+    }
+
+  } else {
+    if (activeModalCard.children().first().is('div.columns.is-gapless')) {
+      const activeModalCardHeader = activeModalCard.find('header.card-header')
+      const activeModalCardImg = activeModalCard.find('div.card-image')
+      const activeModalCardContent = activeModalCard.find('div.card-content')
+
+      activeModalCard.append(activeModalCardHeader)
+      activeModalCard.append(activeModalCardImg)
+      activeModalCard.append(activeModalCardContent)
+
+      activeModalCard.children('div.columns.is-gapless').remove()
+    }
+  }
+
+}
+

@@ -73,6 +73,20 @@
         </div>
       </div>
     </div>
+
+    <% if (originalUrl === '/user') { %>
+      <!--User profile page: Stories-->
+      <% include ./partials/user_story_columns.ejs %>
+    <% } else if (originalUrl === '/user/events') { %>
+
+    <% } else if (originalUrl === '/user/going') { %>
+
+    <% } else if (originalUrl === '/user/interested') { %>
+
+    <% } else { %>
+
+    <% } %>
+
   </div>
 
 </section>

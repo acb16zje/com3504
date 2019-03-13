@@ -10,7 +10,7 @@
 
     <div id="navbar-menu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/' ? 'is-active' : '' %>" href="/">
+        <a class="navbar-item has-text-weight-bold <%= /^\/(events)?$/.test(originalUrl) ? 'is-active' : '' %>" href="/">
           Home
         </a>
         <a class="navbar-item has-text-weight-bold <%= originalUrl === '/explore' ? 'is-active' : '' %>" href="/explore">
@@ -41,9 +41,9 @@
   <div class="navbar-brand">
     <div class="columns is-mobile is-gapless is-vcentered">
       <div class="column">
-        <a <%= originalUrl === '/' ? "class=is-active" : ' ' %> href="/">
+        <a <%= /^\/(events)?$/.test(originalUrl) ? "class=is-active" : ' ' %> href="/">
           <span class="icon is-large">
-            <span class="iconify" data-icon="ant-design:home<%= originalUrl !== '/' ? '-outline' : '' %>">></span>
+            <span class="iconify" data-icon="ant-design:home<%= /^\/(events)?$/.test(originalUrl) ? '' : '-outline' %>">></span>
           </span>
         </a>
       </div>

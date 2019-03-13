@@ -65,6 +65,9 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
 
 #user-profile {
   margin-bottom: 1.5rem;
+  max-width: 935px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #user-profile .card-content {
@@ -155,6 +158,28 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   align-self: center;
 }
 
+/* User profile story image column */
+div.story-image-columns.columns {
+  max-width: 935px;
+  margin: 0 auto;
+}
+
+div.story-image-column figure.image.is-flex {
+  height: 100%;
+  margin: auto;
+  align-items: center;
+  cursor: pointer;
+}
+
+div.story-image-columns > div.story-image-column figure.image img {
+  max-width: 300px;
+}
+
+/* User profile story image modal */
+#story div.card-image {
+  height: 100%;
+}
+
 /* Desktop viewport adjustments */
 @media screen and (min-width: 1088px) {
   /* Desktop navbar */
@@ -215,12 +240,23 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     padding: 1em 1em 0.5em;
   }
 
+  /* User profile */
   #user-profile div.card-content:first-child {
     padding: 1rem 1em 0;
   }
 
   #user-stats div.card-footer-item {
     display: block;
+  }
+
+  div.columns > div.story-image-column {
+    padding: 5px 3px;
+  }
+
+  /* User profile story image modal */
+  figure.image > img.story-image-modal {
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   @media screen and (min-width: 420px) {
@@ -234,12 +270,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
       width: 65%;
     }
 
-    div.card-image {
+    div.card-image-content div.card-image {
       width: 35%;
       padding-right: 10px;
     }
 
-    figure.image {
+    div.card-image-content div.card-image figure.image {
       top: 50%;
       -webkit-transform: translateY(-50%);
       -moz-transform: translateY(-50%);
