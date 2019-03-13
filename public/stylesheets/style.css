@@ -56,6 +56,34 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   transition-duration: 0.25s;
 }
 
+/* Events card column */
+.host.subtitle, .location.subtitle {
+  margin-bottom: 0.2em;
+}
+
+.media-content {
+  overflow-x: auto;
+}
+
+.location.subtitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Notification columns*/
+.notification-columns.columns.is-gapless.is-multiline .card .columns {
+  margin: 0;
+  display: flex;
+  text-align: left;
+  text-decoration: none;
+}
+
+.notification-content {
+  align-self: center;
+}
+
 /**** User profile page adjustments ****/
 .tabs ul {
   width: 100%;
@@ -100,6 +128,33 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   }
 }
 
+/* User profile story image column */
+div.story-image-columns.columns {
+  max-width: 935px;
+  margin: 0 auto;
+}
+
+div.story-image-column figure.image.is-flex {
+  height: 100%;
+  margin: auto;
+  align-items: center;
+  cursor: pointer;
+}
+
+div.story-image-columns > div.story-image-column figure.image img {
+  max-width: 300px;
+}
+
+/* User profile story image modal */
+#story figure.image {
+  margin: 0 auto;
+}
+
+#story div.card-content {
+  overflow: auto;
+  max-height: 500px;
+}
+
 /* Desktop navbar */
 nav.navbar .navbar-brand .navbar-burger {
   margin-left: 0;
@@ -128,56 +183,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a {
 
 nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   color: var(--primary-color);
-}
-
-/* Events card column */
-.host.subtitle, .location.subtitle {
-  margin-bottom: 0.2em;
-}
-
-.media-content {
-  overflow-x: auto;
-}
-
-.location.subtitle {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-/* Notification columns*/
-.notification-columns.columns.is-gapless.is-multiline .card .columns{
-  margin: 0;
-  display: flex;
-  text-align: left;
-  text-decoration: none;
-}
-
-.notification-content {
-  align-self: center;
-}
-
-/* User profile story image column */
-div.story-image-columns.columns {
-  max-width: 935px;
-  margin: 0 auto;
-}
-
-div.story-image-column figure.image.is-flex {
-  height: 100%;
-  margin: auto;
-  align-items: center;
-  cursor: pointer;
-}
-
-div.story-image-columns > div.story-image-column figure.image img {
-  max-width: 300px;
-}
-
-/* User profile story image modal */
-#story div.card-image {
-  height: 100%;
 }
 
 /* Desktop viewport adjustments */
@@ -210,14 +215,23 @@ div.story-image-columns > div.story-image-column figure.image img {
 
 /* Tablet viewport adjustments */
 @media screen and (min-width: 769px) {
+  #notification-image > figure.image {
+    height: 96px;
+    width: 96px;
+  }
+
   #user-image > figure.image {
     height: 128px;
     width: 128px;
   }
 
-  #notification-image > figure.image {
-    height: 96px;
-    width: 96px;
+  #story div.card-image {
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
 
   /* Create form size adjustment */
