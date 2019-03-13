@@ -143,6 +143,18 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 100%;
 }
 
+/* Notification columns*/
+.notification-columns.columns.is-gapless.is-multiline .column.is-full{
+  margin: 0;
+  display: flex;
+  text-align: left;
+  text-decoration: none;
+}
+
+.notification-content {
+  align-self: center;
+}
+
 /* Desktop viewport adjustments */
 @media screen and (min-width: 1088px) {
   /* Desktop navbar */
@@ -176,6 +188,11 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   #user-image > figure.image {
     height: 128px;
     width: 128px;
+  }
+
+  #notification-image > figure.image {
+    height: 96px;
+    width: 96px;
   }
 
   /* Create form size adjustment */
