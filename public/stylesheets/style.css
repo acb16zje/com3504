@@ -144,7 +144,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 /* Notification columns*/
-.notification-columns.columns.is-gapless.is-multiline .column.is-full{
+.notification-columns.columns.is-gapless.is-multiline .card .columns{
   margin: 0;
   display: flex;
   text-align: left;
