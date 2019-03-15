@@ -173,22 +173,13 @@ div.story-image-columns > div.story-image-column figure.image img {
 }
 
 /* User profile story image modal */
-#story div.modal-card {
-  max-height: calc(100vh - 160px);
+#story div.modal-content {
+  overflow: hidden;
 }
 
-#story header.modal-card-head {
-  border-radius: 0;
-  padding: 10px;
-}
-
-#story section.modal-card-body {
-  padding: 0;
-}
-
-#story div.card-image figure.image {
-  margin: 0 auto;
-  background-color: white;
+#story div.card div.card-content.is-paddingless {
+  overflow: auto;
+  max-height: calc(100vh - 260px);
 }
 
 /* Desktop navbar */
@@ -262,32 +253,25 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   }
 
   /* User profile story image modal */
+  #story div.modal-content {
+    overflow: hidden;
+    width: calc(100vw - 200px);
+    max-width: 900px;
+  }
+
   #story div.card-image {
     min-height: 450px;
+    height: 100%;
     background-color: white;
   }
 
-  #story div.card-image figure.image, #story div.card-image figure.image img {
-    /*top: -50%;*/
-    /*-webkit-transform: translateY(-50%);*/
-    /*-moz-transform: translateY(-50%);*/
-    /*-ms-transform: translateY(-50%);*/
-    /*-o-transform: translateY(-50%);*/
-    /*transform: translateY(50%);*/
-    position: absolute;
-    margin: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-
-  #story div.column.is-flex {
-    flex-direction: column;
-  }
-
-  #story div.column.is-flex section.modal-card-body {
-    height: 0;
+  #story div.card-image figure.image {
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
 
   /* Create form size adjustment */

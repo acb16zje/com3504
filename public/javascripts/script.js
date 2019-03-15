@@ -14,11 +14,19 @@ Iconify.preloadImages([
 ])
 Iconify.setConfig('localStorage', true)
 
-// JavaScript-based media queries-like
+// JavaScript-based media queries-like, native code is faster
+const userPage = document.getElementById('user')
+const explorePage = document.getElementById('explore')
+
 $(window).on('load resize', () => {
-  changeEventsColumnsCSS()
-  changeUserProfileCSS()
-  changeUserStoryModalCSS()
+  if (explorePage) {
+    changeEventsColumnsCSS()
+  }
+
+  if (userPage) {
+    changeUserProfileCSS()
+    changeUserStoryModalCSS()
+  }
 })
 
 /**
@@ -28,7 +36,7 @@ function changeEventsColumnsCSS () {
   const DESKTOP_WIDTH = 1024
   const TABLET_WIDTH = 768
 
-  const children = $('.event-columns').children()
+  const children = $(document.getElementsByClassName('event-columns')).children()
 
   if (window.matchMedia(`(min-width: ${DESKTOP_WIDTH}px`).matches) {
     if (!children.hasClass('column is-3')) {
@@ -55,15 +63,15 @@ function changeUserProfileCSS () {
   // The width just enough for user descriptions to fit below follow button
   const DESC_WIDTH = 500
 
-  const userNameFollow = $('#user-name-follow')
-  const userName = $('#user-name')
-  const userFollow = $('#user-follow')
-  const userDescription = $('#user-description')
-  const userStats = $('#user-stats')
+  const userNameFollow = $(document.getElementById('user-name-follow'))
+  const userName = $(document.getElementById('user-name'))
+  const userFollow = $(document.getElementById('user-follow'))
+  const userDescription = $(document.getElementById('user-description'))
+  const userStats = $(document.getElementById('user-stats'))
   const children = userStats.children()
-  const userStories = $('#user-stories')
-  const userFollowers = $('#user-followers')
-  const userFollowing = $('#user-following')
+  const userStories = $(document.getElementById('user-stories'))
+  const userFollowers = $(document.getElementById('user-followers'))
+  const userFollowing = $(document.getElementById('user-following'))
 
   // User stats DOM manipulation
   if (window.matchMedia(`(min-width: ${STATS_WIDTH}px`).matches) {
@@ -106,7 +114,7 @@ function changeUserProfileCSS () {
 
       // .columns.is-vcentered.is-mobile has two .column children
       const userNameColumn = userNameFollow.
-        children('.columns.is-vcentered.is-mobile').children().first()
+        children('.columns.is-vcentered.is-mobile').children(':first')
 
       const userFollowColumn = userNameColumn.next()
 
@@ -186,12 +194,12 @@ function changeUserProfileCSS () {
 }
 
 // Launch and close the user story modal
-const modals = $('.modal')
-const modalButtons = $('.modal-button')
-const modalCloses = $('.modal-close, .modal-background, button.delete')
+const modals = $(document.getElementsByClassName('modal'))
+const modalButtons = $(document.getElementsByClassName('modal-button'))
+const modalCloses = $('.modal-close, .modal-background')
 
 // Open the modal
-if (modalButtons.length > 0) {
+if (modalButtons.length) {
   modalButtons.click(function () {
     const targetID = $(this).data('target')
     const target = $(`#${targetID}`)
@@ -199,12 +207,12 @@ if (modalButtons.length > 0) {
 
     // Add the image source
     const profileImgSrc = $('#user-image img').attr('src')
-    const imgSrc = $(this).find('img').attr('src')
+    const imgSrc = $(this).children(':first').attr('src')
 
-    const imgChild = $(`#${targetID}-image`)
+    const imgChild = $(document.getElementById(`${targetID}-image`))
     imgChild.attr('src', imgSrc)
 
-    const profileImgModal = $('#user-image-modal')
+    const profileImgModal = $(document.getElementById('user-image-modal'))
     profileImgModal.attr('src', profileImgSrc)
 
     changeUserStoryModalCSS()
@@ -212,7 +220,7 @@ if (modalButtons.length > 0) {
 }
 
 // Close modal when click outside of story
-if (modalCloses.length > 0) {
+if (modalCloses.length) {
   modalCloses.click(() => closeModal())
 }
 
@@ -233,48 +241,26 @@ const closeModal = () => modals.removeClass('is-active')
  */
 function changeUserStoryModalCSS () {
   const TABLET_WIDTH = 768
-  const activeModal = $('#story.modal.is-active')
-  const activeModalCard = activeModal.children('.modal-card')
+  const storyModal = $(document.getElementById('story'))
 
   // User story modal DOM manipulation
-  if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px)`).matches) {
-    // Optimise performance by manipulating DOM once
-    if (!activeModalCard.children().first().is('div.columns.is-gapless')) {
-      const activeModalCardHeader = activeModalCard.children(
-        'header.modal-card-head')
-      const activeModalCardImg = activeModalCard.find('div.card-image')
-      const activeModalCardBody = activeModalCard.children(
-        'section.modal-card-body')
+  if (storyModal.hasClass('is-active')) {
+    const firstColumn = storyModal.find('div.column:first')
+    const firstCardContent = $(document.getElementById('first-card-content'))
 
-      activeModalCard.prepend(
-        '<div class="columns is-gapless">' +
-        '<div class="column"></div>' +
-        '<div class="column is-flex"></div>' +
-        '</div>',
-      )
+    if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px)`).matches) {
+      if (!firstColumn.children(':first').is('div.card-image')) {
+        const cardImg = firstCardContent.children().children(':first')
 
-      // .columns.is-vcentered.is-mobile has two .column children
-      const cardImageColumn = activeModalCard.
-        children('.columns.is-gapless').children().first()
+        firstColumn.append(cardImg)
+      }
 
-      const cardContentColumn = cardImageColumn.next()
+    } else {
+      if (firstColumn.children(':first').is('div.card-image')) {
+        const cardImg = firstColumn.children(':first')
 
-      cardImageColumn.append(activeModalCardImg)
-      cardContentColumn.append(activeModalCardHeader)
-      cardContentColumn.append(activeModalCardBody)
-    }
-
-  } else {
-    if (activeModalCard.children().first().is('div.columns.is-gapless')) {
-      const activeModalCardHeader = activeModalCard.find('header.modal-card-head')
-      const activeModalCardImg = activeModalCard.find('div.card-image')
-      const activeModalCardBody = activeModalCard.find('section.modal-card-body')
-
-      activeModalCard.append(activeModalCardHeader)
-      activeModalCard.append(activeModalCardBody)
-      activeModalCardBody.prepend(activeModalCardImg)
-
-      activeModalCard.children('div.columns.is-gapless').remove()
+        firstCardContent.children(':first').prepend(cardImg)
+      }
     }
   }
 }
@@ -282,42 +268,47 @@ function changeUserStoryModalCSS () {
 /************************ Plugins below ************************/
 // Datepicker settings
 $('#startDate').flatpickr({
-  defaultDate: 'today',
+  altInput: true,
+  altFormat: 'j F Y, h:i K',
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: Date.now(),
   minDate: 'today',
+  minTime: Date.now()
 })
 
 // Initialize an empty map without layers (invisible map)
-var map = L.map('map', {
-  center: [40.7259, -73.9805], // Map loads with this location as center
-  zoom: 12,
-  scrollWheelZoom: true,
-  zoomControl: false,
-  attributionControl: false,
-});
-
-//Geocoder options
-var geocoderControlOptions = {
-  bounds: false,          //To not send viewbox
-  markers: false,         //To not add markers when we geocoder
-  attribution: null,      //No need of attribution since we are not using maps
-  expanded: true,         //The geocoder search box will be initialized in expanded mode
-  panToPoint: false       //Since no maps, no need to pan the map to the geocoded-selected location
-}
-
-//Initialize the geocoder
-var geocoderControl = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
-  displayLatLon(e.feature.feature.display_name, e.latlng.lat, e.latlng.lng);
-});
-
-//Get the "search-box" div
-var searchBoxControl = document.getElementById("search-box");
-//Get the geocoder container from the leaflet map
-var geocoderContainer = geocoderControl.getContainer();
-//Append the geocoder container to the "search-box" div
-searchBoxControl.appendChild(geocoderContainer);
-
-//Displays the geocoding response in the "result" div
-function displayLatLon(display_name, lat, lng) {
-  var resultString = "You have selected " + display_name + "<br/>Lat: " + lat + "<br/>Lon: " + lng;
-  document.getElementById("result").innerHTML = resultString;
-}
+// var map = L.map('map', {
+//   center: [40.7259, -73.9805], // Map loads with this location as center
+//   zoom: 12,
+//   scrollWheelZoom: true,
+//   zoomControl: false,
+//   attributionControl: false,
+// });
+//
+// //Geocoder options
+// var geocoderControlOptions = {
+//   bounds: false,          //To not send viewbox
+//   markers: false,         //To not add markers when we geocoder
+//   attribution: null,      //No need of attribution since we are not using maps
+//   expanded: true,         //The geocoder search box will be initialized in expanded mode
+//   panToPoint: false       //Since no maps, no need to pan the map to the geocoded-selected location
+// }
+//
+// //Initialize the geocoder
+// var geocoderControl = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
+//   displayLatLon(e.feature.feature.display_name, e.latlng.lat, e.latlng.lng);
+// });
+//
+// //Get the "search-box" div
+// var searchBoxControl = document.getElementById("search-box");
+// //Get the geocoder container from the leaflet map
+// var geocoderContainer = geocoderControl.getContainer();
+// //Append the geocoder container to the "search-box" div
+// searchBoxControl.appendChild(geocoderContainer);
+//
+// //Displays the geocoding response in the "result" div
+// function displayLatLon(display_name, lat, lng) {
+//   var resultString = "You have selected " + display_name + "<br/>Lat: " + lat + "<br/>Lon: " + lng;
+//   document.getElementById("result").innerHTML = resultString;
+// }
