@@ -8,9 +8,36 @@ html, body {
   /*#ffc038*/
 }
 
+
+/* Plugins CSS below */
 .iconify {
   width: 26px;
   height: 26px;
+}
+
+#map {
+  width: 0;
+  height: 0;
+  background-color:transparent;
+  display: none;
+}
+
+#search-box {
+  padding-left: 20px;
+  padding-top: 20px;
+  width: 800px;
+  height: 100px;
+}
+
+#result {
+  padding-left: 20px;
+  padding-top: 20px;
+  width: 800px;
+  height: 100px;
+}
+
+.leaflet-locationiq-results{
+  padding-top: 45px;
 }
 
 /* Bulma adjustments below */
@@ -146,13 +173,22 @@ div.story-image-columns > div.story-image-column figure.image img {
 }
 
 /* User profile story image modal */
-#story figure.image {
-  margin: 0 auto;
+#story div.modal-card {
+  max-height: calc(100vh - 160px);
 }
 
-#story div.card-content {
-  overflow: auto;
-  max-height: 500px;
+#story header.modal-card-head {
+  border-radius: 0;
+  padding: 10px;
+}
+
+#story section.modal-card-body {
+  padding: 0;
+}
+
+#story div.card-image figure.image {
+  margin: 0 auto;
+  background-color: white;
 }
 
 /* Desktop navbar */
@@ -225,13 +261,33 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     width: 128px;
   }
 
+  /* User profile story image modal */
   #story div.card-image {
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -o-transform: translateY(-50%);
-    transform: translateY(-50%);
+    min-height: 450px;
+    background-color: white;
+  }
+
+  #story div.card-image figure.image, #story div.card-image figure.image img {
+    /*top: -50%;*/
+    /*-webkit-transform: translateY(-50%);*/
+    /*-moz-transform: translateY(-50%);*/
+    /*-ms-transform: translateY(-50%);*/
+    /*-o-transform: translateY(-50%);*/
+    /*transform: translateY(50%);*/
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  #story div.column.is-flex {
+    flex-direction: column;
+  }
+
+  #story div.column.is-flex section.modal-card-body {
+    height: 0;
   }
 
   /* Create form size adjustment */
@@ -250,6 +306,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     padding-right: 10px;
   }
 
+  /* Event page */
   div.event-content {
     padding: 1em 1em 0.5em;
   }

@@ -14,7 +14,15 @@
   <meta name="msapplication-TileColor" content="#603cba">
   <meta name="theme-color" content="#ffffff">
 
+  <!--Preload-->
+  <link rel="preload" href="/stylesheets/style.css" as="style">
+  <link rel="preload" href="/javascripts/script.js" as="script">
+
+  <!--CSS-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.5.7/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css">
+  <link rel="stylesheet" href="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.5/leaflet-geocoder-locationiq.min.css">
   <link rel="stylesheet" href='/stylesheets/style.css'>
 
   <title><%= title %></title>
@@ -25,8 +33,12 @@
 
   <%- body %>
 
+  <!--JavaScripts-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://code.iconify.design/1/1.0.0-rc7/iconify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.5.7/flatpickr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js"></script>
+  <script src="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.5/leaflet-geocoder-locationiq.min.js"></script>
   <script src="/javascripts/script.js"></script>
 </body>
 </html>

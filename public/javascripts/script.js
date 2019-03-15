@@ -16,29 +16,25 @@ Iconify.setConfig('localStorage', true)
 
 // JavaScript-based media queries-like
 $(window).on('load resize', () => {
-  const windowWidth = $(this).innerWidth();
-
-  changeEventsColumnsCSS(windowWidth)
-  changeUserProfileCSS(windowWidth)
-  changeUserStoryModalCSS(windowWidth)
+  changeEventsColumnsCSS()
+  changeUserProfileCSS()
+  changeUserStoryModalCSS()
 })
 
 /**
  * Change the CSS class of events columns based on viewport width
- *
- * @param {number} windowWidth The current window inner width
  */
-function changeEventsColumnsCSS (windowWidth) {
+function changeEventsColumnsCSS () {
   const DESKTOP_WIDTH = 1024
   const TABLET_WIDTH = 768
 
   const children = $('.event-columns').children()
 
-  if (windowWidth >= DESKTOP_WIDTH) {
+  if (window.matchMedia(`(min-width: ${DESKTOP_WIDTH}px`).matches) {
     if (!children.hasClass('column is-3')) {
       children.removeClass().addClass('column is-3')
     }
-  } else if (windowWidth >= TABLET_WIDTH) {
+  } else if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px`).matches) {
     if (!children.hasClass('column is-4')) {
       children.removeClass().addClass('column is-4')
     }
@@ -51,10 +47,8 @@ function changeEventsColumnsCSS (windowWidth) {
 
 /**
  * Change the CSS class of user profile page based on viewport width
- *
- * @param {number} windowWidth The current window inner width
  */
-function changeUserProfileCSS (windowWidth) {
+function changeUserProfileCSS () {
   // The width just enough for user stats to fit above follow button
   const STATS_WIDTH = 650
 
@@ -72,7 +66,7 @@ function changeUserProfileCSS (windowWidth) {
   const userFollowing = $('#user-following')
 
   // User stats DOM manipulation
-  if (windowWidth >= STATS_WIDTH) {
+  if (window.matchMedia(`(min-width: ${STATS_WIDTH}px`).matches) {
     // User stats CSS change and DOM manipulation
     if (!userStats.hasClass('level is-mobile')) {
       userStats.removeClass().addClass('level is-mobile')
@@ -167,16 +161,17 @@ function changeUserProfileCSS (windowWidth) {
   }
 
   // User description DOM manipulation
-  if (windowWidth >= DESC_WIDTH) {
+  if (window.matchMedia(`(min-width: ${DESC_WIDTH}px`).matches) {
     if (!userDescription.parent().is(userNameFollow)) {
       userNameFollow.append(userDescription)
     }
 
     // Remove padding if the stats is displayed above description
-    if (windowWidth >= STATS_WIDTH &&
+    if (window.matchMedia(`(min-width: ${STATS_WIDTH}px)`).matches &&
       !userDescription.hasClass('is-paddingless')) {
       userDescription.addClass('is-paddingless')
-    } else if (windowWidth >= DESC_WIDTH && windowWidth < STATS_WIDTH) {
+    } else if (window.matchMedia(
+      `(min-width: ${DESC_WIDTH}px) and (max-width: ${STATS_WIDTH}px)`).matches) {
       userDescription.removeClass('is-paddingless')
     }
   } else {
@@ -193,7 +188,7 @@ function changeUserProfileCSS (windowWidth) {
 // Launch and close the user story modal
 const modals = $('.modal')
 const modalButtons = $('.modal-button')
-const modalCloses = $('.modal-close, .modal-background')
+const modalCloses = $('.modal-close, .modal-background, button.delete')
 
 // Open the modal
 if (modalButtons.length > 0) {
@@ -212,7 +207,7 @@ if (modalButtons.length > 0) {
     const profileImgModal = $('#user-image-modal')
     profileImgModal.attr('src', profileImgSrc)
 
-    changeUserStoryModalCSS($(window).innerWidth())
+    changeUserStoryModalCSS()
   })
 }
 
@@ -235,27 +230,27 @@ const closeModal = () => modals.removeClass('is-active')
 
 /**
  * Change the CSS class of user story modal based on viewport width
- *
- * @param {number} windowWidth The current window inner width
  */
-function changeUserStoryModalCSS (windowWidth) {
+function changeUserStoryModalCSS () {
   const TABLET_WIDTH = 768
-  const activeModal = $('[id^=story].modal.is-active')
-  const activeModalCard = activeModal.children('.modal-card').children('.card')
+  const activeModal = $('#story.modal.is-active')
+  const activeModalCard = activeModal.children('.modal-card')
 
   // User story modal DOM manipulation
-  if (windowWidth >= TABLET_WIDTH) {
+  if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px)`).matches) {
     // Optimise performance by manipulating DOM once
     if (!activeModalCard.children().first().is('div.columns.is-gapless')) {
-      const activeModalCardHeader = activeModalCard.children('header.card-header')
-      const activeModalCardImg = activeModalCard.children('div.card-image')
-      const activeModalCardContent = activeModalCard.children('div.card-content')
+      const activeModalCardHeader = activeModalCard.children(
+        'header.modal-card-head')
+      const activeModalCardImg = activeModalCard.find('div.card-image')
+      const activeModalCardBody = activeModalCard.children(
+        'section.modal-card-body')
 
       activeModalCard.prepend(
         '<div class="columns is-gapless">' +
         '<div class="column"></div>' +
-        '<div class="column"></div>' +
-        '</div>'
+        '<div class="column is-flex"></div>' +
+        '</div>',
       )
 
       // .columns.is-vcentered.is-mobile has two .column children
@@ -266,22 +261,63 @@ function changeUserStoryModalCSS (windowWidth) {
 
       cardImageColumn.append(activeModalCardImg)
       cardContentColumn.append(activeModalCardHeader)
-      cardContentColumn.append(activeModalCardContent)
+      cardContentColumn.append(activeModalCardBody)
     }
 
   } else {
     if (activeModalCard.children().first().is('div.columns.is-gapless')) {
-      const activeModalCardHeader = activeModalCard.find('header.card-header')
+      const activeModalCardHeader = activeModalCard.find('header.modal-card-head')
       const activeModalCardImg = activeModalCard.find('div.card-image')
-      const activeModalCardContent = activeModalCard.find('div.card-content')
+      const activeModalCardBody = activeModalCard.find('section.modal-card-body')
 
       activeModalCard.append(activeModalCardHeader)
-      activeModalCard.append(activeModalCardImg)
-      activeModalCard.append(activeModalCardContent)
+      activeModalCard.append(activeModalCardBody)
+      activeModalCardBody.prepend(activeModalCardImg)
 
       activeModalCard.children('div.columns.is-gapless').remove()
     }
   }
-
 }
 
+/************************ Plugins below ************************/
+// Datepicker settings
+$('#startDate').flatpickr({
+  defaultDate: 'today',
+  minDate: 'today',
+})
+
+// Initialize an empty map without layers (invisible map)
+var map = L.map('map', {
+  center: [40.7259, -73.9805], // Map loads with this location as center
+  zoom: 12,
+  scrollWheelZoom: true,
+  zoomControl: false,
+  attributionControl: false,
+});
+
+//Geocoder options
+var geocoderControlOptions = {
+  bounds: false,          //To not send viewbox
+  markers: false,         //To not add markers when we geocoder
+  attribution: null,      //No need of attribution since we are not using maps
+  expanded: true,         //The geocoder search box will be initialized in expanded mode
+  panToPoint: false       //Since no maps, no need to pan the map to the geocoded-selected location
+}
+
+//Initialize the geocoder
+var geocoderControl = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
+  displayLatLon(e.feature.feature.display_name, e.latlng.lat, e.latlng.lng);
+});
+
+//Get the "search-box" div
+var searchBoxControl = document.getElementById("search-box");
+//Get the geocoder container from the leaflet map
+var geocoderContainer = geocoderControl.getContainer();
+//Append the geocoder container to the "search-box" div
+searchBoxControl.appendChild(geocoderContainer);
+
+//Displays the geocoding response in the "result" div
+function displayLatLon(display_name, lat, lng) {
+  var resultString = "You have selected " + display_name + "<br/>Lat: " + lat + "<br/>Lon: " + lng;
+  document.getElementById("result").innerHTML = resultString;
+}
