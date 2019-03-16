@@ -8,42 +8,42 @@ const express = require('express')
 const router = express.Router()
 
 /* GET user (stories) profile. */
-router.get('/', function (req, res, next) {
+router.get('/user', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 /* GET user (events) profile. */
-router.get('/events', function (req, res, next) {
+router.get('/user/events', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 /* GET user (going) profile. */
-router.get('/going', function (req, res, next) {
+router.get('/user/going', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 /* GET user (interested) profile. */
-router.get('/interested', function (req, res, next) {
+router.get('/user/interested', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 /* GET user (attended) profile. */
-router.get('/attended', function (req, res, next) {
+router.get('/user/attended', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 

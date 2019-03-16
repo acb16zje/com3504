@@ -11,7 +11,7 @@ const router = express.Router()
 router.get('/', function (req, res, next) {
   res.render('index', {
     title: 'Musicbee - enjoy the sweetest moment of music',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
@@ -19,14 +19,14 @@ router.get('/', function (req, res, next) {
 router.get('/events', function (req, res, next) {
   res.render('index', {
     title: 'Musicbee - enjoy the sweetest moment of music',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 router.get('/notifications', function (req, res, next) {
   res.render('notifications', {
     title: 'Musicbee - notifications',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 

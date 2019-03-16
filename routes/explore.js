@@ -8,10 +8,10 @@ const express = require('express')
 const router = express.Router()
 
 /* GET explore page */
-router.get('/', function (req, res, next) {
+router.get('/explore', function (req, res, next) {
   res.render('explore', {
     title: 'Musicbee - explore',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 

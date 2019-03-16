@@ -8,36 +8,10 @@ html, body {
   /*#ffc038*/
 }
 
-
 /* Plugins CSS below */
 .iconify {
   width: 26px;
   height: 26px;
-}
-
-#map {
-  width: 0;
-  height: 0;
-  background-color:transparent;
-  display: none;
-}
-
-#search-box {
-  padding-left: 20px;
-  padding-top: 20px;
-  width: 800px;
-  height: 100px;
-}
-
-#result {
-  padding-left: 20px;
-  padding-top: 20px;
-  width: 800px;
-  height: 100px;
-}
-
-.leaflet-locationiq-results{
-  padding-top: 45px;
 }
 
 /* Bulma adjustments below */
@@ -50,13 +24,14 @@ form ::placeholder {
   color: #81858c !important;
 }
 
-body.has-navbar-fixed-top div.tabs li.is-active a {
-  color: var(--primary-color)
+.tabs li.is-active a {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
 }
 
 /* Section padding fix on tablet and mobile */
 @media screen and (max-width: 1088px) {
-  body.has-navbar-fixed-top section.section {
+  .section {
     padding-top: 10px;
   }
 }
@@ -83,32 +58,65 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   transition-duration: 0.25s;
 }
 
-/* Events card column */
-.host.subtitle, .location.subtitle {
-  margin-bottom: 0.2em;
+
+/* Desktop navbar */
+nav.navbar .navbar-brand .navbar-burger {
+  margin-left: 0;
+  width: 1.5rem;
+}
+
+nav.navbar .navbar-menu a.navbar-item.is-active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Mobile bottom navbar */
+nav.navbar.is-fixed-bottom.is-hidden-desktop div.columns.is-mobile {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a {
+  color: black;
+}
+
+nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
+  color: var(--primary-color);
+}
+
+/* Explore page events card column */
+#explore img {
+  object-fit: cover;
 }
 
 .media-content {
   overflow-x: auto;
 }
 
-.location.subtitle {
+#explore .host.subtitle, #explore .location.subtitle {
+  margin-bottom: 0.2em;
+}
+
+#explore .location.subtitle {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
 
-/* Notification columns*/
-.notification-columns.columns.is-gapless.is-multiline .card .columns {
-  margin: 0;
-  display: flex;
-  text-align: left;
-  text-decoration: none;
+/* Notification page columns*/
+#notification .card {
+  margin: auto;
+  max-width: 500px;
 }
 
-.notification-content {
-  align-self: center;
+#notification .card-content {
+  padding: 0.75rem 1.5rem;
+}
+
+#notification .media {
+  align-items: center;
 }
 
 /**** User profile page adjustments ****/
@@ -141,6 +149,25 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   max-width: 180px;
 }
 
+/* User page name and follow specific case */
+/*@media screen and (min-width: 740px) {*/
+  /*#user-name-follow {*/
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*padding: 0;*/
+  /*}*/
+  /**/
+  /*#user-name {*/
+    /*font-size: 1.25rem;*/
+  /*}*/
+  /**/
+  /*#user-name, #user-follow {*/
+    /*margin: .75rem;*/
+    /*display: block;*/
+    /*width: auto;*/
+  /*}*/
+/*}*/
+
 /* User description specific case */
 @media screen and (min-width: 500px) {
   #user-description {
@@ -155,20 +182,20 @@ body.has-navbar-fixed-top div.tabs li.is-active a {
   }
 }
 
-/* User profile story image column */
-div.story-image-columns.columns {
+/* User profile page stories */
+#stories div.columns {
   max-width: 935px;
   margin: 0 auto;
 }
 
-div.story-image-column figure.image.is-flex {
+#stories div.column figure {
   height: 100%;
   margin: auto;
   align-items: center;
   cursor: pointer;
 }
 
-div.story-image-columns > div.story-image-column figure.image img {
+#stories div.column figure img {
   max-width: 300px;
 }
 
@@ -177,46 +204,16 @@ div.story-image-columns > div.story-image-column figure.image img {
   overflow: hidden;
 }
 
-#story header nav.level div.level-item p.title {
+#story header p.title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
 }
 
-#story div.card div.card-content.is-paddingless {
+#story #first-card-content {
   overflow: auto;
   max-height: calc(100vh - 260px);
-}
-
-/* Desktop navbar */
-nav.navbar .navbar-brand .navbar-burger {
-  margin-left: 0;
-  width: 1.5rem;
-}
-
-nav.navbar .navbar-menu a.navbar-item.is-active {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-nav.navbar.is-fixed-bottom.is-hidden-desktop div.columns.is-mobile {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-nav.navbar.is-fixed-bottom.is-hidden-desktop div.columns.is-mobile div.column {
-  text-align: center;
-}
-
-/* Mobile bottom navbar */
-nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a {
-  color: black;
-}
-
-nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
-  color: var(--primary-color);
 }
 
 /* Desktop viewport adjustments */
@@ -245,15 +242,16 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     border-bottom: 2px solid var(--primary-color);
     border-radius: 0;
   }
+
+  /* Explore page event column */
+  #explore div.column {
+    flex: none;
+    width: 25%;
+  }
 }
 
 /* Tablet viewport adjustments */
 @media screen and (min-width: 769px) {
-  #notification-image > figure.image {
-    height: 96px;
-    width: 96px;
-  }
-
   #user-image > figure.image {
     height: 128px;
     width: 128px;
@@ -281,10 +279,16 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     transform: translateY(-50%);
   }
 
-  /* Create form size adjustment */
   @media screen and (max-width: 1088px) {
-    body > section.section > div.columns > div.column.form-column {
+    /* Create form size adjustment */
+    #create div.column.is-7 {
       width: 80%;
+    }
+
+    /* Explore page event column */
+    #explore div.column {
+      flex: none;
+      width: 33.33333%;
     }
   }
 }
@@ -297,8 +301,8 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     padding-right: 10px;
   }
 
-  /* Event page */
-  div.event-content {
+  /* Explore page event columns */
+  #explore div.card-content {
     padding: 1em 1em 0.5em;
   }
 
@@ -311,33 +315,33 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     display: block;
   }
 
-  div.columns > div.story-image-column {
+  #stories div.column {
     padding: 5px 3px;
   }
 
   /* User profile story image modal */
-  figure.image > img.story-image-modal {
+  #story figure img {
     max-width: 320px;
     margin: 0 auto;
   }
 
   @media screen and (min-width: 420px) {
     /* Event card column adjustments */
-    div.card-image-content {
+    #explore div.card-image-content {
       display: flex;
       flex-direction: row-reverse;
     }
 
-    div.event-content {
+    #explore div.card-content {
       width: 65%;
     }
 
-    div.card-image-content div.card-image {
+    #explore div.card-image-content div.card-image {
       width: 35%;
       padding-right: 10px;
     }
 
-    div.card-image-content div.card-image figure.image {
+    #explore div.card-image-content div.card-image figure.image {
       top: 50%;
       -webkit-transform: translateY(-50%);
       -moz-transform: translateY(-50%);

@@ -10,16 +10,16 @@
 
     <div id="navbar-menu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item has-text-weight-bold <%= /^\/(events)?$/.test(originalUrl) ? 'is-active' : '' %>" href="/">
+        <a class="navbar-item has-text-weight-bold <%= /^\/(events)?$/.test(path) ? 'is-active' : '' %>" href="/">
           Home
         </a>
-        <a class="navbar-item has-text-weight-bold <%= originalUrl === '/explore' ? 'is-active' : '' %>" href="/explore">
+        <a class="navbar-item has-text-weight-bold <%= path === '/explore' ? 'is-active' : '' %>" href="/explore">
           Explore
         </a>
       </div>
 
       <div class="navbar-end">
-        <a class="navbar-item has-text-weight-bold <%= /\/create\/*/.test(originalUrl) ? "is-active" : '' %>" href="/create">
+        <a class="navbar-item has-text-weight-bold <%= /\/create\/*/.test(path) ? "is-active" : '' %>" href="/create">
             Create
         </a>
         <div class="navbar-item">
@@ -39,43 +39,42 @@
 
 <nav class="navbar is-fixed-bottom is-hidden-desktop">
   <div class="navbar-brand">
-    <div class="columns is-mobile is-gapless is-vcentered">
+    <div class="columns is-mobile is-gapless has-text-centered">
       <div class="column">
-        <a <%= /^\/(events)?$/.test(originalUrl) ? "class=is-active" : ' ' %> href="/">
+        <a <%= /^\/(events)?$/.test(path) ? "class=is-active" : ' ' %> href="/">
           <span class="icon is-large">
-            <span class="iconify" data-icon="ant-design:home<%= /^\/(events)?$/.test(originalUrl) ? '' : '-outline' %>">></span>
+            <span class="iconify" data-icon="ant-design:home<%= /^\/(events)?$/.test(path) ? '' : '-outline' %>"></span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= originalUrl === '/explore' ? "class=is-active" : '' %> href="/explore">
+        <a <%= path === '/explore' ? "class=is-active" : '' %> href="/explore">
           <span class="icon is-large">
-            <span class="iconify" data-icon="<%= originalUrl === '/explore' ? 'fa-solid:search' : 'ion:ios-search' %>">
-            </span>
+            <span class="iconify" data-icon="<%= path === '/explore' ? 'fa-solid:search' : 'ion:ios-search' %>"></span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= /\/create\/*/.test(originalUrl) ? "class=is-active" : '' %> href="/create">
+        <a <%= /\/create\/*/.test(path) ? "class=is-active" : '' %> href="/create">
           <span class="icon is-large">
             <span class="iconify"
-                  data-icon="<%= /\/create\/*/.test(originalUrl) ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
+                  data-icon="<%= /\/create\/*/.test(path) ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
             </span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= originalUrl === '/notifications' ? "class=is-active" : '' %> href="/notifications">
+        <a <%= path === '/notifications' ? "class=is-active" : '' %> href="/notifications">
           <span class="icon is-large">
-            <span class="iconify" data-icon="zmdi:notifications<%= originalUrl !== '/notifications' ? '-none' : '' %>">
+            <span class="iconify" data-icon="zmdi:notifications<%= path !== '/notifications' ? '-none' : '' %>">
             </span>
           </span>
         </a>
       </div>
       <div class="column">
-        <a <%= /\/user/.test(originalUrl) ? "class=is-active" : '' %> href="/user">
+        <a <%= /\/user/.test(path) ? "class=is-active" : '' %> href="/user">
           <span class="icon is-large">
-            <span class="iconify" data-icon="fa-<%= /\/user/.test(originalUrl) ? 'solid' : 'regular' %>:user">></span>
+            <span class="iconify" data-icon="fa-<%= /\/user/.test(path) ? 'solid' : 'regular' %>:user"></span>
           </span>
         </a>
       </div>

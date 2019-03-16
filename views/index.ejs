@@ -5,12 +5,12 @@
     <!--Tabs-->
     <div class="columns is-centered">
       <div class="column is-half">
-        <div class="tabs is-fullwidth is-centered">
+        <div class="tabs is-fullwidth">
           <ul>
-            <li <%= originalUrl === '/' ? "class=is-active" : '' %>>
+            <li <%= path === '/' ? "class=is-active" : '' %>>
               <a href="/">Stories</a>
             </li>
-            <li <%= originalUrl === '/events' ? "class=is-active" : '' %>>
+            <li <%= path === '/events' ? "class=is-active" : '' %>>
               <a href="/events">Events</a>
             </li>
           </ul>

@@ -3,18 +3,18 @@ const express = require('express')
 const router = express.Router()
 
 /* GET create story page. */
-router.get('/', function (req, res, next) {
-  res.render('create_story', {
+router.get('/create', function (req, res, next) {
+  res.render('create', {
     title: 'Musicbee - create story',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 
 /* GET create event page. */
-router.get('/event', function (req, res, next) {
-  res.render('create_event', {
+router.get('/create/event', function (req, res, next) {
+  res.render('create', {
     title: 'Musicbee - create event',
-    originalUrl: req.originalUrl,
+    path: req.path,
   })
 })
 

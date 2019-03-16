@@ -15,7 +15,7 @@
 
           <!--User name and follow / edit profile button-->
           <div id="user-name-follow" class="column is-7">
-            <p id="user-name" class="subtitle is-4">Gakki le mari mari mari</p>
+            <p id="user-name" class="subtitle is-4">gakki le mari mari mari mari m</p>
             <a id="user-follow" class="button is-info is-fullwidth">Follow</a>
           </div>
         </div>
@@ -54,19 +54,19 @@
       <div class="column is-two-thirds">
         <div class="tabs is-centered">
           <ul>
-            <li <%= originalUrl === '/user' ? 'class=is-active' : ''%>>
+            <li <%= path === '/user' ? 'class=is-active' : ''%>>
               <a href="/user">Stories</a>
             </li>
-            <li <%= originalUrl === '/user/events' ? 'class=is-active' : ''%>>
+            <li <%= path === '/user/events' ? 'class=is-active' : ''%>>
               <a href="/user/events">Events</a>
             </li>
-            <li <%= originalUrl === '/user/going' ? 'class=is-active' : ''%>>
+            <li <%= path === '/user/going' ? 'class=is-active' : ''%>>
               <a href="/user/going">Going</a>
             </li>
-            <li <%= originalUrl === '/user/interested' ? 'class=is-active' : ''%>>
+            <li <%= path === '/user/interested' ? 'class=is-active' : ''%>>
               <a href="/user/interested">Interested</a>
             </li>
-            <li <%= originalUrl === '/user/attended' ? 'class=is-active' : ''%>>
+            <li <%= path === '/user/attended' ? 'class=is-active' : ''%>>
               <a href="/user/attended">Attended</a>
             </li>
           </ul>
@@ -74,14 +74,14 @@
       </div>
     </div>
 
-    <% if (originalUrl === '/user') { %>
+    <% if (path === '/user') { %>
       <!--User profile page: Stories-->
       <% include ./partials/user_story_columns.ejs %>
-    <% } else if (originalUrl === '/user/events') { %>
+    <% } else if (path === '/user/events') { %>
 
-    <% } else if (originalUrl === '/user/going') { %>
+    <% } else if (path === '/user/going') { %>
 
-    <% } else if (originalUrl === '/user/interested') { %>
+    <% } else if (path === '/user/interested') { %>
 
     <% } else { %>
 

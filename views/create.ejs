@@ -1,0 +1,15 @@
+<%- contentFor('body') %>
+
+<section id="create" class="section">
+  <% include ./partials/create_tabs.ejs %>
+
+  <div class="columns is-centered">
+    <div class="column is-7">
+      <% if (path === '/create') { %>
+        <% include ./partials/create_story.ejs %>
+      <% } else if (path === '/create/event') { %>
+        <% include ./partials/create_event.ejs %>
+      <% } %>
+    </div>
+  </div>
+</section>

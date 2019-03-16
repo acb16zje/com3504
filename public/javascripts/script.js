@@ -15,53 +15,24 @@ Iconify.preloadImages([
 Iconify.setConfig('localStorage', true)
 
 // Service worker configuration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }, function(err) {
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+//       console.log('ServiceWorker registration successful with scope: ', registration.scope);
+//     }, function(err) {
+//       console.log('ServiceWorker registration failed: ', err);
+//     });
+//   });
+// }
 
 // JavaScript-based media queries-like, native code is faster
 const userPage = document.getElementById('user')
-const explorePage = document.getElementById('explore')
 
-$(window).on('load resize', () => {
-  if (explorePage) {
-    changeEventsColumnsCSS()
-  }
-
-  if (userPage) {
-    changeUserProfileCSS()
-    changeUserStoryModalCSS()
-  }
-})
-
-/**
- * Change the CSS class of events columns based on viewport width
- */
-function changeEventsColumnsCSS () {
-  const DESKTOP_WIDTH = 1024
-  const TABLET_WIDTH = 768
-
-  const children = $(document.getElementsByClassName('event-columns')).children()
-
-  if (window.matchMedia(`(min-width: ${DESKTOP_WIDTH}px`).matches) {
-    if (!children.hasClass('column is-3')) {
-      children.removeClass().addClass('column is-3')
-    }
-  } else if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px`).matches) {
-    if (!children.hasClass('column is-4')) {
-      children.removeClass().addClass('column is-4')
-    }
-  } else {
-    if (children.hasClass('column is-3') || children.hasClass('column is-4')) {
-      children.removeClass().addClass('column')
-    }
-  }
+if (userPage) {
+  $(window).on('load resize', () => {
+      changeUserProfileCSS()
+      changeUserStoryModalCSS()
+  })
 }
 
 /**
@@ -213,7 +184,7 @@ const modalCloses = $('.modal-close, .modal-background')
 if (modalButtons.length) {
   modalButtons.click(function () {
     const targetID = $(this).data('target')
-    const target = $(`#${targetID}`)
+    const target = $(document.getElementById(`${targetID}`))
     target.addClass('is-active')
 
     // Add the image source

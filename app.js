@@ -35,10 +35,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter)
-app.use('/user', userRouter)
-app.use('/explore', exploreRouter)
-app.use('/create', createRouter)
+app.use(indexRouter)
+app.use(userRouter)
+app.use(exploreRouter)
+app.use(createRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -48,6 +48,8 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
+  res.locals.title = 'Error'
+  res.locals.path = req.path
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
 
