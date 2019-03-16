@@ -22,7 +22,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.5.7/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css">
-  <link rel="stylesheet" href="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.5/leaflet-geocoder-locationiq.min.css">
   <link rel="stylesheet" href='/stylesheets/style.css'>
 
   <title><%= title %></title>
@@ -38,7 +37,11 @@
   <script src="https://code.iconify.design/1/1.0.0-rc7/iconify.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.5.7/flatpickr.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js"></script>
-  <script src="https://maps.locationiq.com/v2/libs/leaflet-geocoder/1.9.5/leaflet-geocoder-locationiq.min.js"></script>
+
+  <% if (/\/create/.test(originalUrl)) { %>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADJ3makQvB2HU3yBydhdiYUgTsnit5QBA&libraries=places"></script>
+  <% } %>
+
   <script src="/javascripts/script.js"></script>
 </body>
 </html>

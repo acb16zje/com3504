@@ -19,7 +19,7 @@
       </div>
 
       <div class="navbar-end">
-        <a class="navbar-item has-text-weight-bold <%= /\/create/.test(originalUrl) ? "is-active" : '' %>" href="/create">
+        <a class="navbar-item has-text-weight-bold <%= /\/create\/*/.test(originalUrl) ? "is-active" : '' %>" href="/create">
             Create
         </a>
         <div class="navbar-item">
@@ -56,10 +56,10 @@
         </a>
       </div>
       <div class="column">
-        <a <%= /\/create/.test(originalUrl) ? "class=is-active" : '' %> href="/create">
+        <a <%= /\/create\/*/.test(originalUrl) ? "class=is-active" : '' %> href="/create">
           <span class="icon is-large">
             <span class="iconify"
-                  data-icon="<%= /\/create/.test(originalUrl) ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
+                  data-icon="<%= /\/create\/*/.test(originalUrl) ? 'entypo:squared-plus' : 'fa-regular:plus-square' %>">
             </span>
           </span>
         </a>

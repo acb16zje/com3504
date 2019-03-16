@@ -14,6 +14,17 @@ Iconify.preloadImages([
 ])
 Iconify.setConfig('localStorage', true)
 
+// Service worker configuration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+      console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }, function(err) {
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  });
+}
+
 // JavaScript-based media queries-like, native code is faster
 const userPage = document.getElementById('user')
 const explorePage = document.getElementById('explore')
@@ -247,6 +258,7 @@ function changeUserStoryModalCSS () {
   if (storyModal.hasClass('is-active')) {
     const firstColumn = storyModal.find('div.column:first')
     const firstCardContent = $(document.getElementById('first-card-content'))
+    firstCardContent.scrollTop = 0
 
     if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px)`).matches) {
       if (!firstColumn.children(':first').is('div.card-image')) {
@@ -267,48 +279,32 @@ function changeUserStoryModalCSS () {
 
 /************************ Plugins below ************************/
 // Datepicker settings
-$('#startDate').flatpickr({
-  altInput: true,
-  altFormat: 'j F Y, h:i K',
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: Date.now(),
-  minDate: 'today',
-  minTime: Date.now()
-})
+const startDate = document.getElementById('startDate')
 
-// Initialize an empty map without layers (invisible map)
-// var map = L.map('map', {
-//   center: [40.7259, -73.9805], // Map loads with this location as center
-//   zoom: 12,
-//   scrollWheelZoom: true,
-//   zoomControl: false,
-//   attributionControl: false,
-// });
-//
-// //Geocoder options
-// var geocoderControlOptions = {
-//   bounds: false,          //To not send viewbox
-//   markers: false,         //To not add markers when we geocoder
-//   attribution: null,      //No need of attribution since we are not using maps
-//   expanded: true,         //The geocoder search box will be initialized in expanded mode
-//   panToPoint: false       //Since no maps, no need to pan the map to the geocoded-selected location
-// }
-//
-// //Initialize the geocoder
-// var geocoderControl = new L.control.geocoder('pk.87f2d9fcb4fdd8da1d647b46a997c727', geocoderControlOptions).addTo(map).on('select', function (e) {
-//   displayLatLon(e.feature.feature.display_name, e.latlng.lat, e.latlng.lng);
-// });
-//
-// //Get the "search-box" div
-// var searchBoxControl = document.getElementById("search-box");
-// //Get the geocoder container from the leaflet map
-// var geocoderContainer = geocoderControl.getContainer();
-// //Append the geocoder container to the "search-box" div
-// searchBoxControl.appendChild(geocoderContainer);
-//
-// //Displays the geocoding response in the "result" div
-// function displayLatLon(display_name, lat, lng) {
-//   var resultString = "You have selected " + display_name + "<br/>Lat: " + lat + "<br/>Lon: " + lng;
-//   document.getElementById("result").innerHTML = resultString;
-// }
+if (startDate) {
+  $(startDate).flatpickr({
+    altInput: true,
+    altFormat: 'j F Y, h:i K',
+    enableTime: true,
+    time_24hr: true,
+    defaultDate: Date.now(),
+    minDate: 'today',
+    minTime: Date.now()
+  })
+}
+
+
+// Google Maps JavaScript API
+try {
+  initAutocomplete()
+} catch (e) {}
+
+function initAutocomplete() {
+  const input = document.getElementById('autocomplete')
+
+  const autocomplete = new google.maps.places.Autocomplete(input)
+
+  autocomplete.addListener('place_changed', function() {
+    const place = autocomplete.getPlace()
+  });
+}

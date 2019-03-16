@@ -177,6 +177,13 @@ div.story-image-columns > div.story-image-column figure.image img {
   overflow: hidden;
 }
 
+#story header nav.level div.level-item p.title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
 #story div.card div.card-content.is-paddingless {
   overflow: auto;
   max-height: calc(100vh - 260px);
