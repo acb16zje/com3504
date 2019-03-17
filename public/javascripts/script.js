@@ -25,15 +25,6 @@ Iconify.setConfig('localStorage', true)
 //   });
 // }
 
-// JavaScript-based media queries-like, native code is faster
-const userPage = document.getElementById('user')
-
-if (userPage) {
-  $(window).on('load resize', () => {
-      changeUserStoryModalCSS()
-  })
-}
-
 // Launch and close the user story modal
 const modals = $(document.getElementsByClassName('modal'))
 const modalButtons = $(document.getElementsByClassName('modal-button'))
@@ -56,56 +47,27 @@ if (modalButtons.length) {
     const profileImgModal = $(document.getElementById('user-image-modal'))
     profileImgModal.attr('src', profileImgSrc)
 
-    changeUserStoryModalCSS()
+    // Reset comments scroll to top
+    $('#story div.card-content')[0].scrollTop = 0
   })
 }
 
 // Close modal when click outside of story
 if (modalCloses.length) {
   modalCloses.click(() => closeModal())
-}
 
-// Close modal when Esc is pressed or click outside of story
-$(document).keydown(e => {
-  if (e.key === 'Escape') {
-    closeModal()
-  }
-})
+  // Close modal when Esc is pressed or click outside of story
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal()
+    }
+  })
+}
 
 /**
  * Close the user story modal
  */
 const closeModal = () => modals.removeClass('is-active')
-
-/**
- * Change the CSS class of user story modal based on viewport width
- */
-function changeUserStoryModalCSS () {
-  const TABLET_WIDTH = 768
-  const storyModal = $(document.getElementById('story'))
-
-  // User story modal DOM manipulation
-  if (storyModal.hasClass('is-active')) {
-    const firstColumn = storyModal.find('div.column:first')
-    const firstCardContent = $(document.getElementById('first-card-content'))
-    firstCardContent.scrollTop = 0
-
-    if (window.matchMedia(`(min-width: ${TABLET_WIDTH}px)`).matches) {
-      if (!firstColumn.children(':first').is('div.card-image')) {
-        const cardImg = firstCardContent.children().children(':first')
-
-        firstColumn.append(cardImg)
-      }
-
-    } else {
-      if (firstColumn.children(':first').is('div.card-image')) {
-        const cardImg = firstColumn.children(':first')
-
-        firstCardContent.children(':first').prepend(cardImg)
-      }
-    }
-  }
-}
 
 /************************ Plugins below ************************/
 // Datepicker settings
@@ -138,3 +100,5 @@ function initAutocomplete() {
     const place = autocomplete.getPlace()
   });
 }
+
+

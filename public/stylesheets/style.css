@@ -251,10 +251,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 /* User profile story image modal */
-#story div.modal-content {
-  overflow: hidden;
-}
-
 #story header p.title {
   white-space: nowrap;
   overflow: hidden;
@@ -262,9 +258,14 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 220px;
 }
 
-#story #first-card-content {
+#story div.card-content {
+  height: 450px;
   overflow: auto;
-  max-height: calc(100vh - 260px);
+}
+
+#story figure img {
+  max-width: 350px;
+  margin: 0 auto;
 }
 
 /* Desktop viewport adjustments */
@@ -305,24 +306,40 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 @media screen and (min-width: 769px) {
   /* User profile story image modal */
   #story div.modal-content {
-    overflow: hidden;
-    width: calc(100vw - 200px);
+    width: auto;
     max-width: 900px;
   }
 
-  #story div.card-image {
-    min-height: 450px;
-    height: 100%;
-    background-color: white;
+  #story div.card {
+    display: grid;
+    grid-template-areas: "image header" "image content";
   }
 
-  #story div.card-image figure.image {
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -o-transform: translateY(-50%);
-    transform: translateY(-50%);
+  #story header.card-header {
+    grid-area: header;
+  }
+
+  #story div.card-image {
+    display: flex;
+    align-items: center;
+    grid-area: image;
+  }
+
+  #story div.card-image > figure.image {
+    margin: 0 auto;
+  }
+
+  #story div.card-image > figure > img {
+    min-width: 350px;
+    max-width: 600px;
+  }
+
+  /*#story div.card-image > figure > img {*/
+    /*width: 1000px;*/
+  /*}*/
+
+  #story div.card-content {
+    grid-area: content
   }
 
   @media screen and (max-width: 1088px) {
@@ -363,12 +380,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
   #stories div.column {
     padding: 5px 3px;
-  }
-
-  /* User profile story image modal */
-  #story figure img {
-    max-width: 320px;
-    margin: 0 auto;
   }
 
   @media screen and (min-width: 420px) {
