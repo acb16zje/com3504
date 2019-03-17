@@ -133,8 +133,22 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   margin-right: auto;
 }
 
-#user-profile .card-content {
+#user-profile-content {
   margin: auto;
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-areas: "user-image user-name-follow" "user-description user-description" "user-stats user-stats";
+}
+
+#user-image {
+  padding: .75rem;
+  grid-area: user-image;
+}
+
+#user-name-follow {
+  padding: .75rem;
+  grid-area: user-name-follow;
 }
 
 #user-name {
@@ -149,36 +163,73 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 180px;
 }
 
-/* User page name and follow specific case */
-/*@media screen and (min-width: 740px) {*/
-  /*#user-name-follow {*/
-    /*display: flex;*/
-    /*align-items: center;*/
-    /*padding: 0;*/
-  /*}*/
-  /**/
-  /*#user-name {*/
-    /*font-size: 1.25rem;*/
-  /*}*/
-  /**/
-  /*#user-name, #user-follow {*/
-    /*margin: .75rem;*/
-    /*display: block;*/
-    /*width: auto;*/
-  /*}*/
-/*}*/
+#user-description {
+  padding-left: .75rem;
+  grid-area: user-description;
+}
 
-/* User description specific case */
-@media screen and (min-width: 500px) {
+#user-stats {
+  grid-area: user-stats;
+}
+
+/* User page name and follow specific case */
+@media screen and (min-width: 680px) {
+  #user-profile-content {
+    grid-template-columns: 41.66666% 58.33333%;
+    grid-template-areas: "user-image user-name-follow" "user-image user-stats" "user-image user-description";
+  }
+
+  #user-image > figure.image {
+    height: 128px;
+    width: 128px;
+  }
+
+  #user-name-follow {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 10px;
+  }
+
+  #user-name, #user-follow {
+    margin: .75rem;
+    display: block;
+    width: auto;
+  }
+
+  #user-name {
+    margin-left: 0;
+    font-size: 1.25rem;
+  }
+
   #user-description {
     padding-left: 0;
   }
-}
 
-/* User stats specific case */
-@media screen and (min-width: 650px) {
   #user-stats {
     max-width: 400px;
+  }
+
+  #user-stats nav {
+    border: none;
+    display: flex;
+  }
+
+  #user-stats nav > div {
+    border: none;
+    flex-grow: 1;
+    padding: 0;
+    justify-content: left;
+    text-align: left !important;
+  }
+
+  #user-stats nav > div:not(:last-child)  {
+    margin-bottom: 0;
+    margin-right: .75rem;
+  }
+
+  #user-stats nav > div br {
+    content: ''
   }
 }
 
@@ -252,11 +303,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 /* Tablet viewport adjustments */
 @media screen and (min-width: 769px) {
-  #user-image > figure.image {
-    height: 128px;
-    width: 128px;
-  }
-
   /* User profile story image modal */
   #story div.modal-content {
     overflow: hidden;
@@ -308,7 +354,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
   /* User profile */
   #user-profile div.card-content:first-child {
-    padding: 1rem 1em 0;
+    padding: .5rem .25rem 0;
   }
 
   #user-stats div.card-footer-item {
