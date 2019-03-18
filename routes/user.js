@@ -1,9 +1,10 @@
-'use strict'
 /**
  * Routes handler for user page
  *
  * @author Zer Jun Eng
  */
+
+'use strict'
 const express = require('express')
 const router = express.Router()
 
@@ -11,7 +12,7 @@ const router = express.Router()
 router.get('/user', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 
@@ -19,7 +20,7 @@ router.get('/user', function (req, res, next) {
 router.get('/user/events', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 
@@ -27,7 +28,7 @@ router.get('/user/events', function (req, res, next) {
 router.get('/user/going', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 
@@ -35,7 +36,7 @@ router.get('/user/going', function (req, res, next) {
 router.get('/user/interested', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 
@@ -43,7 +44,7 @@ router.get('/user/interested', function (req, res, next) {
 router.get('/user/attended', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 

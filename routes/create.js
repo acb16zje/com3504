@@ -1,3 +1,9 @@
+/**
+ * Routes handler for create story / event page
+ *
+ * @author Zer Jun Eng
+ */
+
 'use strict'
 const express = require('express')
 const router = express.Router()
@@ -6,7 +12,7 @@ const router = express.Router()
 router.get('/create', function (req, res, next) {
   res.render('create', {
     title: 'Musicbee - create story',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 
@@ -14,7 +20,7 @@ router.get('/create', function (req, res, next) {
 router.get('/create/event', function (req, res, next) {
   res.render('create', {
     title: 'Musicbee - create event',
-    path: req.path,
+    path: req.path.toLowerCase(),
   })
 })
 

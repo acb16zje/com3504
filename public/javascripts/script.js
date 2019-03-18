@@ -1,3 +1,9 @@
+/**
+ * Main JavaScript file
+ *
+ * @author Zer Jun Eng
+ */
+
 'use strict'
 // Iconify performance improvement
 Iconify.preloadImages([
@@ -15,15 +21,16 @@ Iconify.preloadImages([
 Iconify.setConfig('localStorage', true)
 
 // Service worker configuration
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', () => {
-//     navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-//       console.log('ServiceWorker registration successful with scope: ', registration.scope);
-//     }, function(err) {
-//       console.log('ServiceWorker registration failed: ', err);
-//     });
-//   });
-// }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').
+      then(function (registration) {
+        console.log('SW registration successful with scope: ', registration.scope)
+      }, function (err) {
+        console.log('SW registration failed: ', err)
+      })
+  })
+}
 
 // Launch and close the user story modal
 const modals = $(document.getElementsByClassName('modal'))
@@ -81,24 +88,23 @@ if (startDate) {
     time_24hr: true,
     defaultDate: Date.now(),
     minDate: 'today',
-    minTime: Date.now()
+    minTime: Date.now(),
   })
 }
 
-
 // Google Maps JavaScript API
 try {
-  initAutocomplete()
+  (function () {
+    const input = document.getElementById('autocomplete')
+
+    const autocomplete = new google.maps.places.Autocomplete(input)
+
+    autocomplete.addListener('place_changed', function() {
+      const place = autocomplete.getPlace()
+    });
+  }) ()
 } catch (e) {}
 
-function initAutocomplete() {
-  const input = document.getElementById('autocomplete')
 
-  const autocomplete = new google.maps.places.Autocomplete(input)
-
-  autocomplete.addListener('place_changed', function() {
-    const place = autocomplete.getPlace()
-  });
-}
 
 

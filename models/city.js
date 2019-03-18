@@ -1,13 +1,11 @@
 // grab the things we need
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-// create city schema
-const city = new Schema({
-  name: { type: String, required: true }
-});
-
-const City = mongoose.model('City', city);
+// create City model
+const City = mongoose.model('City', new Schema({
+  name: { type: String, required: true },
+}))
 
 // make city available in Node applications
-module.exports = City;
+module.exports = City

@@ -14,7 +14,6 @@
     "express": "^4.16.0",
     "express-ejs-layouts": "^2.5.0",
     "http-errors": "^1.7.2",
-    "mangodb": "^1.0.0",
     "mongodb": "^3.1.13",
     "mongoose": "^5.4.19",
     "morgan": "^1.9.0"
