@@ -13,6 +13,7 @@ const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
 const logger = require('morgan')
 const path = require('path')
+const mongoose = require('mongoose')
 
 const indexRouter = require('./routes/index')
 const userRouter = require('./routes/user')
@@ -57,5 +58,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
+
+mongoose.connect('mongodb://localhost:27017/mongo_db', {useNewUrlParser: true});
 
 module.exports = app
