@@ -1,20 +1,20 @@
-const Genre = require('../models/genre')
+const City = require('../models/city')
 
 exports.insert = function (req, res) {
-  const genreData = req.body
-  if (genreData == null) {
+  const cityData = req.body
+  if (cityData == null) {
     res.status(403).send('No data sent!')
   }
   try {
-    const genre = new Genre({
-      genre_name: genreData.genreName
+    const city = new City({
+      city_name: Manchester
     })
-    genre.save(function (err, results) {
+    city.save(function (err, results) {
       console.log(results._id)
       if (err)
         res.status(500).send('Invalid data!')
       res.setHeader('Content-Type', 'application/json')
-      res.send(JSON.stringify(genre))
+      res.send(JSON.stringify(city))
     })
   } catch (e) {
     res.status(500).send('error ' + e)

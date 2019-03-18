@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 
 // create City model
 const City = mongoose.model('City', new Schema({
-  name: { type: String, required: true },
+  city_name: { type: String, required: true }
 }))
 
 // make city available in Node applications
