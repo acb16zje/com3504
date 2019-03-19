@@ -8,6 +8,13 @@ html, body {
   /*#ffc038*/
 }
 
+#offline {
+  display: none;
+  margin-bottom: 0;
+  top: 30px;
+  padding: .5rem;
+}
+
 /* Plugins CSS below */
 .iconify {
   width: 26px;
@@ -29,8 +36,12 @@ form ::placeholder {
   border-bottom-color: var(--primary-color);
 }
 
-/* Section padding fix on tablet and mobile */
+/* Offline and section padding fix on tablet and mobile */
 @media screen and (max-width: 1088px) {
+  #offline {
+    top: 0;
+  }
+
   .section {
     padding-top: 10px;
   }
@@ -235,8 +246,15 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 /* User profile page stories */
 #stories div.columns {
+  min-height: 37.5vw;
   max-width: 935px;
   margin: 0 auto;
+}
+
+@media screen and (min-width: 983px) {
+  #stories div.columns {
+    min-height: 369px;
+  }
 }
 
 #stories div.column figure {

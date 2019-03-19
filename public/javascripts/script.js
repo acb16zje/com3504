@@ -32,6 +32,18 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+$(function() {
+  $('img').each(
+    function() {
+      try {
+        if (!this.complete || this.naturalWidth == 0) {
+          this.src = '/images/placeholder.png';
+        }
+      } catch(e) {}
+    }
+  );
+});
+
 // Launch and close the user story modal
 const modals = $(document.getElementsByClassName('modal'))
 const modalButtons = $(document.getElementsByClassName('modal-button'))
@@ -76,6 +88,21 @@ if (modalCloses.length) {
  */
 const closeModal = () => modals.removeClass('is-active')
 
+// Offline notification
+const offlineNotification = document.getElementById('offline')
+
+if (!navigator.onLine) {
+  offlineNotification.style.display = 'block'
+}
+
+window.addEventListener('online', () => {
+  offlineNotification.style.display = 'none'
+})
+
+window.addEventListener('offline', () => {
+  offlineNotification.style.display = 'block'
+})
+
 /************************ Plugins below ************************/
 // Datepicker settings
 const startDate = document.getElementById('startDate')
@@ -99,7 +126,7 @@ try {
 
     const autocomplete = new google.maps.places.Autocomplete(input)
 
-    autocomplete.addListener('place_changed', function() {
+    autocomplete.on('place_changed', function() {
       const place = autocomplete.getPlace()
     });
   }) ()

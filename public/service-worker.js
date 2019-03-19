@@ -17,10 +17,12 @@ const FILES = [
   '/user/events',
   '/user/going',
   '/user/interested',
-  '/user/attended',
-  '/images/logo.svg',
+  '/user/went',
+  '/images/logo_text.svg',
+  '/images/placeholder.png',
   '/stylesheets/style.css',
-  '/javascripts/idb.mjs',
+  '/javascripts/databases/database.mjs',
+  '/javascripts/databases/user.mjs',
   '/javascripts/script.js',
 ]
 
@@ -51,9 +53,9 @@ self.addEventListener('activate', function (event) {
 })
 
 self.addEventListener('fetch', function (event) {
-  const dataUrl = '/something'
+  const dataUrl = ['/something']
 
-  if (event.request.url.indexOf(dataUrl) > -1) {
+  if (dataUrl.includes(event.request.url)) {
     /*
      * When the request URL contains dataUrl, the app is asking for fresh
      * weather data. In this case, the service worker always goes to the

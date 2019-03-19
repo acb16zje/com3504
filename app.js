@@ -12,7 +12,6 @@ const createError = require('http-errors')
 const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
 const logger = require('morgan')
-const mongoose = require('mongoose')
 const path = require('path')
 
 const indexRouter = require('./routes/index')
@@ -20,18 +19,7 @@ const userRouter = require('./routes/user')
 const exploreRouter = require('./routes/explore')
 const createRouter = require('./routes/create')
 
-const	city = require('./controllers/city');
-
 const app = express()
-
-// connect to mongoose mongodb
-mongoose.connect('mongodb://localhost:27017/mongo_db', {useNewUrlParser: true})
-mongoose.connection.once('open', function(){
-  console.log('Connected to MongoDB')
-  indexRouter.post('/', city.insert)
-}).on('error', function(error){
-  console.log('Connection error:', error)
-})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
