@@ -103,6 +103,10 @@ window.addEventListener('offline', () => {
   offlineNotification.style.display = 'block'
 })
 
+$(document).on("keypress", "form", function(event) { 
+  return event.keyCode != 13;
+});
+
 /************************ Plugins below ************************/
 // Datepicker settings
 const startDate = document.getElementById('startDate')

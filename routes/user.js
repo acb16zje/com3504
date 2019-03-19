@@ -1,4 +1,4 @@
-/**attended
+/**
  * Routes handler for user page
  *
  * @author Zer Jun Eng
@@ -40,7 +40,7 @@ router.get('/user/interested', function (req, res, next) {
   })
 })
 
-/* GET user (attended) profile. */
+/* GET user (went) profile. */
 router.get('/user/went', function (req, res, next) {
   res.render('user', {
     title: 'Musicbee - gakki profile',

@@ -2,22 +2,16 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// create User model
-const User = mongoose.model('User', new Schema({
-  user_id: {
-    type: Number,
+const user = new Schema({
+  username: {
+    type: String,
+    maxlength: 30,
     required: true,
     unique: true,
   },
   full_name: {
     type: String,
     required: true,
-  },
-  user_name: {
-    type: String,
-    maxlength: 30,
-    required: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -67,7 +61,12 @@ const User = mongoose.model('User', new Schema({
     ref: 'User',
     default: [],
   },
-}))
+})
+
+user.index({ username: 1, email: 1 }, { unique: true })
+
+// create User model
+const User = mongoose.model('User', user)
 
 // make user available in Node applications
 module.exports = User

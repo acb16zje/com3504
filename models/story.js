@@ -4,16 +4,10 @@ const Schema = mongoose.Schema
 
 // create Story model
 const Story = mongoose.model('Story', new Schema({
-  story_id: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true,
   },
   photo: {
     data: Buffer,
@@ -23,11 +17,13 @@ const Story = mongoose.model('Story', new Schema({
     longitude: Number,
     latitude: Number,
   },
-  caption: String,
+  caption: {
+    type: String,
+  },
   datetime: {
     type: Date,
     default: Date.now,
-    required: true
+    required: true,
   },
   likes: {
     type: [Schema.Types.ObjectId],

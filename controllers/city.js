@@ -7,7 +7,7 @@ exports.insert = function (req, res) {
   }
   try {
     const city = new City({
-      city_name: Manchester
+      city_name: 'Manchester'
     })
     city.save(function (err, results) {
       console.log(results._id)
