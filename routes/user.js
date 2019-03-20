@@ -10,47 +10,19 @@ const router = express.Router()
 
 const user_controller = require('../controllers/user')
 
-/* GET user profile. */
-router.get('/user/:username', user_controller.get_user_profile)
-
 /* GET user (stories) profile. */
-router.get('/user', function (req, res, next) {
-  res.render('user', {
-    title: 'Musicbee - gakki profile',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/:username', user_controller.get_user_stories)
 
 /* GET user (events) profile. */
-router.get('/user/events', function (req, res, next) {
-  res.render('user', {
-    title: 'Musicbee - gakki profile',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/:username/events', user_controller.get_user_events)
 
 /* GET user (going) profile. */
-router.get('/user/going', function (req, res, next) {
-  res.render('user', {
-    title: 'Musicbee - gakki profile',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/:username/going', user_controller.get_user_going)
 
 /* GET user (interested) profile. */
-router.get('/user/interested', function (req, res, next) {
-  res.render('user', {
-    title: 'Musicbee - gakki profile',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/:username/interested', user_controller.get_user_interested)
 
 /* GET user (went) profile. */
-router.get('/user/went', function (req, res, next) {
-  res.render('user', {
-    title: 'Musicbee - gakki profile',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/:username/went', user_controller.get_user_went)
 
 module.exports = router

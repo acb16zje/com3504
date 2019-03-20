@@ -5,9 +5,9 @@
 
   <div class="columns is-centered">
     <div class="column is-7">
-      <% if (path === '/create') { %>
+      <% if (path === 'create_story') { %>
         <% include ./partials/create_story.ejs %>
-      <% } else if (path === '/create/event') { %>
+      <% } else if (path === 'create_event') { %>
         <% include ./partials/create_event.ejs %>
       <% } %>
     </div>

@@ -8,7 +8,7 @@
         <!--User profile image-->
         <div id="user-image">
           <figure class="image is-96x96 container">
-            <img class="is-rounded" src="<%= `/image/${doc.image.id}` %>" alt="User profile picture">
+            <img class="is-rounded" src="<%= `/image/${doc.image}` %>" alt="User profile picture">
           </figure>
         </div>
 
@@ -23,7 +23,6 @@
           <p class="title is-6"><%= doc.fullname %></p>
           <p class="subtitle is-spaced is-6"><%= doc.description %></p>
 
-          <p class="title is-spaced is-6">Favourite cities:</p>
           <p class="title is-6">Favourite genres:</p>
         </div>
 
@@ -51,34 +50,34 @@
       <div class="column is-two-thirds">
         <div class="tabs is-centered">
           <ul>
-            <li <%= path === '/user' ? 'class=is-active' : ''%>>
-              <a href="/user">Stories</a>
+            <li <%= path === 'user_stories' ? 'class=is-active' : ''%>>
+              <a href="<%= `/${doc.username}` %>">Stories</a>
             </li>
-            <li <%= path === '/user/events' ? 'class=is-active' : ''%>>
-              <a href="/user/events">Events</a>
+            <li <%= path === 'user_events' ? 'class=is-active' : ''%>>
+              <a href="<%= `/${doc.username}/events` %>">Events</a>
             </li>
-            <li <%= path === '/user/going' ? 'class=is-active' : ''%>>
-              <a href="/user/going">Going</a>
+            <li <%= path === 'user_going' ? 'class=is-active' : ''%>>
+              <a href="<%= `/${doc.username}/going` %>">Going</a>
             </li>
-            <li <%= path === '/user/interested' ? 'class=is-active' : ''%>>
-              <a href="/user/interested">Interested</a>
+            <li <%= path === 'user_interested' ? 'class=is-active' : ''%>>
+              <a href="<%= `/${doc.username}/interested` %>">Interested</a>
             </li>
-            <li <%= path === '/user/went' ? 'class=is-active' : ''%>>
-              <a href="/user/went">Went</a>
+            <li <%= path === 'user_went' ? 'class=is-active' : ''%>>
+              <a href="<%= `/${doc.username}/went` %>">Went</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
 
-    <% if (path === '/user') { %>
+    <% if (path === 'user_stories') { %>
       <!--User profile page: Stories-->
       <% include ./partials/user_story_columns.ejs %>
-    <% } else if (path === '/user/events') { %>
+    <% } else if (path === 'user_events') { %>
 
-    <% } else if (path === '/user/going') { %>
+    <% } else if (path === 'user_going') { %>
 
-    <% } else if (path === '/user/interested') { %>
+    <% } else if (path === 'user_interested') { %>
 
     <% } else { %>
 

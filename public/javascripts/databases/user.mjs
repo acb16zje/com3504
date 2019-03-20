@@ -10,21 +10,24 @@ import {
   openDB,
 } from 'https://cdn.jsdelivr.net/npm/idb/build/esm/index.js'
 
-const DB_NAME = 'user'
+import { DB_NAME } from './database.mjs'
+
 const STORE_NAME = 'user_store'
 const VERSION = 1
+let dbPromise
 
 /**
+ * Initialise the user IndexedDB
  *
  * @returns {Promise<void>}
  */
 async function initUserDatabase () {
-  const dbPromise = await openDB(DB_NAME, VERSION, {
-    upgrade(db, oldVersion, newVersion, transaction) {
+  dbPromise = await openDB(DB_NAME, VERSION, {
+    upgrade (db, oldVersion, newVersion, transaction) {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, {keyPath: 'id', autoIncrement: true})
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true })
       }
-    }
+    },
   })
 }
 

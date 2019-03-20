@@ -2,10 +2,10 @@
   <div class="column is-half">
     <div class="tabs is-fullwidth">
       <ul>
-        <li <%= path === '/create' ? "class=is-active" : '' %>>
+        <li <%= path === 'create_story' ? "class=is-active" : '' %>>
           <a href="/create">Create Story</a>
         </li>
-        <li <%= /\/create\/event/.test(path) ? "class=is-active" : '' %>>
+        <li <%= path === 'create_event' ? "class=is-active" : '' %>>
           <a href="/create/event">Create Event</a>
         </li>
       </ul>

@@ -12,19 +12,20 @@ const Image = require('../models/image')
  * Explore page (/explore) with featured and suggested events
  *
  * @param req The request header
- * @param res The response header callback
+ * @param res The response header
  */
 exports.index = function (req, res) {
   Event.
     find({}).
     populate('organiser genre').
     exec(function (err, docs) {
-      if (err) throw err
+      if (err) res.render('error')
 
       if (docs) {
+        console.log(docs)
         res.render('explore', {
-          title: 'Musicbee - explore',
-          path: req.path.toLowerCase(),
+          title: 'Explore - Musicbee',
+          path: 'explore',
           docs: docs,
         })
       }
