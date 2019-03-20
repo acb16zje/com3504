@@ -4,189 +4,74 @@
   <div class="container">
 
     <!--Events columns-->
-    <div class="columns">
-      <div class="column">
-        <div class="card">
-          <div class="card-image-content">
+    <div class="columns is-multiline">
+      <% docs.forEach(function(e) { %>
+        <div class="column">
+          <div class="card">
+            <div class="card-image-content">
 
-            <!--Event image-->
-            <div class="card-image">
-              <figure class="image is-3by2">
-                <img src="/images/gakki2.jpg" alt="Placeholder image">
-              </figure>
-            </div>
-
-            <!--Event content-->
-            <div class="card-content">
-              <div class="media">
-                <div class="media-content">
-                  <p class="title is-4">Gakki Event</p>
-                  <p class="host subtitle is-6">By: @gakki le mari</p>
-                  <p class="location subtitle is-6">At: Gakki house househousehousehousehousehousehousehousehousehousehousehousehousehouse</p>
-                  <p class="time subtitle is-6">On: Gakki time</p>
-                </div>
+              <!--Event image-->
+              <div class="card-image">
+                <figure class="image is-3by2">
+                  <img src="<%= `/event/p/${e.image}` %>" alt="Event image">
+                </figure>
               </div>
 
-              <div class="content is-hidden-mobile">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-                <a href="#">#css</a> <a href="#">#responsive</a>
-                <br>
-                <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-              </div>
-
-              <nav class="level is-mobile">
-                <div class="level-left">
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">Pop</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">&#183;</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">1234 people</p>
-                    </div>
+              <!--Event content-->
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-content">
+                    <p class="title is-4"><a href="#"><%= e.event_name %></a></p>
+                    <p class="host subtitle is-6">By: <a href="#">@<%= e.organiser.username %></a></p>
+                    <p class="location subtitle is-6">At: <%= e.location %></p>
+                    <p class="time subtitle is-6">
+                      On: <%= e.datetime.toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour12: true,
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        timeZoneName: "short"}) %>
+                    </p>
                   </div>
                 </div>
-              </nav>
 
+                <div class="content is-hidden-mobile">
+                  <%= e.description %>
+                </div>
+
+                <nav class="level is-mobile">
+                  <div class="level-left">
+                    <div class="level-item has-text-centered">
+                      <div>
+                        <p class="subtitle is-6"><%= e.genre[0].genre_name %></p>
+                      </div>
+                    </div>
+                    <div class="level-item has-text-centered">
+                      <div>
+                        <p class="subtitle is-6">&#183;</p>
+                      </div>
+                    </div>
+                    <div class="level-item has-text-centered">
+                      <div>
+                        <p class="subtitle is-6">1234 people</p>
+                      </div>
+                    </div>
+                  </div>
+                </nav>
+
+              </div>
             </div>
+
+            <!--Interested and going-->
+            <footer class="card-footer">
+              <a href="#" class="card-footer-item">Interested</a>
+              <a href="#" class="card-footer-item">Going</a>
+            </footer>
           </div>
-
-          <!--Interested and going-->
-          <footer class="card-footer">
-            <a href="#" class="card-footer-item">Interested</a>
-            <a href="#" class="card-footer-item">Going</a>
-          </footer>
         </div>
-      </div>
-
-      <div class="column">
-        <div class="card">
-          <div class="card-image-content">
-
-            <!--Event image-->
-            <div class="card-image">
-              <figure class="image is-3by2">
-                <img src="/images/gakki.jpg" alt="Placeholder image">
-              </figure>
-            </div>
-
-            <!--Event content-->
-            <div class="card-content">
-              <div class="media">
-                <div class="media-content">
-                  <p class="title is-4">Gakki Event</p>
-                  <p class="host subtitle is-6">By: @gakki le mari</p>
-                  <p class="location subtitle is-6">At: Gakki house </p>
-                  <p class="time subtitle is-6">On: Gakki time</p>
-                </div>
-              </div>
-
-              <div class="content is-hidden-mobile">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-                <a href="#">#css</a> <a href="#">#responsive</a>
-                <br>
-                <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-              </div>
-
-              <nav class="level is-mobile">
-                <div class="level-left">
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">Pop</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">&#183;</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">1234 people</p>
-                    </div>
-                  </div>
-                </div>
-              </nav>
-
-            </div>
-          </div>
-
-          <!--Interested and going-->
-          <footer class="card-footer">
-            <a href="#" class="card-footer-item">Interested</a>
-            <a href="#" class="card-footer-item">Going</a>
-          </footer>
-        </div>
-      </div>
-
-      <div class="column">
-        <div class="card">
-          <div class="card-image-content">
-
-            <!--Event image-->
-            <div class="card-image">
-              <figure class="image is-3by2">
-                <img src="/images/gakki.jpg" alt="Placeholder image">
-              </figure>
-            </div>
-
-            <!--Event content-->
-            <div class="card-content">
-              <div class="media">
-                <div class="media-content">
-                  <p class="title is-4">Gakki Event</p>
-                  <p class="host subtitle is-6">By: @gakki le mari</p>
-                  <p class="location subtitle is-6">At: Gakki house</p>
-                  <p class="time subtitle is-6">On: Gakki time</p>
-                </div>
-              </div>
-
-              <div class="content is-hidden-mobile">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-                <a href="#">#css</a> <a href="#">#responsive</a>
-                <br>
-                <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-              </div>
-
-              <nav class="level is-mobile">
-                <div class="level-left">
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">Pop</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">&#183;</p>
-                    </div>
-                  </div>
-                  <div class="level-item has-text-centered">
-                    <div>
-                      <p class="subtitle is-6">1234 people</p>
-                    </div>
-                  </div>
-                </div>
-              </nav>
-
-            </div>
-          </div>
-
-          <!--Interested and going-->
-          <footer class="card-footer">
-            <a href="#" class="card-footer-item">Interested</a>
-            <a href="#" class="card-footer-item">Going</a>
-          </footer>
-        </div>
-      </div>
+      <% }) %>
     </div>
 
   </div>

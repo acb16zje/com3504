@@ -105,6 +105,14 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   overflow-x: auto;
 }
 
+#explore .media-content .title a {
+  color: initial;
+}
+
+#explore .media-content .title a:hover {
+  text-decoration: underline;
+}
+
 #explore .host.subtitle, #explore .location.subtitle {
   margin-bottom: 0.2em;
 }

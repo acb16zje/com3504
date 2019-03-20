@@ -1,54 +1,118 @@
-const MongoClient = require('mongodb').MongoClient;
+/**
+ * Connect to MongoDB and initialise the database with default data
+ *
+ * @author Zer Jun Eng
+ */
+
+'use strict'
+const MongoClient = require('mongodb').MongoClient
 const fs = require('fs')
 const path = require('path')
-const Promise = require('bluebird')
 
-// Use connect method to connect to the server
-MongoClient.connect('mongodb://localhost:27017/', {useNewUrlParser: true}).then(function (client) {
-  console.log("Connected successfully to server");
+const URL = 'mongodb://localhost:27017/'
+const DB_NAME = 'musicbee'
+
+// Models
+const Event = require('../models/event')
+const Genre = require('../models/genre')
+const Image = require('../models/image')
+const User = require('../models/user')
+
+// Connect to the MongoDB server
+MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
+  console.log('Connected successfully to server')
   const allPromises = []
-  const db = client.db('musicbee')
+  const db = client.db(DB_NAME)
 
-  db.dropDatabase().then(function() {}).catch(function() {});
+  db.dropDatabase().
+    then(() => {
+      console.log(`Dropped database '${DB_NAME}'`)
+      console.log('Inserting default data...')
+    }).
+    catch((err) => console.log(err))
 
-  allPromises.push(db.collection('cities').insertMany([
-    { city_name: 'Manchester' },
-    { city_name: 'London' },
-    { city_name: 'Cardiff' },
-    { city_name: 'Bath' },
-    { city_name: 'Nottingham' },
-    { city_name: 'Sheffield' },
-  ]))
+  const eventsCollection = db.collection('events')
+  const genresCollection = db.collection('genres')
+  const imagesCollection = db.collection('images')
+  const usersCollection = db.collection('users')
 
-  allPromises.push(db.collection('genres').insertMany([
-    { genre_name: 'Jazz' },
-    { genre_name: 'Pop' },
-    { genre_name: 'K-pop' },
-    { genre_name: 'Rock' },
-    { genre_name: 'Contry' },
-    { genre_name: 'Metal' },
-    { genre_name: 'EDM' },
-  ]))
+  // Genre data
+  allPromises.push(genresCollection.insertMany([
+    new Genre({ genre_name: 'Classical' }),
+    new Genre({ genre_name: 'Country' }),
+    new Genre({ genre_name: 'Electronic' }),
+    new Genre({ genre_name: 'Funk' }),
+    new Genre({ genre_name: 'Jazz' }),
+    new Genre({ genre_name: 'Metal' }),
+    new Genre({ genre_name: 'Pop' }),
+    new Genre({ genre_name: 'Rock' }),
+  ]).then((genresRes) => {
+    // Image data
+    const gakki = fs.readFileSync(
+      path.join(__dirname, '../public/images/gakki.webp'), { encoding: 'base64' })
 
-  let userId1;
+    const mario = fs.readFileSync(
+      path.join(__dirname, '../public/images/mario.webp'), { encoding: 'base64' })
 
-  allPromises.push(db.collection('users').insertMany([
-    { username: 'jamesS', full_name: 'James Smith', email: "jamessmith@gmail.com" },
-    { username: 'janeS', full_name: 'Jane Smith', email: "janesmith@gmail.com" }
-  ]).then(function(result) {
-    userId1 = result.ops[0]
+    const luigi = fs.readFileSync(
+      path.join(__dirname, '../public/images/luigi.webp'), { encoding: 'base64' })
 
-    var newImg = fs.readFileSync(path.join(__dirname, '..', 'public', 'images', 'gakki.jpg'));
-    var encImg = newImg.toString('base64');
-  
-    allPromises.push(db.collection('events').insertOne({
-      event_name: 'New Year Rave Party',
-      organizer: userId1,
-      photo: Buffer.from(encImg)
+    allPromises.push(imagesCollection.insertMany([
+      new Image({
+        content: Buffer.from(gakki, 'base64'),
+        contentType: 'image/webp',
+      }),
+      new Image({
+        content: Buffer.from(mario, 'base64'),
+        contentType: 'image/webp',
+      }),
+      new Image({
+        content: Buffer.from(luigi, 'base64'),
+        contentType: 'image/webp',
+      }),
+    ]).then((imagesRes) => {
+
+      // User data
+      allPromises.push(usersCollection.insertMany([
+        new User({
+          username: 'gakki',
+          fullname: 'Aragaki Yui',
+          email: 'yui-aragaki@lespros.co.jp',
+        }),
+        new User({
+          username: 'super_mario',
+          fullname: 'Mario Mario',
+          email: 'mario@nintendo.com',
+        }),
+        new User({
+          username: 'luigi',
+          fullname: 'Luigi Mario',
+          email: 'luigi@nintendo.com',
+        }),
+      ]).then((usersRes) => {
+
+        // Event data
+        allPromises.push(eventsCollection.insertOne(
+          new Event({
+            event_name: 'Gakki Festival',
+            description: 'Your daily heavenly days',
+            organiser: usersRes.ops[0]._id,
+            genre: genresRes.ops[6]._id,
+            image: imagesRes.ops[0]._id,
+          }),
+        ).then(() => {
+
+          Promise.all(allPromises).
+            then(() => {
+              console.log('Finished successfully, closing the server')
+              client.close()
+            }).
+            catch((err) => {
+              console.log(err)
+              client.close()
+            })
+        }))
+      }))
     }))
   }))
-
-  Promise.all(allPromises).then(function() {
-    client.close()
-  })
-});
+})

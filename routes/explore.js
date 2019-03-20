@@ -8,12 +8,12 @@
 const express = require('express')
 const router = express.Router()
 
+const event_controller = require('../controllers/event')
+
 /* GET explore page */
-router.get('/explore', function (req, res, next) {
-  res.render('explore', {
-    title: 'Musicbee - explore',
-    path: req.path.toLowerCase(),
-  })
-})
+router.get('/explore', event_controller.index)
+
+/* GET the event image */
+router.get('/event/p/:id', event_controller.get_event_image)
 
 module.exports = router

@@ -12,6 +12,7 @@ const createError = require('http-errors')
 const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
 const logger = require('morgan')
+const mime = require('mime-types')
 const path = require('path')
 
 const indexRouter = require('./routes/index')

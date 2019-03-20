@@ -37,7 +37,7 @@ $(function() {
     function() {
       try {
         if (!this.complete || this.naturalWidth == 0) {
-          this.src = '/images/placeholder.png';
+          this.src = '/images/placeholder.webp';
         }
       } catch(e) {}
     }
