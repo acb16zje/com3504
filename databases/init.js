@@ -49,13 +49,16 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
   ]).then((genresRes) => {
     // Image data
     const gakki = fs.readFileSync(
-      path.join(__dirname, '../public/images/gakki.webp'), { encoding: 'base64' })
+      path.join(__dirname, '../public/images/gakki.webp'),
+      { encoding: 'base64' })
 
     const mario = fs.readFileSync(
-      path.join(__dirname, '../public/images/mario.webp'), { encoding: 'base64' })
+      path.join(__dirname, '../public/images/mario.webp'),
+      { encoding: 'base64' })
 
     const luigi = fs.readFileSync(
-      path.join(__dirname, '../public/images/luigi.webp'), { encoding: 'base64' })
+      path.join(__dirname, '../public/images/luigi.webp'),
+      { encoding: 'base64' })
 
     allPromises.push(imagesCollection.insertMany([
       new Image({
@@ -78,16 +81,22 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
           username: 'gakki',
           fullname: 'Aragaki Yui',
           email: 'yui-aragaki@lespros.co.jp',
+          description: 'I am Gakki',
+          image: imagesRes.ops[0]._id,
         }),
         new User({
           username: 'super_mario',
           fullname: 'Mario Mario',
           email: 'mario@nintendo.com',
+          description: 'I am Mario',
+          image: imagesRes.ops[1]._id,
         }),
         new User({
           username: 'luigi',
           fullname: 'Luigi Mario',
           email: 'luigi@nintendo.com',
+          description: 'I am Luigi',
+          image: imagesRes.ops[2]._id,
         }),
       ]).then((usersRes) => {
 

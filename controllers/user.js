@@ -7,6 +7,7 @@
 'use strict'
 const Event = require('../models/event')
 const Image = require('../models/image')
+const User = require('../models/user')
 
 /**
  * Return the event image if valid, otherwise load a placeholder image
@@ -15,15 +16,21 @@ const Image = require('../models/image')
  * @param res The response header callback
  */
 exports.get_user_profile = function (req, res) {
-  // User.findOne(req.params.username).lean().exec(function (err, doc) {
-  //   if (err) {
-  //     res.setHeader('content-type', 'image/webp')
-  //     res.send('/images/placeholder.webp')
-  //   }
-  //
-  //   if (doc) {
-  //     res.setHeader('content-type', doc.contentType)
-  //     res.send(doc.content.buffer)
-  //   }
-  // })
+  User.
+    findOne({ 'username': req.params.username }).
+    populate('image').
+    exec(function (err, doc) {
+      if (err) res.send('error')
+
+      if (doc) {
+        console.log(JSON.stringify(doc))
+        res.render('user', {
+          title: `${doc.fullname} (${doc.username}) - Musicbee`,
+          path: req.path.toLowerCase(),
+          doc: doc
+        })
+      } else {
+        res.send('not found')
+      }
+    })
 }

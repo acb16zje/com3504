@@ -11,7 +11,7 @@ const router = express.Router()
 const user_controller = require('../controllers/user')
 
 /* GET user profile. */
-router.get('/user', user_controller.get_user_profile)
+router.get('/user/:username', user_controller.get_user_profile)
 
 /* GET user (stories) profile. */
 router.get('/user', function (req, res, next) {

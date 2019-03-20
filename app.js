@@ -15,10 +15,11 @@ const logger = require('morgan')
 const mime = require('mime-types')
 const path = require('path')
 
+const createRouter = require('./routes/create')
+const exploreRouter = require('./routes/explore')
+const imageRouter = require('./routes/image')
 const indexRouter = require('./routes/index')
 const userRouter = require('./routes/user')
-const exploreRouter = require('./routes/explore')
-const createRouter = require('./routes/create')
 
 const app = express()
 
@@ -36,10 +37,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use(createRouter)
+app.use(exploreRouter)
+app.use(imageRouter)
 app.use(indexRouter)
 app.use(userRouter)
-app.use(exploreRouter)
-app.use(createRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

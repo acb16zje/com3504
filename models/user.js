@@ -16,6 +16,13 @@ require('../models/genre')
 const Image = require('../models/image')
 require('../models/story')
 
+const defaultProfileImg = new Image({
+  content: fs.readFileSync(
+    path.join(__dirname, '../public/images/default.webp'),
+    { encoding: 'base64' }),
+  contentType: 'image/webp',
+})
+
 const user = new Schema({
   username: {
     type: String,
@@ -43,12 +50,7 @@ const user = new Schema({
   image: {
     type: Schema.Types.ObjectId,
     ref: 'Image',
-    default: new Image({
-      content: fs.readFileSync(
-        path.join(__dirname, '../public/images/default.webp'),
-        { encoding: 'base64' }),
-      contentType: 'image/webp',
-    }),
+    default: defaultProfileImg,
   },
   fav_genre: [
     {

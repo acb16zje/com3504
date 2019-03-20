@@ -19,33 +19,16 @@ exports.index = function (req, res) {
     find({}).
     populate('organiser genre').
     exec(function (err, docs) {
-      console.log(err)
-      res.render('explore', {
-        title: 'Musicbee - explore',
-        path: req.path.toLowerCase(),
-        docs: docs,
-      })
+      if (err) throw err
+
+      if (docs) {
+        res.render('explore', {
+          title: 'Musicbee - explore',
+          path: req.path.toLowerCase(),
+          docs: docs,
+        })
+      }
     })
-}
-
-/**
- * Return the event image if valid, otherwise load a placeholder image
- *
- * @param req The request header
- * @param res The response header callback
- */
-exports.get_event_image = function (req, res) {
-  Image.findById(req.params.id).lean().exec(function (err, doc) {
-    if (err) {
-      res.setHeader('content-type', 'image/webp')
-      res.send('/images/placeholder.webp')
-    }
-
-    if (doc) {
-      res.setHeader('content-type', doc.contentType)
-      res.send(doc.content.buffer)
-    }
-  })
 }
 
 exports.insert = function (req, res) {
