@@ -1,6 +1,6 @@
 <%- contentFor('body') %>
 
-<section id="user" class="section">
+<section id="user" class="section is-hidden">
   <div class="container">
 
     <div id="user-profile" class="card is-paddingless">
@@ -8,37 +8,39 @@
         <!--User profile image-->
         <div id="user-image">
           <figure class="image is-96x96 container">
-            <img class="is-rounded" src="<%= `/image/${doc.image}` %>" alt="User profile picture">
+            <img id="profile-img" class="is-rounded" src="" alt="User profile picture">
           </figure>
         </div>
 
         <!--User name and follow / edit profile button-->
         <div id="user-name-follow">
-          <p id="user-name" class="subtitle is-4"><%= doc.username %></p>
+          <p id="user-name" class="subtitle is-4"></p>
           <a id="user-follow" class="button is-info is-fullwidth">Follow</a>
         </div>
 
         <!--User description-->
         <div id="user-description" class="card-content">
-          <p class="title is-6"><%= doc.fullname %></p>
-          <p class="subtitle is-spaced is-6"><%= doc.description %></p>
+          <p id="fullname" class="title is-6"></p>
+          <p id="description" class="subtitle is-spaced is-6"></p>
 
-          <p class="title is-6">Favourite genres:</p>
+          <div id="genre" class="tags">
+            <p class="title is-6">Favourite genres:</p>
+          </div>
         </div>
 
         <!--User stats-->
         <div id="user-stats" class="card is-shadowless">
           <nav class="card-footer">
             <div class="card-footer-item has-text-centered">
-              <p class="subtitle is-6"><strong>3,456</strong><br/> stories</p>
+              <p class="subtitle is-6"><strong id="story-count"></strong><br/> stories</p>
             </div>
 
             <div class="card-footer-item has-text-centered">
-              <p class="subtitle is-6 is-spaced"><strong>988k</strong><br/> followers</p>
+              <p class="subtitle is-6 is-spaced"><strong id="follower-count"></strong><br/> followers</p>
             </div>
 
             <div class="card-footer-item has-text-centered">
-              <p class="subtitle is-6"><strong>123</strong><br/> following</p>
+              <p class="subtitle is-6"><strong id="following-count"></strong><br/> following</p>
             </div>
           </nav>
         </div>
@@ -50,27 +52,27 @@
       <div class="column is-two-thirds">
         <div class="tabs is-centered">
           <ul>
-            <li <%= path === 'user_stories' ? 'class=is-active' : ''%>>
-              <a href="<%= `/${doc.username}` %>">Stories</a>
+            <li <%= path === 'user_' ? 'class=is-active' : ''%>>
+              <a id="stories-link" href="">Stories</a>
             </li>
             <li <%= path === 'user_events' ? 'class=is-active' : ''%>>
-              <a href="<%= `/${doc.username}/events` %>">Events</a>
+              <a id="events-link" href="">Events</a>
             </li>
             <li <%= path === 'user_going' ? 'class=is-active' : ''%>>
-              <a href="<%= `/${doc.username}/going` %>">Going</a>
+              <a id="going-link" href="">Going</a>
             </li>
             <li <%= path === 'user_interested' ? 'class=is-active' : ''%>>
-              <a href="<%= `/${doc.username}/interested` %>">Interested</a>
+              <a id="interested-link" href="">Interested</a>
             </li>
             <li <%= path === 'user_went' ? 'class=is-active' : ''%>>
-              <a href="<%= `/${doc.username}/went` %>">Went</a>
+              <a id="went-link" href="">Went</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
 
-    <% if (path === 'user_stories') { %>
+    <% if (path === 'user_') { %>
       <!--User profile page: Stories-->
       <% include ./partials/user_story_columns.ejs %>
     <% } else if (path === 'user_events') { %>

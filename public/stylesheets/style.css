@@ -187,6 +187,10 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   grid-area: user-description;
 }
 
+#user-description #genre p.title {
+  margin: 0 .5rem .5rem 0;
+}
+
 #user-stats {
   grid-area: user-stats;
 }

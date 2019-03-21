@@ -36,6 +36,8 @@ const FILES = [
  * installation event: it adds all the files to be cached
  */
 self.addEventListener('install', function (event) {
+  self.skipWaiting()
+
   event.waitUntil(caches.open(CACHENAME).then(function (cache) {
     return cache.addAll(FILES)
   }))
@@ -57,6 +59,10 @@ self.addEventListener('activate', function (event) {
 
   return self.clients.claim()
 })
+
+function isImage (request) {
+  return request.method === 'GET' && request.destination === 'image'
+}
 
 self.addEventListener('fetch', function (event) {
   const dataUrl = ['/something']

@@ -32,17 +32,31 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-$(function() {
+// Localise number format
+function intlFormat (num) {
+  return new Intl.NumberFormat().format(Math.round(num * 10) / 10)
+}
+
+function makeFriendly (num) {
+  if (num >= 1000000)
+    return intlFormat(num / 1000000) + 'M'
+  if (num >= 1000)
+    return intlFormat(num / 1000) + 'k'
+  return intlFormat(num)
+}
+
+// Dislpay placeholder image if original image failed to load
+$(function () {
   $('img').each(
-    function() {
+    function () {
       try {
-        if (!this.complete || this.naturalWidth == 0) {
-          this.src = '/images/placeholder.webp';
+        if (!this.complete || this.naturalWidth === 0) {
+          this.src = '/images/placeholder.webp'
         }
-      } catch(e) {}
-    }
-  );
-});
+      } catch (e) {}
+    },
+  )
+})
 
 // Launch and close the user story modal
 const modals = $(document.getElementsByClassName('modal'))
@@ -103,9 +117,9 @@ window.addEventListener('offline', () => {
   offlineNotification.style.display = 'block'
 })
 
-$(document).on("keypress", "form", function(event) { 
-  return event.keyCode != 13;
-});
+$(document).on('keypress', 'form', function (event) {
+  return event.key !== 'Enter'
+})
 
 /************************ Plugins below ************************/
 // Datepicker settings
@@ -129,11 +143,15 @@ try {
     const input = document.getElementById('autocomplete')
 
     const autocomplete = new google.maps.places.Autocomplete(input)
+    // const service = new google.maps.places.PlacesService(map);
 
-    autocomplete.on('place_changed', function() {
+    $(input).change(function() {
       const place = autocomplete.getPlace()
-    });
-  }) ()
+      const latitude = place.geometry.location.lat()
+      const longitude  = place.geometry.location.lng()
+    })
+
+  })()
 } catch (e) {}
 
 

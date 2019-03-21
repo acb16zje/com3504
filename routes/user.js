@@ -11,18 +11,14 @@ const router = express.Router()
 const user_controller = require('../controllers/user')
 
 /* GET user (stories) profile. */
-router.get('/:username', user_controller.get_user_stories)
+router.get('/:username/?:type(|events|going|interested|went)', function (req, res) {
+  res.render('user', {
+    title: 'Musicbee',
+    path: `user_${req.params.type}`,
+  })
+})
 
-/* GET user (events) profile. */
-router.get('/:username/events', user_controller.get_user_events)
-
-/* GET user (going) profile. */
-router.get('/:username/going', user_controller.get_user_going)
-
-/* GET user (interested) profile. */
-router.get('/:username/interested', user_controller.get_user_interested)
-
-/* GET user (went) profile. */
-router.get('/:username/went', user_controller.get_user_went)
+/* AJAX GET user (stories) profile */
+router.get('/u/:username/?:type(|events|going|interested|went)', user_controller.get_user_data)
 
 module.exports = router

@@ -5,6 +5,7 @@
  */
 
 'use strict'
+const createError = require('http-errors')
 const Event = require('../models/event')
 const Image = require('../models/image')
 
@@ -13,21 +14,23 @@ const Image = require('../models/image')
  *
  * @param req The request header
  * @param res The response header
+ * @param next The redirect handler
  */
-exports.index = function (req, res) {
+exports.index = function (req, res, next) {
   Event.
     find({}).
     populate('organiser genre').
     exec(function (err, docs) {
-      if (err) res.render('error')
+      if (err) throw err
 
-      if (docs) {
-        console.log(docs)
+      if (docs.length) {
         res.render('explore', {
           title: 'Explore - Musicbee',
           path: 'explore',
           docs: docs,
         })
+      } else {
+        next(createError(404))
       }
     })
 }

@@ -74,54 +74,60 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
         contentType: 'image/webp',
       }),
     ]).then((imagesRes) => {
+      const gakki = new User({
+        username: 'gakki',
+        fullname: 'Aragaki Yui',
+        email: 'yui-aragaki@lespros.co.jp',
+        description: 'I am Gakki',
+        image: imagesRes.ops[0]._id,
+        genres: genresRes.ops[6]._id
+      })
+
+      const luigi = new User({
+        username: 'luigi',
+        fullname: 'Luigi Mario',
+        email: 'luigi@nintendo.com',
+        description: 'I am Luigi',
+        image: imagesRes.ops[2]._id,
+        following: [gakki]
+      })
+
+      const mario = new User({
+        username: 'super_mario',
+        fullname: 'Mario Mario',
+        email: 'mario@nintendo.com',
+        description: 'I am Mario',
+        image: imagesRes.ops[1]._id,
+        following: [gakki]
+      })
+
+      gakki.followers.push(luigi, mario)
 
       // User data
-      allPromises.push(usersCollection.insertMany([
-        new User({
-          username: 'gakki',
-          fullname: 'Aragaki Yui',
-          email: 'yui-aragaki@lespros.co.jp',
-          description: 'I am Gakki',
-          image: imagesRes.ops[0]._id,
-        }),
-        new User({
-          username: 'super_mario',
-          fullname: 'Mario Mario',
-          email: 'mario@nintendo.com',
-          description: 'I am Mario',
-          image: imagesRes.ops[1]._id,
-        }),
-        new User({
-          username: 'luigi',
-          fullname: 'Luigi Mario',
-          email: 'luigi@nintendo.com',
-          description: 'I am Luigi',
-          image: imagesRes.ops[2]._id,
-        }),
-      ]).then((usersRes) => {
+      allPromises.push(usersCollection.insertMany([gakki, mario, luigi]).
+        then((usersRes) => {
+          // Event data
+          allPromises.push(eventsCollection.insertOne(
+            new Event({
+              event_name: 'Gakki Festival',
+              description: 'Your daily heavenly days',
+              organiser: usersRes.ops[0]._id,
+              genre: genresRes.ops[6]._id,
+              image: imagesRes.ops[0]._id,
+            }),
+          ).then(() => {
 
-        // Event data
-        allPromises.push(eventsCollection.insertOne(
-          new Event({
-            event_name: 'Gakki Festival',
-            description: 'Your daily heavenly days',
-            organiser: usersRes.ops[0]._id,
-            genre: genresRes.ops[6]._id,
-            image: imagesRes.ops[0]._id,
-          }),
-        ).then(() => {
-
-          Promise.all(allPromises).
-            then(() => {
-              console.log('Finished successfully, closing the server')
-              client.close()
-            }).
-            catch((err) => {
-              console.log(err)
-              client.close()
-            })
+            Promise.all(allPromises).
+              then(() => {
+                console.log('Finished successfully, closing the server')
+                client.close()
+              }).
+              catch((err) => {
+                console.log(err)
+                client.close()
+              })
+          }))
         }))
-      }))
     }))
   }))
 })

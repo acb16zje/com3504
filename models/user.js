@@ -34,14 +34,14 @@ const user = new Schema({
     required: [true, 'Username is required'],
     unique: true,
   },
-  fullname: {
-    type: String,
-    required: true,
-  },
   email: {
     type: String,
     required: [true, 'Please enter an email address'],
     unique: true,
+  },
+  fullname: {
+    type: String,
+    required: true,
   },
   description: {
     type: String,
@@ -52,7 +52,7 @@ const user = new Schema({
     ref: 'Image',
     default: defaultProfileImg,
   },
-  fav_genre: [
+  genres: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Genre',
@@ -62,6 +62,18 @@ const user = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: 'Story',
+      default: [],
+    }],
+  followers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: [],
+    }],
+  following: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       default: [],
     }],
   events: [
@@ -80,18 +92,6 @@ const user = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: 'Event', default: [],
-    }],
-  followers: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      default: [],
-    }],
-  following: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      default: [],
     }],
 })
 
