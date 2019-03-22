@@ -13,9 +13,9 @@ const User = require('../models/user')
 /**
  * Get all the data of the user
  *
- * @param req The request header
- * @param res The response header
- * @param next The redirect handler
+ * @param {object} req The request header
+ * @param {object} res The response header
+ * @param {object} next The redirect handler
  */
 exports.get_user_data = function (req, res, next) {
   User.

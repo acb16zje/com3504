@@ -12,9 +12,9 @@ const Image = require('../models/image')
 /**
  * Explore page (/explore) with featured and suggested events
  *
- * @param req The request header
- * @param res The response header
- * @param next The redirect handler
+ * @param {object} req The request header
+ * @param {object} res The response header
+ * @param {object} next The redirect handler
  */
 exports.index = function (req, res, next) {
   Event.
@@ -24,11 +24,7 @@ exports.index = function (req, res, next) {
       if (err) throw err
 
       if (docs.length) {
-        res.render('explore', {
-          title: 'Explore - Musicbee',
-          path: 'explore',
-          docs: docs,
-        })
+        res.json(docs)
       } else {
         next(createError(404))
       }

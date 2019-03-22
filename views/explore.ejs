@@ -5,73 +5,7 @@
 
     <!--Events columns-->
     <div class="columns is-multiline">
-      <% docs.forEach(function(e) { %>
-        <div class="column">
-          <div class="card">
-            <div class="card-image-content">
 
-              <!--Event image-->
-              <div class="card-image">
-                <figure class="image is-3by2">
-                  <img src="<%= `/image/${e.image}` %>" alt="Event image">
-                </figure>
-              </div>
-
-              <!--Event content-->
-              <div class="card-content">
-                <div class="media">
-                  <div class="media-content">
-                    <p class="title is-4"><a href="<%= `/event/${e.id}` %>"><%= e.event_name %></a></p>
-                    <p class="host subtitle is-6">By: <a href="<%= `/${e.organiser.username}` %>">@<%= e.organiser.username %></a></p>
-                    <p class="location subtitle is-6">At: <%= e.location %></p>
-                    <p class="time subtitle is-6">
-                      On: <%= e.datetime.toLocaleString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour12: true,
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        timeZoneName: "short"}) %>
-                    </p>
-                  </div>
-                </div>
-
-                <div class="content is-hidden-mobile">
-                  <%= e.description %>
-                </div>
-
-                <nav class="level is-mobile">
-                  <div class="level-left">
-                    <div class="level-item has-text-centered">
-                      <div>
-                        <p class="subtitle is-6"><%= e.genre[0].genre_name %></p>
-                      </div>
-                    </div>
-                    <div class="level-item has-text-centered">
-                      <div>
-                        <p class="subtitle is-6">&#183;</p>
-                      </div>
-                    </div>
-                    <div class="level-item has-text-centered">
-                      <div>
-                        <p class="subtitle is-6">1234 people</p>
-                      </div>
-                    </div>
-                  </div>
-                </nav>
-
-              </div>
-            </div>
-
-            <!--Interested and going-->
-            <footer class="card-footer">
-              <a href="#" class="card-footer-item">Interested</a>
-              <a href="#" class="card-footer-item">Going</a>
-            </footer>
-          </div>
-        </div>
-      <% }) %>
     </div>
 
   </div>

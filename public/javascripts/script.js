@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').
       then(function (registration) {
-        console.log('SW registration successful with scope: ', registration.scope)
+        console.log('SW registration successful')
       }, function (err) {
         console.log('SW registration failed: ', err)
       })
@@ -143,12 +143,13 @@ try {
     const input = document.getElementById('autocomplete')
 
     const autocomplete = new google.maps.places.Autocomplete(input)
-    // const service = new google.maps.places.PlacesService(map);
 
     $(input).change(function() {
       const place = autocomplete.getPlace()
       const latitude = place.geometry.location.lat()
       const longitude  = place.geometry.location.lng()
+      console.log(latitude)
+      console.log(longitude)
     })
 
   })()

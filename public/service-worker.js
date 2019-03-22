@@ -13,12 +13,14 @@ const FILES = [
   '/create',
   '/create/event',
   '/notifications',
-  // '/user',
-  // '/user/events',
-  // '/user/going',
-  // '/user/interested',
-  // '/user/went',
+  '/user',
+  '/user/events',
+  '/user/going',
+  '/user/interested',
+  '/user/went',
   '/favicon/favicon-32x32.png',
+  '/favicon/android-chrome-192x192.png',
+  '/favicon/android-chrome-256x256.png',
   '/favicon/site.webmanifest',
   '/images/logo_text.webp',
   '/images/default.webp',
@@ -30,14 +32,13 @@ const FILES = [
   '/javascripts/databases/database.mjs',
   '/javascripts/databases/user.mjs',
   '/javascripts/script.js',
+  '/offline.html',
 ]
 
 /**
  * installation event: it adds all the files to be cached
  */
 self.addEventListener('install', function (event) {
-  self.skipWaiting()
-
   event.waitUntil(caches.open(CACHENAME).then(function (cache) {
     return cache.addAll(FILES)
   }))
@@ -60,14 +61,10 @@ self.addEventListener('activate', function (event) {
   return self.clients.claim()
 })
 
-function isImage (request) {
-  return request.method === 'GET' && request.destination === 'image'
-}
-
 self.addEventListener('fetch', function (event) {
-  const dataUrl = ['/something']
+  const dataUrl = ['/some_ajax_url']
 
-  if (dataUrl.includes(event.request.url)) {
+  if (dataUrl.some(url => event.request.url.includes(url))) {
     /*
      * When the request URL contains dataUrl, the app is asking for fresh
      * weather data. In this case, the service worker always goes to the
@@ -78,7 +75,7 @@ self.addEventListener('fetch', function (event) {
       // note: it the network is down, response will contain the error
       // that will be passed to Ajax
       return response
-    }).catch(function (e) {
+    }).catch(async function (e) {
       console.log('service worker error 1: ' + e.message)
     })
   } else {
@@ -87,23 +84,50 @@ self.addEventListener('fetch', function (event) {
      * "Cache, then if network available, it will refresh the cache
      * see stale-while-revalidate
      */
-
-    event.respondWith(async function () {
-      const cache = await caches.open(CACHENAME)
-      const cachedResponse = await cache.match(event.request)
-      const networkResponsePromise = fetch(event.request).catch(() => {})
-
-      event.waitUntil(async function () {
-        const networkResponse = await networkResponsePromise
-        try {
-          if (networkResponse.type !== 'opaque') {
-            await cache.put(event.request, networkResponse.clone())
+    event.respondWith(
+      caches.open(CACHENAME).then(function (cache) {
+        return cache.match(event.request).then(function (response) {
+          return response || fetch(event.request).then(function (response) {
+            if (response.type !== 'opaque') {
+              cache.put(event.request, response.clone())
+            }
+            return response
+          })
+        }).catch(() => {
+          if (event.request.method === 'GET' && event.request.mode === 'navigate' &&
+            event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('offline.html')
           }
-        } catch (e) {}
-      }())
-
-      // Returned the cached response if we have one, otherwise return the network response.
-      return cachedResponse || networkResponsePromise
-    }())
+        })
+      }),
+    )
+    // event.respondWith(async function () {
+    //   const cache = await caches.open(CACHENAME)
+    //   const cachedResponse = await cache.match(event.request)
+    //   const networkResponsePromise = fetch(event.request).catch(() => {
+    //     /* Display custom offline page if the user is not online and trying
+    //      * to browse a page that has never been cached by service worker
+    //      */
+    //     if (event.request.method === 'GET' && event.request.mode === 'navigate' &&
+    //       event.request.headers.get('accept').includes('text/html')) {
+    //       if (!cachedResponse || !networkResponsePromise) {
+    //         return caches.match('offline.html')
+    //       }
+    //     }
+    //   })
+    //
+    //   event.waitUntil(async function () {
+    //     const networkResponse = await networkResponsePromise
+    //     console.log(networkResponse)
+    //     try {
+    //       if (networkResponse.type !== 'opaque') {
+    //         await cache.put(event.request, networkResponse.clone())
+    //       }
+    //     } catch (e) {}
+    //   }())
+    //
+    //   // Returned the cached response if we have one, otherwise return the network response.
+    //   return cachedResponse || networkResponsePromise
+    // }())
   }
 })

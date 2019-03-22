@@ -19,6 +19,6 @@ router.get('/:username/?:type(|events|going|interested|went)', function (req, re
 })
 
 /* AJAX GET user (stories) profile */
-router.get('/u/:username/?:type(|events|going|interested|went)', user_controller.get_user_data)
+router.get('/api/user/:username/?:type(|events|going|interested|went)', user_controller.get_user_data)
 
 module.exports = router

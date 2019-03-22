@@ -80,7 +80,7 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
         email: 'yui-aragaki@lespros.co.jp',
         description: 'I am Gakki',
         image: imagesRes.ops[0]._id,
-        genres: genresRes.ops[6]._id
+        genres: genresRes.ops[6]._id,
       })
 
       const luigi = new User({
@@ -89,7 +89,7 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
         email: 'luigi@nintendo.com',
         description: 'I am Luigi',
         image: imagesRes.ops[2]._id,
-        following: [gakki]
+        following: [gakki],
       })
 
       const mario = new User({
@@ -98,24 +98,35 @@ MongoClient.connect(URL, { useNewUrlParser: true }).then((client) => {
         email: 'mario@nintendo.com',
         description: 'I am Mario',
         image: imagesRes.ops[1]._id,
-        following: [gakki]
+        following: [gakki],
       })
 
       gakki.followers.push(luigi, mario)
 
       // User data
-      allPromises.push(usersCollection.insertMany([gakki, mario, luigi]).
+      allPromises.push(usersCollection.insertMany([gakki, luigi, mario]).
         then((usersRes) => {
           // Event data
-          allPromises.push(eventsCollection.insertOne(
+          allPromises.push(eventsCollection.insertMany([
             new Event({
               event_name: 'Gakki Festival',
-              description: 'Your daily heavenly days',
+              description: 'Your daily heavenly days by gakki cute cute cute cute cute cutee',
               organiser: usersRes.ops[0]._id,
               genre: genresRes.ops[6]._id,
               image: imagesRes.ops[0]._id,
             }),
-          ).then(() => {
+            new Event({
+              event_name: 'Mario Festival',
+              description: 'Super Mario Bros. theme song everyday',
+              organiser: usersRes.ops[2]._id,
+              genre: [genresRes.ops[0]._id, genresRes.ops[2]._id],
+              image: imagesRes.ops[1]._id,
+              end_datetime: new Date().setHours(new Date().getHours() + 3),
+            }),
+          ]).then((eventRes) => {
+            // Give the users the event they organised
+            usersCollection.updateOne({'username': usersRes.ops[0].username}, {$set: {'events': [eventRes.ops[0]._id]}})
+            usersCollection.updateOne({'username': usersRes.ops[2].username}, {$set: {'events': [eventRes.ops[1]._id]}})
 
             Promise.all(allPromises).
               then(() => {

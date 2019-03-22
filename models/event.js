@@ -25,14 +25,19 @@ const Event = mongoose.model('Event', new Schema({
     ref: 'User',
     required: [true, 'Event must have an organiser'],
   },
-  datetime: {
+  start_datetime: {
     type: Date,
     required: true,
     default: Date.now,
   },
+  end_datetime: Date,
   location: {
-    type: String,
-    default: 'No location',
+    latitude: Number,
+    longitude: Number,
+    address: {
+      type: String,
+      default: 'No location',
+    }
   },
   image: {
     type: Schema.Types.ObjectId,

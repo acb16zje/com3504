@@ -7,17 +7,19 @@
 'use strict'
 import { dbPromise } from './database.mjs'
 
-const STORE_NAME = 'user_store'
+const USER_STORE = 'user_store'
+const userSection = document.getElementById('user')
 
 /**
  * Initialise the user IndexedDB
  *
- * @returns {Promise<void>}
+ * @param {object} db The DB object
+ * @returns {Promise<void>} The Promise
  */
 export async function initUserDatabase (db) {
-  if (!db.objectStoreNames.contains(STORE_NAME)) {
-    const store = db.createObjectStore(STORE_NAME, {
-      keyPath: 'username'
+  if (!db.objectStoreNames.contains(USER_STORE)) {
+    const store = db.createObjectStore(USER_STORE, {
+      keyPath: 'username',
     })
     store.createIndex('username', 'username', {
       unique: true,
@@ -52,37 +54,85 @@ export async function initUserDatabase (db) {
   }
 }
 
-const userSection = document.getElementById('user')
-
 if (userSection) {
   $(userSection).ready(async function () {
-    loadUserProfile().then((doc) => {
-      Promise.resolve(displayUserProfile(doc)).then(() => {
-        console.log('displayed')
+    // Path will always be /:username/
+    const path = window.location.pathname.split('/')
+    const username = path[1]
+    const type = path[2] // undefined for /:username (stories)
 
-        Promise.resolve(storeUserProfile(doc)).then(() => {
-          console.log('data stored')
-        }).catch(err => console.log(err))
-      })
+    loadUserProfile(username).then((doc) => {
+      Promise.resolve(storeUserProfile(doc)).then(() => {
+        displayUserProfile(doc)
+      }).catch(() => console.log('Failed to store user profile'))
+    }).catch(() => {
+      console.log('Failed to load user profile from server, loading from local')
+
+      loadUserProfileLocal(username)
     })
+
   })
 }
 
 /**
- * Load the user profile data
+ * Load the user profile data from MongoDB
+ *
+ * @param {string} username The username in the URL
+ * @returns {Promise<any>} The Promise
  */
-async function loadUserProfile () {
+async function loadUserProfile (username) {
   return Promise.resolve($.ajax({
     method: 'GET',
-    contentType: 'application/json',
-    url: `/u${window.location.pathname}`,
+    dataType: 'json',
+    url: `/api/user/${username}`,
   }))
+}
+
+/**
+ * Store the user profile data into IndexedDB
+ *
+ * @param {object} doc The user document retrieved
+ * @returns {Promise<void>} The Promise
+ */
+async function storeUserProfile (doc) {
+  if (dbPromise) {
+    dbPromise.then(async db => {
+      const tx = db.transaction(USER_STORE, 'readwrite')
+      doc.genres = doc.genres.map(genre => {return genre._id})
+      await tx.store.put(doc)
+      await tx.done
+    }).catch(err => {
+      console.log(err)
+    })
+  }
+}
+
+/**
+ * Get the user profile data from IndexedDB
+ *
+ * @param {string} username The username in the URL
+ * @return {Promise<void>} The Promise
+ */
+function loadUserProfileLocal (username) {
+  if (dbPromise) {
+    dbPromise.then(async db => {
+      return await db.getFromIndex(USER_STORE, 'username', username)
+    }).then(doc => {
+      if (doc) {
+        displayUserProfile(doc)
+      } else {
+        userSection.innerHTML = '<p class=\'title has-text-centered\'>' +
+          'Unable to load page</p>'
+        userSection.classList.remove('is-hidden')
+      }
+    }).catch(err => console.log(err))
+  }
 }
 
 /**
  * Display the user data on the page
  *
- * @param doc The user document retrieved
+ * @param {object} doc The user document retrieved
  */
 function displayUserProfile (doc) {
   document.title = `${doc.fullname} (${doc.username}) - Musicbee`
@@ -94,12 +144,15 @@ function displayUserProfile (doc) {
   document.getElementById('description').textContent = doc.description
   document.getElementById('story-count').textContent = makeFriendly(
     doc.stories.length)
+
   document.getElementById('follower-count').textContent = makeFriendly(
     doc.followers.length)
+
   document.getElementById('following-count').textContent = makeFriendly(
     doc.following.length)
 
   const genre = $(document.getElementById('genre'))
+
   if (doc.genres.length) {
     doc.genres.forEach((tag) => {
       genre.append(`<span class="tag">${tag.genre_name}</span>`)
@@ -116,23 +169,5 @@ function displayUserProfile (doc) {
     'interested-link').href = `/${doc.username}/interested`
   document.getElementById('went-link').href = `/${doc.username}/went`
 
-  document.getElementById('user').classList.remove('is-hidden')
-}
-
-/**
- * Store the user profile data into IndexedDB
- *
- * @param doc The user document retrieved
- */
-async function storeUserProfile (doc) {
-  if (dbPromise) {
-    dbPromise.then(async db => {
-      const tx = db.transaction(STORE_NAME, 'readwrite')
-      doc.genres = doc.genres.map(genre => {return genre._id})
-      await tx.store.put(doc)
-      await tx.done
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
+  userSection.classList.remove('is-hidden')
 }

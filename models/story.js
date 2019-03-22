@@ -20,11 +20,9 @@ const Story = mongoose.model('Story', new Schema({
   },
   location: {
     type: String,
-    default: 'No location'
+    default: 'No location',
   },
-  caption: {
-    type: String,
-  },
+  caption: String,
   datetime: {
     type: Date,
     default: Date.now,
