@@ -161,10 +161,24 @@ try {
 // WebRTC
 // Checks for browser support
 function hasGetUserMedia(){
-  return !!(navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia);
+  if (navigator.mediaDevices === undefined) {
+    navigator.mediaDevices = {};
+  }
+  if (navigator.mediaDevices.getUserMedia === undefined) {
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  
+      // Return rejected promise with an error
+      if (!getUserMedia) {
+        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+      }
+  
+      // Wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function(resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject);
+      });
+    }
+  }
 }
 
 $("form").submit(function(e){
@@ -185,7 +199,11 @@ function takePhoto(){
   navigator.mediaDevices.getUserMedia({audio: false, video: true})
   .then(function(stream) {
     window.stream = stream;
-    video.srcObject = stream;
+    if ("srcObject" in video) {
+      video.srcObject = stream;
+    } else {
+      video.src = window.URL.createObjectURL(stream);
+    }
     button.removeEventListener('click', takePhoto);
     button.addEventListener('click', capture);
   })
@@ -209,13 +227,10 @@ const picButtons = $(document.getElementsByClassName('pic-button'))
 
 // Open the modal
 if (picButtons.length) {
-  if (hasGetUserMedia()) {
-    picButtons.click(function () {
-      const targetID = $(this).data('target')
-      const target = $(document.getElementById(`${targetID}`))
-      target.addClass('is-active')
-    })
-  } else {
-    alert('Camera media (getUserMedia()) not supported in your browser...');
-  }
+  hasGetUserMedia()
+  picButtons.click(function () {
+    const targetID = $(this).data('target')
+    const target = $(document.getElementById(`${targetID}`))
+    target.addClass('is-active')
+  })
 }
