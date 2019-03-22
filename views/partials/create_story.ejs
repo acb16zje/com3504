@@ -24,6 +24,36 @@
 
   <div class="field is-horizontal">
     <div class="field-label is-normal">
+      <label class="label">Selfie Cam</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <span class="file-cta">
+          <span class="file-label pic-button" data-target="selfie" onclick="takePhoto()">Take A Selfie</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div id="selfie" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <div class="card">
+        <div class="card-content">
+          <div class="content">
+            <video autoplay></video>
+            <canvas class="is-hidden"></canvas>
+            <img id="snapshot" src="">
+            <button id="camera-button" onclick="capture()">Capture</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
       <label class="label">Location</label>
     </div>
     <div class="field-body">

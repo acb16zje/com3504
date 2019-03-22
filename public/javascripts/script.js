@@ -157,4 +157,65 @@ try {
 
 
 
+/************************ WebRTC below ************************/
+// WebRTC
+// Checks for browser support
+function hasGetUserMedia(){
+  return !!(navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia);
+}
 
+$("form").submit(function(e){
+  return false;
+});
+
+// Takes snapshots
+const video = document.querySelector('video');
+const canvas = window.canvas = document.querySelector('canvas');
+canvas.width = 480;
+canvas.height = 360;
+const button = document.getElementById('camera-button');
+const snapshot = document.getElementById('snapshot');
+
+function takePhoto(){
+  video.classList.remove('is-hidden')
+  snapshot.classList.add('is-hidden')
+  navigator.mediaDevices.getUserMedia({audio: false, video: true})
+  .then(function(stream) {
+    window.stream = stream;
+    video.srcObject = stream;
+    button.removeEventListener('click', takePhoto);
+    button.addEventListener('click', capture);
+  })
+  .catch(function(error) {
+    console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+  });
+}
+
+function capture(){
+  video.classList.add('is-hidden')
+  snapshot.classList.remove('is-hidden')
+  button.addEventListener('click', takePhoto);
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  snapshot.src = canvas.toDataURL('image/png');
+}
+
+// Launch selfie camera modal
+const picButtons = $(document.getElementsByClassName('pic-button'))
+
+// Open the modal
+if (picButtons.length) {
+  if (hasGetUserMedia()) {
+    picButtons.click(function () {
+      const targetID = $(this).data('target')
+      const target = $(document.getElementById(`${targetID}`))
+      target.addClass('is-active')
+    })
+  } else {
+    alert('Camera media (getUserMedia()) not supported in your browser...');
+  }
+}
