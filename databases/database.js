@@ -7,19 +7,13 @@
 'use strict'
 const mongoose = require('mongoose')
 
+const DB_NAME = 'musicbee'
+const URL = `mongodb://localhost:27017/${DB_NAME}`
+
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/musicbee', {useNewUrlParser: true})
-mongoose.set('useCreateIndex', true);
-mongoose.connection.once('open', () => {
-  console.log('Connected to MongoDB')
-}).on('error', function(error){
-  console.log('Connection error:', error)
-})
-
-mongoose.Promise = global.Promise
-
-// Get the default connection
-const db = mongoose.connection
-
-//Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+mongoose.connect(URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+}).then(() => {
+  console.log('Connected to', URL)
+}).catch(err => console.log(err))

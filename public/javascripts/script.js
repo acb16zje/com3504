@@ -144,10 +144,10 @@ try {
 
     const autocomplete = new google.maps.places.Autocomplete(input)
 
-    $(input).change(function() {
+    $(input).change(function () {
       const place = autocomplete.getPlace()
       const latitude = place.geometry.location.lat()
-      const longitude  = place.geometry.location.lng()
+      const longitude = place.geometry.location.lng()
       console.log(latitude)
       console.log(longitude)
     })
@@ -155,82 +155,80 @@ try {
   })()
 } catch (e) {}
 
-
-
 /************************ WebRTC below ************************/
 // WebRTC
 // Checks for browser support
-function hasGetUserMedia(){
-  if (navigator.mediaDevices === undefined) {
-    navigator.mediaDevices = {};
-  }
-  if (navigator.mediaDevices.getUserMedia === undefined) {
-    navigator.mediaDevices.getUserMedia = function(constraints) {
-      const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  
-      // Return rejected promise with an error
-      if (!getUserMedia) {
-        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-      }
-  
-      // Wrap the call to the old navigator.getUserMedia with a Promise
-      return new Promise(function(resolve, reject) {
-        getUserMedia.call(navigator, constraints, resolve, reject);
-      });
-    }
-  }
-}
+// function hasGetUserMedia(){
+//   if (navigator.mediaDevices === undefined) {
+//     navigator.mediaDevices = {};
+//   }
+//   if (navigator.mediaDevices.getUserMedia === undefined) {
+//     navigator.mediaDevices.getUserMedia = function(constraints) {
+//       const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-$("form").submit(function(e){
-  return false;
-});
+//       // Return rejected promise with an error
+//       if (!getUserMedia) {
+//         return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+//       }
 
-// Takes snapshots
-const video = document.querySelector('video');
-const canvas = window.canvas = document.querySelector('canvas');
-canvas.width = 480;
-canvas.height = 360;
-const button = document.getElementById('camera-button');
-const snapshot = document.getElementById('snapshot');
+//       // Wrap the call to the old navigator.getUserMedia with a Promise
+//       return new Promise(function(resolve, reject) {
+//         getUserMedia.call(navigator, constraints, resolve, reject);
+//       });
+//     }
+//   }
+// }
 
-function takePhoto(){
-  video.classList.remove('is-hidden')
-  snapshot.classList.add('is-hidden')
-  navigator.mediaDevices.getUserMedia({audio: false, video: true})
-  .then(function(stream) {
-    window.stream = stream;
-    if ("srcObject" in video) {
-      video.srcObject = stream;
-    } else {
-      video.src = window.URL.createObjectURL(stream);
-    }
-    button.removeEventListener('click', takePhoto);
-    button.addEventListener('click', capture);
-  })
-  .catch(function(error) {
-    console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-  });
-}
+// $("form").submit(function(e){
+//   return false;
+// });
 
-function capture(){
-  video.classList.add('is-hidden')
-  snapshot.classList.remove('is-hidden')
-  button.addEventListener('click', takePhoto);
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-  snapshot.src = canvas.toDataURL('image/png');
-}
+// // Takes snapshots
+// const video = document.querySelector('video');
+// const canvas = window.canvas = document.querySelector('canvas');
+// canvas.width = 480;
+// canvas.height = 360;
+// const button = document.getElementById('camera-button');
+// const snapshot = document.getElementById('snapshot');
 
-// Launch selfie camera modal
-const picButtons = $(document.getElementsByClassName('pic-button'))
+// function takePhoto(){
+//   video.classList.remove('is-hidden')
+//   snapshot.classList.add('is-hidden')
+//   navigator.mediaDevices.getUserMedia({audio: false, video: true})
+//   .then(function(stream) {
+//     window.stream = stream;
+//     if ("srcObject" in video) {
+//       video.srcObject = stream;
+//     } else {
+//       video.src = window.URL.createObjectURL(stream);
+//     }
+//     button.removeEventListener('click', takePhoto);
+//     button.addEventListener('click', capture);
+//   })
+//   .catch(function(error) {
+//     console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+//   });
+// }
 
-// Open the modal
-if (picButtons.length) {
-  hasGetUserMedia()
-  picButtons.click(function () {
-    const targetID = $(this).data('target')
-    const target = $(document.getElementById(`${targetID}`))
-    target.addClass('is-active')
-  })
-}
+// function capture(){
+//   video.classList.add('is-hidden')
+//   snapshot.classList.remove('is-hidden')
+//   button.addEventListener('click', takePhoto);
+//   canvas.width = video.videoWidth;
+//   canvas.height = video.videoHeight;
+//   canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+//   snapshot.src = canvas.toDataURL('image/png');
+// }
+
+// // Launch selfie camera modal
+// const picButtons = $(document.getElementsByClassName('pic-button'))
+
+// // Open the modal
+// if (picButtons.length) {
+//   hasGetUserMedia()
+//   picButtons.click(function () {
+//     const targetID = $(this).data('target')
+//     const target = $(document.getElementById(`${targetID}`))
+//     target.addClass('is-active')
+//   })
+// }

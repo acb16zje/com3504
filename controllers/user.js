@@ -7,7 +7,6 @@
 'use strict'
 const createError = require('http-errors')
 const Event = require('../models/event')
-const Image = require('../models/image')
 const User = require('../models/user')
 
 /**
@@ -20,7 +19,8 @@ const User = require('../models/user')
 exports.get_user_data = function (req, res, next) {
   User.
     findOne({ 'username': req.params.username }).
-    populate('genres').
+    populate(
+      'genres stories followers following events interested_events going_events').
     exec(function (err, doc) {
       if (err) throw err
 

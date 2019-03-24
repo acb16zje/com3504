@@ -12,31 +12,36 @@ const Story = mongoose.model('Story', new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
   image: {
-    type: Schema.Types.ObjectId,
-    ref: 'Image',
+    type: String,
   },
   location: {
-    type: String,
-    default: 'No location',
+    latitude: Number,
+    longitude: Number,
+    address: {
+      type: String,
+      default: 'No location',
+    }
   },
   caption: String,
   datetime: {
     type: Date,
-    default: Date.now,
     required: true,
+    default: Date.now,
   },
   likes: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: []
     }],
   comments: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
+      default: []
     }],
 }))
 

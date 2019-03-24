@@ -19,7 +19,7 @@
       </div>
 
       <div class="navbar-end">
-        <a class="navbar-item has-text-weight-bold <%= path === 'create' ? "is-active" : '' %>" href="/create">
+        <a class="navbar-item has-text-weight-bold <%= /create_/.test(path) ? "is-active" : '' %>" href="/create">
             Create
         </a>
         <div class="navbar-item">

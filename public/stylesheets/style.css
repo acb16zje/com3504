@@ -361,7 +361,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   /* Explore page event column */
   #explore div.column {
     flex: none;
-    width: 25%;
+    width: 33.33333%;
   }
 }
 
@@ -436,7 +436,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     padding: 5px 3px;
   }
 
-  @media screen and (min-width: 420px) {
+  @media screen and (min-width: 440px) {
     /* Event card column adjustments */
     #explore div.card-image {
       grid-area: card-image;

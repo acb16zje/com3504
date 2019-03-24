@@ -13,22 +13,18 @@ const Schema = mongoose.Schema
 // Models required for population
 require('../models/event')
 require('../models/genre')
-const Image = require('../models/image')
 require('../models/story')
 
-const defaultProfileImg = new Image({
-  content: fs.readFileSync(
-    path.join(__dirname, '../public/images/default.webp'),
-    { encoding: 'base64' }),
-  contentType: 'image/webp',
-})
+const defaultProfileImg = `data:image/webp;base64, ${fs.readFileSync(
+  path.join(__dirname, '../public/images/default.webp'),
+  { encoding: 'base64' })}`
 
 const user = new Schema({
   username: {
     type: String,
     maxlength: [30, 'Username must be shorter than 30 characters'],
     match: [
-      /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/ig,
+      /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/i,
       'Username can only use letters, numbers, underscores and periods,' +
       'and must start with a letter or number'],
     required: [true, 'Username is required'],
@@ -48,8 +44,7 @@ const user = new Schema({
     default: '',
   },
   image: {
-    type: Schema.Types.ObjectId,
-    ref: 'Image',
+    type: String,
     default: defaultProfileImg,
   },
   genres: [
@@ -91,7 +86,8 @@ const user = new Schema({
   going_events: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Event', default: [],
+      ref: 'Event',
+      default: [],
     }],
 })
 

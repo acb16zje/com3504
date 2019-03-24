@@ -17,7 +17,6 @@ const path = require('path')
 
 const createRouter = require('./routes/create')
 const exploreRouter = require('./routes/explore')
-const imageRouter = require('./routes/image')
 const indexRouter = require('./routes/index')
 const userRouter = require('./routes/user')
 
@@ -39,7 +38,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(createRouter)
 app.use(exploreRouter)
-app.use(imageRouter)
 app.use(indexRouter)
 app.use(userRouter)
 

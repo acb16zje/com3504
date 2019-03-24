@@ -7,7 +7,6 @@
 'use strict'
 const createError = require('http-errors')
 const Event = require('../models/event')
-const Image = require('../models/image')
 
 /**
  * Explore page (/explore) with featured and suggested events

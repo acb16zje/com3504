@@ -4,12 +4,17 @@
  * @author Zer Jun Eng
  */
 const mongoose = require('mongoose')
+const fs = require('fs')
+const path = require('path')
 const Schema = mongoose.Schema
 
 // Models required for population
 require('../models/genre')
-require('../models/image')
 require('../models/user')
+
+const defaultEventImg = `data:image/webp;base64, ${fs.readFileSync(
+  path.join(__dirname, '../public/images/default.webp'),
+  { encoding: 'base64' })}`
 
 const Event = mongoose.model('Event', new Schema({
   event_name: {
@@ -40,23 +45,26 @@ const Event = mongoose.model('Event', new Schema({
     }
   },
   image: {
-    type: Schema.Types.ObjectId,
-    ref: 'Image',
+    type: String,
+    default: defaultEventImg
   },
   genre: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Genre',
+      default: []
     }],
   interested: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: []
     }],
   going: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: []
     }],
 }))
 

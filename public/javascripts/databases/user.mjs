@@ -61,14 +61,19 @@ if (userSection) {
     const username = path[1]
     const type = path[2] // undefined for /:username (stories)
 
-    loadUserProfile(username).then((doc) => {
-      Promise.resolve(storeUserProfile(doc)).then(() => {
-        displayUserProfile(doc)
-      }).catch(() => console.log('Failed to store user profile'))
-    }).catch(() => {
-      console.log('Failed to load user profile from server, loading from local')
+    loadUserProfile(username).then(doc => {
+      console.log(`Loaded ${username} from server`)
 
-      loadUserProfileLocal(username)
+      Promise.resolve(storeUserProfile(doc)).then(() => {
+        console.log(`Stored ${username}`)
+        displayUserProfile(doc)
+      }).catch(() => console.log(`Failed to store ${username}`))
+    }).catch(() => {
+      console.log(`Failed to load ${username} from server, loading from local`)
+
+      loadUserProfileLocal(username).then(() => {
+        console.log(`Loaded ${username} from local`)
+      }).catch(() => console.log(`Failed to load ${username} from local`))
     })
 
   })
@@ -92,18 +97,17 @@ async function loadUserProfile (username) {
  * Store the user profile data into IndexedDB
  *
  * @param {object} doc The user document retrieved
- * @returns {Promise<void>} The Promise
  */
-async function storeUserProfile (doc) {
+function storeUserProfile (doc) {
   if (dbPromise) {
     dbPromise.then(async db => {
       const tx = db.transaction(USER_STORE, 'readwrite')
-      doc.genres = doc.genres.map(genre => {return genre._id})
+      doc.genres = doc.genres.map(genre => {return genre.genre_name})
+      doc.followers = doc.followers.map(follower => {return follower.username})
+      doc.following = doc.following.map(following => {return following.username})
       await tx.store.put(doc)
       await tx.done
-    }).catch(err => {
-      console.log(err)
-    })
+    }).catch(err => console.log(err))
   }
 }
 
@@ -113,7 +117,7 @@ async function storeUserProfile (doc) {
  * @param {string} username The username in the URL
  * @return {Promise<void>} The Promise
  */
-function loadUserProfileLocal (username) {
+async function loadUserProfileLocal (username) {
   if (dbPromise) {
     dbPromise.then(async db => {
       return await db.getFromIndex(USER_STORE, 'username', username)
@@ -139,7 +143,7 @@ function displayUserProfile (doc) {
 
   // User data
   document.getElementById('user-name').textContent = doc.username
-  document.getElementById('profile-img').src = `/image/${doc.image}`
+  document.getElementById('profile-img').src = `${doc.image}`
   document.getElementById('fullname').textContent = doc.fullname
   document.getElementById('description').textContent = doc.description
   document.getElementById('story-count').textContent = makeFriendly(
@@ -154,8 +158,8 @@ function displayUserProfile (doc) {
   const genre = $(document.getElementById('genre'))
 
   if (doc.genres.length) {
-    doc.genres.forEach((tag) => {
-      genre.append(`<span class="tag">${tag.genre_name}</span>`)
+    doc.genres.forEach(tag => {
+      genre.append(`<span class="tag">${tag}</span>`)
     })
   } else {
     genre.addClass('is-hidden')
@@ -169,5 +173,6 @@ function displayUserProfile (doc) {
     'interested-link').href = `/${doc.username}/interested`
   document.getElementById('went-link').href = `/${doc.username}/went`
 
+  // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')
 }
