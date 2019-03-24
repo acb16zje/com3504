@@ -75,14 +75,9 @@
     <% if (path === 'user_') { %>
       <!--User profile page: Stories-->
       <% include ./partials/user_story_columns.ejs %>
-    <% } else if (path === 'user_events') { %>
-
-    <% } else if (path === 'user_going') { %>
-
-    <% } else if (path === 'user_interested') { %>
-
     <% } else { %>
-
+      <!--User profile page: user related events-->
+      <div class="columns is-multiline event-columns"></div>
     <% } %>
 
   </div>

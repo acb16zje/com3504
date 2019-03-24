@@ -97,36 +97,36 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 /* Explore page events card column */
-#explore div.card {
+.event-columns div.card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
 }
 
-#explore  div.card-content {
+.event-columns div.card-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   padding: 1em 1.25em 1em;
 }
 
-#explore div.card-content div.content.is-hidden-mobile {
+.event-columns div.card-content div.content.is-hidden-mobile {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2; /* number of lines to show */
-  line-height: 22px;        /* fallback */
-  max-height: 44px;       /* fallback */
+  line-height: 22px; /* fallback */
+  max-height: 44px; /* fallback */
   padding-bottom: 2px;
 }
 
-#explore  div.card-content nav.level {
+.event-columns div.card-content nav.level {
   margin-top: auto;
 }
 
-#explore img {
+.event-columns img {
   object-fit: cover;
 }
 
@@ -134,19 +134,19 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   overflow-x: auto;
 }
 
-#explore .media-content .title a {
+.event-columns .media-content .title a {
   color: initial;
 }
 
-#explore .media-content .title a:hover {
+.event-columns .media-content .title a:hover {
   text-decoration: underline;
 }
 
-#explore .host.subtitle, #explore .location.subtitle {
-  margin-bottom: 0.2em;
+.event-columns .host.subtitle, .event-columns .location.subtitle {
+  margin-bottom: 0.3em;
 }
 
-#explore .location.subtitle {
+.event-columns .location.subtitle {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -359,7 +359,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   }
 
   /* Explore page event column */
-  #explore div.column {
+  .event-columns div.column {
     flex: none;
     width: 33.33333%;
   }
@@ -408,9 +408,9 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     }
 
     /* Explore page event column */
-    #explore div.column {
+    .event-columns div.column {
       flex: none;
-      width: 33.33333%;
+      width: 50%;
     }
   }
 }
@@ -438,28 +438,28 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
   @media screen and (min-width: 440px) {
     /* Event card column adjustments */
-    #explore div.card-image {
+    .event-columns div.card-image {
       grid-area: card-image;
       padding: 5px 5px 5px 0;
     }
 
-    #explore div.card-image figure {
+    .event-columns div.card-image figure {
       height: 100%;
     }
 
-    #explore div.card-image figure img {
+    .event-columns div.card-image figure img {
       border-radius: 5%;
     }
 
-    #explore div.card-content {
+    .event-columns div.card-content {
       grid-area: card-content;
     }
 
-    #explore footer.card-footer {
+    .event-columns footer.card-footer {
       grid-area: card-footer;
     }
 
-    #explore div.card {
+    .event-columns div.card {
       display: grid;
       grid-template-columns: 65% 35%;
       grid-template-areas: 'card-content card-image' 'card-footer card-footer';

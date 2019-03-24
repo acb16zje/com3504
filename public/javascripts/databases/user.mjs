@@ -6,6 +6,7 @@
 
 'use strict'
 import { dbPromise } from './database.mjs'
+import { renderEventCard } from './event.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
@@ -33,22 +34,10 @@ export async function initUserDatabase (db) {
     store.createIndex('genres', 'genres', {
       multiEntry: true,
     })
-    store.createIndex('stories', 'stories', {
-      multiEntry: true,
-    })
     store.createIndex('followers', 'followers', {
       multiEntry: true,
     })
     store.createIndex('following', 'following', {
-      multiEntry: true,
-    })
-    store.createIndex('events', 'events', {
-      multiEntry: true,
-    })
-    store.createIndex('interested_events', 'interested_events', {
-      multiEntry: true,
-    })
-    store.createIndex('going_events', 'going_events', {
       multiEntry: true,
     })
   }
@@ -59,19 +48,19 @@ if (userSection) {
     // Path will always be /:username/
     const path = window.location.pathname.split('/')
     const username = path[1]
-    const type = path[2] // undefined for /:username (stories)
+    const tab = path[2] // undefined for /:username (stories)
 
     loadUserProfile(username).then(doc => {
       console.log(`Loaded ${username} from server`)
 
       Promise.resolve(storeUserProfile(doc)).then(() => {
         console.log(`Stored ${username}`)
-        displayUserProfile(doc)
+        displayUserProfile(tab, doc)
       }).catch(() => console.log(`Failed to store ${username}`))
     }).catch(() => {
       console.log(`Failed to load ${username} from server, loading from local`)
 
-      loadUserProfileLocal(username).then(() => {
+      loadUserProfileLocal(tab, username).then(() => {
         console.log(`Loaded ${username} from local`)
       }).catch(() => console.log(`Failed to load ${username} from local`))
     })
@@ -104,7 +93,8 @@ function storeUserProfile (doc) {
       const tx = db.transaction(USER_STORE, 'readwrite')
       doc.genres = doc.genres.map(genre => {return genre.genre_name})
       doc.followers = doc.followers.map(follower => {return follower.username})
-      doc.following = doc.following.map(following => {return following.username})
+      doc.following = doc.following.map(
+        following => {return following.username})
       await tx.store.put(doc)
       await tx.done
     }).catch(err => console.log(err))
@@ -114,16 +104,17 @@ function storeUserProfile (doc) {
 /**
  * Get the user profile data from IndexedDB
  *
+ * @param tab The user tab to display (stories, events, going, interested, went)
  * @param {string} username The username in the URL
  * @return {Promise<void>} The Promise
  */
-async function loadUserProfileLocal (username) {
+async function loadUserProfileLocal (tab, username) {
   if (dbPromise) {
     dbPromise.then(async db => {
       return await db.getFromIndex(USER_STORE, 'username', username)
     }).then(doc => {
       if (doc) {
-        displayUserProfile(doc)
+        resolve(doc)
       } else {
         userSection.innerHTML = '<p class=\'title has-text-centered\'>' +
           'Unable to load page</p>'
@@ -136,9 +127,10 @@ async function loadUserProfileLocal (username) {
 /**
  * Display the user data on the page
  *
+ * @param tab The user tab to display (stories, events, going, interested, went)
  * @param {object} doc The user document retrieved
  */
-function displayUserProfile (doc) {
+function displayUserProfile (tab, doc) {
   document.title = `${doc.fullname} (${doc.username}) - Musicbee`
 
   // User data
@@ -172,6 +164,25 @@ function displayUserProfile (doc) {
   document.getElementById(
     'interested-link').href = `/${doc.username}/interested`
   document.getElementById('went-link').href = `/${doc.username}/went`
+
+  // Stories, Events, Going, Interested, or Went
+  switch (tab) {
+    case 'events':
+      const eventColumns = document.getElementsByClassName('event-columns')[0]
+      doc.events.forEach((event) => {
+        eventColumns.innerHTML += renderEventCard(event)
+      })
+      break
+    case 'going':
+      break
+    case 'interested':
+      break
+    case 'went':
+      break
+    default:
+      // Stories tab, tab is undefined
+      break
+  }
 
   // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')

@@ -127,7 +127,7 @@ function displayExplorePage (docs) {
  * @param {object} doc An event document
  * @return {string} The HTML fragment
  */
-function renderEventCard(doc) {
+export function renderEventCard(doc) {
   const organiser = doc.organiser.username
   const address = doc.location.address
   const people = doc.interested.length + doc.going.length
@@ -186,7 +186,7 @@ function renderEventCard(doc) {
       '<div class="media">' +
         '<div class="media-content">' +
           `<p class="title is-4"><a href="/event/${doc._id}">${doc.event_name}</a></p>` +
-          `<p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>` +
+          `${organiser ? `<p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>` : ''}` +
           `<p class="location subtitle is-6">${address}</p>` +
           `<p class="time subtitle is-6">${start_datetime} ${end_datetime ? ` – ${end_datetime}` : ''}</p>` +
         '</div>' +

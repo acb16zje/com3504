@@ -21,7 +21,13 @@
 
 \newpage
 \section{Introduction}
-The Progressive Web App (PWA) allows users to create, post and search for events. Users are able to take selfies through the use of WebRTC or select a photo from a folder to be posted, where each post can receive likes and comments which is implemented with SocketIO. Each user can follow other users and vice versa. Attended and interested events are stored and displayed for each user. Web workers are used to allow offline usage with IndexedDB used to store data locally. MongoDB is used to store data which can only be retrieved online. The search function (via location) was implemented with the use of Google API, allowing selected location to be displayed on the map.
+The Progressive Web App (PWA) allows users to create, post and search for events. Users are able to
+take selfies through the use of WebRTC or select a photo from a folder to be posted, where each post
+can receive likes and comments which is implemented with SocketIO. Each user can follow other users
+and vice versa. Attended and interested events are stored and displayed for each user. Web workers
+are used to allow offline usage with IndexedDB used to store data locally. MongoDB is used to store
+data which can only be retrieved online. The search function (via location) was implemented with the
+use of Google API, allowing selected location to be displayed on the map.
 
 \section{Diagrams}
 Diagram 1 displays the flow of each web page and the transmission and retrieval of data.
@@ -104,7 +110,9 @@ Diagram 1 displays the flow of each web page and the transmission and retrieval 
   \end{itemize}
   \item \textbf{Requirements}:
   \begin{itemize}
-    \item Data stored in MongoDB is stored online. Data is not stored locally and cannot be retrieved offline. When user is online, data is retrieved from the database and displayed on the PWA.
+    \item Data stored in MongoDB is stored online. Data is not stored locally and cannot be
+    retrieved offline. When user is online, data is retrieved from the database and displayed on the
+    PWA.
   \end{itemize}
   \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
   bibendum turpis in sollicitudin molestie.
@@ -132,7 +140,8 @@ molestie.
 
 \section{Extra Information}
 \begin{itemize}
-  \item \textbf{Initial population of MongoDB}: run 'node run initdb' to drop database and repopulate database with default data.
+  \item \textbf{Initial population of MongoDB}: run 'npm run initdb' to drop database and
+  repopulate database with default data.
 \end{itemize}
 
 \end{document}
