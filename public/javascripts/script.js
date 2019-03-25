@@ -158,77 +158,100 @@ try {
 /************************ WebRTC below ************************/
 // WebRTC
 // Checks for browser support
-// function hasGetUserMedia(){
-//   if (navigator.mediaDevices === undefined) {
-//     navigator.mediaDevices = {};
-//   }
-//   if (navigator.mediaDevices.getUserMedia === undefined) {
-//     navigator.mediaDevices.getUserMedia = function(constraints) {
-//       const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+function hasGetUserMedia(){
+  if (navigator.mediaDevices === undefined) {
+    navigator.mediaDevices = {}
+  }
+  if (navigator.mediaDevices.getUserMedia === undefined) {
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
 
-//       // Return rejected promise with an error
-//       if (!getUserMedia) {
-//         return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-//       }
+      // Return rejected promise with an error
+      if (!getUserMedia) {
+        return Promise.reject(new Error('getUserMedia is not implemented in this browser'))
+      }
 
-//       // Wrap the call to the old navigator.getUserMedia with a Promise
-//       return new Promise(function(resolve, reject) {
-//         getUserMedia.call(navigator, constraints, resolve, reject);
-//       });
-//     }
-//   }
-// }
+      // Wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function(resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject);
+      })
+    }
+  }
+}
 
-// $("form").submit(function(e){
-//   return false;
-// });
+$("form").submit(function(e){
+  return false
+})
 
-// // Takes snapshots
-// const video = document.querySelector('video');
-// const canvas = window.canvas = document.querySelector('canvas');
-// canvas.width = 480;
-// canvas.height = 360;
-// const button = document.getElementById('camera-button');
-// const snapshot = document.getElementById('snapshot');
+// Switch on camera to take snapshots
+const video = document.querySelector('video')
+const button = document.getElementById('camera-button')
+const snapshot = document.getElementById('snapshot')
 
-// function takePhoto(){
-//   video.classList.remove('is-hidden')
-//   snapshot.classList.add('is-hidden')
-//   navigator.mediaDevices.getUserMedia({audio: false, video: true})
-//   .then(function(stream) {
-//     window.stream = stream;
-//     if ("srcObject" in video) {
-//       video.srcObject = stream;
-//     } else {
-//       video.src = window.URL.createObjectURL(stream);
-//     }
-//     button.removeEventListener('click', takePhoto);
-//     button.addEventListener('click', capture);
-//   })
-//   .catch(function(error) {
-//     console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-//   });
-// }
+function onCamera(){
+  // Change button label
+  if (button.innerHTML == "Take Again"){
+    button.innerHTML = "Capture"
+  }
 
-// function capture(){
-//   video.classList.add('is-hidden')
-//   snapshot.classList.remove('is-hidden')
-//   button.addEventListener('click', takePhoto);
-//   canvas.width = video.videoWidth;
-//   canvas.height = video.videoHeight;
-//   canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-//   snapshot.src = canvas.toDataURL('image/png');
-// }
+  // Switch between rear and environment camera
+  var front = false;
+  document.getElementById('switch-button').onclick = function() { front = !front; };
 
-// // Launch selfie camera modal
-// const picButtons = $(document.getElementsByClassName('pic-button'))
+  video.classList.remove('is-hidden')
+  snapshot.classList.add('is-hidden')
+  navigator.mediaDevices.getUserMedia({audio: false, video: { facingMode: (front? "user" : "environment") }})
+  .then(function(stream) {
+    window.stream = stream;
+    if ("srcObject" in video) {
+      video.srcObject = stream
+    } else {
+      video.src = window.URL.createObjectURL(stream)
+    }
+    button.removeEventListener('click', onCamera)
+    button.addEventListener('click', capture)
+  })
+  .catch(function(error) {
+    console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name)
+  })
+}
 
-// // Open the modal
-// if (picButtons.length) {
-//   hasGetUserMedia()
-//   picButtons.click(function () {
-//     const targetID = $(this).data('target')
-//     const target = $(document.getElementById(`${targetID}`))
-//     target.addClass('is-active')
-//   })
-// }
+// Takes snapshot
+function capture(){
+  // Change button label
+  if (button.innerHTML == "Capture"){
+    button.innerHTML = "Take Again"
+  }
+
+  const canvas = window.canvas = document.querySelector('canvas')
+  video.classList.add('is-hidden')
+  snapshot.classList.remove('is-hidden')
+  button.addEventListener('click', onCamera)
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
+  snapshot.src = canvas.toDataURL('image/png')
+}
+
+// Launch and close selfie camera modal
+const picButtons = $(document.getElementsByClassName('pic-button'))
+
+// Check for Canvas support and presence
+function isCanvas(){
+  const elem = document.createElement('canvas')
+  return (elem.getContext && elem.getContext('2d') && document.querySelector('canvas') != null)
+}
+
+// Open the modal
+if (picButtons.length) {
+  if (isCanvas()){
+    hasGetUserMedia()
+    picButtons.click(function () {
+      button.innerHTML = "Capture"
+      const targetID = $(this).data('target')
+      const target = $(document.getElementById(`${targetID}`))
+      target.addClass('is-active')
+      onCamera()
+    })
+  }
+}
