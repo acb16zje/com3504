@@ -18,10 +18,17 @@ const User = require('../models/user')
  */
 exports.get_user_data = function (req, res, next) {
   User.
-    findOne({ 'username': req.params.username }).
-    populate(
-      'genres stories followers following events interested_events going_events').
-    exec(function (err, doc) {
+    findOne({ 'username': req.params.username }, '-_id').
+    populate('genres', '-_id genre_name').
+    populate({
+      path:'events going interested',
+      populate: [
+        { path: 'organiser', select: '-_id username' },
+        { path: 'genres', select: '-_id genre_name'},
+      ],
+    }).
+    populate('stories followers following').
+    lean().exec(function (err, doc) {
       if (err) throw err
 
       if (doc) {

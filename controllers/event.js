@@ -18,8 +18,10 @@ const Event = require('../models/event')
 exports.index = function (req, res, next) {
   Event.
     find({}).
-    populate('organiser genre').
-    exec(function (err, docs) {
+    populate('organiser', '-_id').
+    populate('genres', '-_id genre_name').
+    populate('interested going', '-_id username image').
+    lean().exec(function (err, docs) {
       if (err) throw err
 
       if (docs.length) {

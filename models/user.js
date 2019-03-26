@@ -77,13 +77,13 @@ const user = new Schema({
       ref: 'Event',
       default: [],
     }],
-  interested_events: [
+  interested: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Event',
       default: [],
     }],
-  going_events: [
+  going: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Event',

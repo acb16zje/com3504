@@ -8,6 +8,13 @@ html, body {
   /*#ffc038*/
 }
 
+@media screen and (max-width: 1088px) {
+  /* We have two navbar at tablet view */
+  body.has-navbar-fixed-top {
+    padding-bottom: 3.25rem;
+  }
+}
+
 #offline {
   display: none;
   margin-bottom: 0;
@@ -69,7 +76,6 @@ form ::placeholder {
   transition-duration: 0.25s;
 }
 
-
 /* Desktop navbar */
 nav.navbar .navbar-brand .navbar-burger {
   margin-left: 0;
@@ -94,6 +100,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a {
 
 nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   color: var(--primary-color);
+}
+
+/* Login page */
+#login {
+  height: 100%;
+  min-height: 0;
 }
 
 /* Explore page events card column */
@@ -326,9 +338,19 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   overflow: auto;
 }
 
+#story div.card-content div.content strong {
+  padding-right: 5px;
+}
+
 #story figure img {
   max-width: 350px;
   margin: 0 auto;
+}
+
+/* User profile event card */
+#user div.event-columns {
+  max-width: 935px;
+  margin: auto;
 }
 
 /* Desktop viewport adjustments */
@@ -398,7 +420,8 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   }
 
   #story div.card-content {
-    grid-area: content
+    grid-area: content;
+    max-width: 350px;
   }
 
   @media screen and (max-width: 1088px) {

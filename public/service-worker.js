@@ -63,7 +63,7 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(
       caches.open(CACHENAME).then(function (cache) {
         return fetch(event.request).then(function (response) {
-          if (response.type !== 'opaque') {
+          if (!response.type.includes('opaque')) {
             cache.put(event.request, response.clone())
           }
           return response

@@ -48,7 +48,7 @@ const Event = mongoose.model('Event', new Schema({
     type: String,
     default: defaultEventImg
   },
-  genre: [
+  genres: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Genre',

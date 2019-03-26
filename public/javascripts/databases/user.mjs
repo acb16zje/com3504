@@ -6,7 +6,7 @@
 
 'use strict'
 import { dbPromise } from './database.mjs'
-import { renderEventCard } from './event.mjs'
+import { renderEventCard, storeExplorePage } from './event.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
@@ -53,9 +53,16 @@ if (userSection) {
     loadUserProfile(username).then(doc => {
       console.log(`Loaded ${username} from server`)
 
-      Promise.resolve(storeUserProfile(doc)).then(() => {
+      storeUserProfile(doc).then(() => {
         console.log(`Stored ${username}`)
-        displayUserProfile(tab, doc)
+
+        Promise.resolve(displayUserProfile(tab, doc)).then(() => {
+          storeExplorePage(doc.events.concat(doc.interested, doc.going)).
+            then(() => {
+              console.log(`Pre-stored ${username}'s events`)
+            }).
+            catch(() => console.log('Failed to pre-store events'))
+        })
       }).catch(() => console.log(`Failed to store ${username}`))
     }).catch(() => {
       console.log(`Failed to load ${username} from server, loading from local`)
@@ -86,8 +93,9 @@ async function loadUserProfile (username) {
  * Store the user profile data into IndexedDB
  *
  * @param {object} doc The user document retrieved
+ * @return {Promise<void>} The Promise
  */
-function storeUserProfile (doc) {
+async function storeUserProfile (doc) {
   if (dbPromise) {
     dbPromise.then(async db => {
       const tx = db.transaction(USER_STORE, 'readwrite')
@@ -114,7 +122,7 @@ async function loadUserProfileLocal (tab, username) {
       return await db.getFromIndex(USER_STORE, 'username', username)
     }).then(doc => {
       if (doc) {
-        resolve(doc)
+        return Promise.resolve(displayUserProfile(tab, doc))
       } else {
         userSection.innerHTML = '<p class=\'title has-text-centered\'>' +
           'Unable to load page</p>'
@@ -166,18 +174,25 @@ function displayUserProfile (tab, doc) {
   document.getElementById('went-link').href = `/${doc.username}/went`
 
   // Stories, Events, Going, Interested, or Went
+  const eventColumns = document.getElementsByClassName('event-columns')[0]
   switch (tab) {
     case 'events':
-      const eventColumns = document.getElementsByClassName('event-columns')[0]
-      doc.events.forEach((event) => {
+      doc.events.forEach(
+        event => eventColumns.innerHTML += renderEventCard(event))
+      break
+    case 'interested':
+      doc.interested.forEach(
+        event => eventColumns.innerHTML += renderEventCard(event))
+      break
+    case 'going':
+      doc.going.forEach(event => {
         eventColumns.innerHTML += renderEventCard(event)
       })
       break
-    case 'going':
-      break
-    case 'interested':
-      break
     case 'went':
+      doc.going.forEach(event => {
+        eventColumns.innerHTML += renderEventCard(event)
+      })
       break
     default:
       // Stories tab, tab is undefined

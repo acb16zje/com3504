@@ -13,6 +13,6 @@ const Genre = mongoose.model('Genre', new Schema({
     type: String,
     required: true
   },
-}))
+}).index({ genre_name: 1 }, { unique: true }))
 
 module.exports = Genre

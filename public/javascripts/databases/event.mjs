@@ -38,8 +38,9 @@ if (exploreSection) {
   $(exploreSection).ready(async function () {
     loadExplorePage().then(docs => {
       console.log('Loaded /explore from server')
+      console.log(docs)
 
-      Promise.resolve(storeExplorePage(docs)).then(() => {
+      storeExplorePage(docs).then(() => {
         console.log('Stored /explore')
         displayExplorePage(docs)
       })
@@ -72,7 +73,7 @@ async function loadExplorePage () {
  * @param {object} docs The events documents retrieved
  * @return {Promise<void>} The Promise
  */
-function storeExplorePage (docs) {
+export async function storeExplorePage (docs) {
   docs = JSON.parse(JSON.stringify(docs).split('"_id":').join('"id":'))
   if (dbPromise) {
     dbPromise.then(async db => {
@@ -128,7 +129,7 @@ function displayExplorePage (docs) {
  * @return {string} The HTML fragment
  */
 export function renderEventCard(doc) {
-  const organiser = doc.organiser.username
+  const organiser = doc.organiser.username || doc.organiser
   const address = doc.location.address
   const people = doc.interested.length + doc.going.length
 
@@ -186,7 +187,7 @@ export function renderEventCard(doc) {
       '<div class="media">' +
         '<div class="media-content">' +
           `<p class="title is-4"><a href="/event/${doc._id}">${doc.event_name}</a></p>` +
-          `${organiser ? `<p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>` : ''}` +
+          `<p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>` +
           `<p class="location subtitle is-6">${address}</p>` +
           `<p class="time subtitle is-6">${start_datetime} ${end_datetime ? ` – ${end_datetime}` : ''}</p>` +
         '</div>' +

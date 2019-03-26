@@ -85,36 +85,42 @@ mongoose.connect(URL, {
       event_name: 'Gakki Festival',
       description: 'Your daily heavenly days by gakki cute cute cute cute cute cutee',
       organiser: gakki.id,
-      genre: pop.id,
       image: gakkiImg,
+      genres: pop.id,
+      going: [mario.id, luigi.id]
     }).save()
     const marioEvent = await new Event({
       event_name: 'Mario Festival',
       description: 'Super Mario Bros. theme song everyday',
       organiser: mario.id,
-      genre: [classical.id, electronic.id],
-      image: marioImg,
       start_datetime: new Date().setHours(new Date().getHours() + 3),
       end_datetime: new Date().setHours(new Date().getDay() + 3),
+      image: marioImg,
+      genres: [classical.id, electronic.id],
+      interested: [gakki.id]
     }).save()
     const luigiEvent = await new Event({
       event_name: 'Luigi Festival',
       description: 'Super Luigi Bros. theme song everyday',
       organiser: luigi.id,
-      genre: [classical.id, electronic.id, pop.id],
-      image: luigiImg,
       end_datetime: new Date().setHours(new Date().getHours() + 25),
+      image: luigiImg,
+      genres: [classical.id, electronic.id, pop.id],
+      interested: [gakki.id]
     }).save()
 
     // Update the users followers and events details
     gakki.followers = [mario.id, luigi.id]
     gakki.events = gakkiEvent.id
+    gakki.interested = [marioEvent.id, luigiEvent.id]
     await gakki.save()
 
     mario.events = marioEvent.id
+    mario.going = [gakkiEvent.id]
     await mario.save()
 
     luigi.events = luigiEvent.id
+    luigi.going = [gakkiEvent.id]
     await luigi.save()
 
     console.log('Finished successfully, closing the connection')

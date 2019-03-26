@@ -7,9 +7,10 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
+const auth = require('./auth')
 
 /* GET home (stories) page */
-router.get('/', function (req, res, next) {
+router.get('/', auth.checkAuth, function (req, res, next) {
   res.render('index', {
     title: 'Musicbee - Enjoy the Sweetest Moment of Music',
     path: 'home_stories',
@@ -20,14 +21,14 @@ router.get('/', function (req, res, next) {
 router.get('/events', function (req, res, next) {
   res.render('index', {
     title: 'Musicbee - Enjoy the Sweetest Moment of Music',
-    path: 'home_events'
+    path: 'home_events',
   })
 })
 
-router.get('/notifications', function (req, res, next) {
+router.get('/notifications', auth.checkAuth, function (req, res, next) {
   res.render('notifications', {
     title: 'Musicbee - notifications',
-    path: 'notifications'
+    path: 'notifications',
   })
 })
 

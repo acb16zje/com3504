@@ -7,14 +7,16 @@
 'use strict'
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const cookieParser = require('cookie-parser')
 const createError = require('http-errors')
 const express = require('express')
+const session = require('express-session')
 const expressLayouts = require('express-ejs-layouts')
 const logger = require('morgan')
 const mime = require('mime-types')
+const passport = require('passport')
 const path = require('path')
 
+const authRouter = require('./routes/auth')
 const createRouter = require('./routes/create')
 const exploreRouter = require('./routes/explore')
 const indexRouter = require('./routes/index')
@@ -33,9 +35,26 @@ app.use(compression())
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(session({
+  secret: 'musicbee pwa',
+  resave: false,
+  saveUninitialized: false
+}))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(passport.initialize())
+app.use(passport.session())
 
+app.locals.title = 'Musicbee'
+app.locals.path = ''
+
+// Locals variable for checking login
+app.use(function(req, res, next) {
+  res.locals.authenticated = req.isAuthenticated()
+  res.locals.username = req.isAuthenticated() ? req.user.username : ''
+  next()
+})
+
+app.use(authRouter.router)
 app.use(createRouter)
 app.use(exploreRouter)
 app.use(indexRouter)
