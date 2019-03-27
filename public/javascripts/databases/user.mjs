@@ -7,12 +7,15 @@
 'use strict'
 import { dbPromise } from './database.mjs'
 import { renderEventCard, storeExplorePage } from './event.mjs'
+import { getGenres } from './genre.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
+const editProfileForm = document.getElementById('edit-profile-form')
 
+// Loading, storing, and displaying user profile (Promise based)
 if (userSection) {
-  $(userSection).ready(async function () {
+  $(userSection).ready(() => {
     // Path will always be /:username/
     const path = window.location.pathname.split('/')
     const username = path[1]
@@ -26,56 +29,19 @@ if (userSection) {
 
         Promise.resolve(displayUserProfile(tab, doc)).then(() => {
           storeExplorePage(doc.events.concat(doc.interested, doc.going)).
-            then(() => {
-              console.log(`Pre-stored ${username}'s events`)
-            }).
+            then(() => console.log(`Pre-stored ${username}'s events`)).
             catch(() => console.log('Failed to pre-store events'))
         })
       }).catch(() => console.log(`Failed to store ${username}`))
     }).catch(() => {
       console.log(`Failed to load ${username} from server, loading from local`)
 
-      loadUserProfileLocal(tab, username).then(() => {
-        console.log(`Loaded ${username} from local`)
-      }).catch(() => console.log(`Failed to load ${username} from local`))
+      loadUserProfileLocal(tab, username).
+        then(() => console.log(`Loaded ${username} from local`)).
+        catch(() => console.log(`Failed to load ${username} from local`))
     })
-
   })
 }
-
-$(document.getElementById('edit-profile-form')).submit(function (e) {
-  e.preventDefault()
-
-  const formJson = convertToJSON($(this).serializeArray())
-
-  Promise.resolve($.ajax({
-    method: 'POST',
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(formJson),
-    url: '/api/user/edit',
-  })).then(() => {
-    // Update the user profile page without refresh
-    document.getElementById('edit-profile').classList.remove('is-active')
-    document.getElementById('user-name').textContent = formJson.username
-    document.getElementById('fullname').textContent = formJson.fullname
-    document.getElementById('description').textContent = formJson.description
-
-    // Show a notification
-    Snackbar.show({
-      text: 'Changes saved',
-      pos: 'top-center',
-      actionTextColor: '#f66496',
-      duration: 3000
-    })
-  }).catch(() => {
-    Snackbar.show({
-      text: 'Unable to save changes',
-      pos: 'top-center',
-      actionTextColor: '#f66496',
-      duration: 3000
-    })
-  })
-})
 
 /************************ Functions below ************************/
 /**
@@ -84,7 +50,7 @@ $(document.getElementById('edit-profile-form')).submit(function (e) {
  * @param {object} db The DB object
  * @returns {Promise<void>} The Promise
  */
-export async function initUserDatabase (db) {
+export function initUserDatabase (db) {
   if (!db.objectStoreNames.contains(USER_STORE)) {
     const store = db.createObjectStore(USER_STORE, {
       keyPath: 'username',
@@ -116,7 +82,7 @@ export async function initUserDatabase (db) {
  * @param {string} username The username in the URL
  * @returns {Promise<any>} The Promise
  */
-async function loadUserProfile (username) {
+function loadUserProfile (username) {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
@@ -157,7 +123,7 @@ async function storeUserProfile (doc) {
   if (dbPromise) {
     dbPromise.then(async db => {
       const tx = db.transaction(USER_STORE, 'readwrite')
-      doc.genres = doc.genres.map(genre => {return genre.genre_name})
+      doc.genres = doc.genres.map(genre => {return genre.name})
       doc.followers = doc.followers.map(follower => {return follower.username})
       doc.following = doc.following.map(
         following => {return following.username})
@@ -201,12 +167,8 @@ function displayUserProfile (tab, doc) {
   }
 
   // Edit profile modal
-  const usernameInput = document.getElementsByName('username')[0]
-
-  if (usernameInput) {
-    usernameInput.value = doc.username
-    document.getElementsByName('fullname')[0].value = doc.fullname
-    document.getElementsByName('description')[0].value = doc.description
+  if (editProfileForm) {
+    renderEditProfileModal(doc)
   }
 
   // User links
@@ -238,6 +200,70 @@ function displayUserProfile (tab, doc) {
 
   // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')
+}
+
+/**
+ * Render the edit profile modal, with the user's values set
+ *
+ * @param {object} doc The user document retrieved
+ */
+function renderEditProfileModal (doc) {
+  const usernameInput = document.getElementsByName('username')[0]
+  const fullnameInput = document.getElementsByName('fullname')[0]
+  const descriptionInput = document.getElementsByName('description')[0]
+  const genresInput = document.getElementsByName('genres')[0]
+
+  usernameInput.setAttribute('value', doc.username)
+  fullnameInput.setAttribute('value', doc.fullname)
+  descriptionInput.innerText = doc.description
+
+  getGenres().then(genres => {
+    new Choices(genresInput, {
+      duplicateItemsAllowed: false,
+      maxItemCount: 5,
+      removeItemButton: true,
+      choices: genres.map(genre => ({
+        value: genre.name,
+        option: genre.name,
+        selected : doc.genres.includes(genre.name),
+      })),
+    })
+  })
+
+  // Edit profile form submitted
+  $(editProfileForm).submit(function (e) {
+    e.preventDefault()
+    const formJson = convertToJSON($(this).serializeArray())
+
+    Promise.resolve($.ajax({
+      method: 'POST',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify(formJson),
+      url: '/api/user/edit',
+    })).then(() => {
+      // Update the user profile page without refresh
+      document.getElementById('edit-profile').classList.remove('is-active')
+      document.getElementById('user-name').textContent = formJson.username
+      document.getElementById('fullname').textContent = formJson.fullname
+      document.getElementById('description').textContent = formJson.description
+
+      const genre = $(document.getElementById('genre')).empty()
+
+      for (let i = 0, n = genresInput.options.length; i < n; i++) {
+        genre.append(`<span class="tag">${genresInput.options[i].text}</span>`)
+      }
+
+      showSnackbar('Changes saved')
+    }).catch(err => {
+      err = err.responseJSON
+
+      // Username unique error
+      const text = err.name === 'MongoError' && err.code === 11000 ?
+        'Username already exist' : 'Error occurred, failed to save changes'
+
+      showSnackbar(text)
+    })
+  })
 }
 
 /**

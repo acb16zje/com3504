@@ -30,14 +30,14 @@ mongoose.connect(URL, {
   db.dropDatabase().then(async () => {
     console.log('Inserting default data...')
 
-    const classical = await new Genre({ genre_name: 'Classical' }).save()
-    const country = await new Genre({ genre_name: 'Country' }).save()
-    const electronic = await new Genre({ genre_name: 'Electronic' }).save()
-    const funk = await new Genre({ genre_name: 'Funk' }).save()
-    const jazz = await new Genre({ genre_name: 'Jazz' }).save()
-    const metal = await new Genre({ genre_name: 'Metal' }).save()
-    const pop = await new Genre({ genre_name: 'Pop' }).save()
-    const rock = await new Genre({ genre_name: 'Rock' }).save()
+    const classical = await new Genre({ name: 'Classical' }).save()
+    const country = await new Genre({ name: 'Country' }).save()
+    const electronic = await new Genre({ name: 'Electronic' }).save()
+    const funk = await new Genre({ name: 'Funk' }).save()
+    const jazz = await new Genre({ name: 'Jazz' }).save()
+    const metal = await new Genre({ name: 'Metal' }).save()
+    const pop = await new Genre({ name: 'Pop' }).save()
+    const rock = await new Genre({ name: 'Rock' }).save()
 
     // Image data
     const gakkiImg = `data:image/webp;base64, ${fs.readFileSync(

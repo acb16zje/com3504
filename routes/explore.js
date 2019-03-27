@@ -8,7 +8,7 @@
 const express = require('express')
 const router = express.Router()
 
-const event_controller = require('../controllers/event')
+const eventController = require('../controllers/event')
 
 /* GET explore page */
 router.get('/explore', function (req, res) {
@@ -19,6 +19,6 @@ router.get('/explore', function (req, res) {
 })
 
 /* AJAX GET explore page */
-router.get('/api/explore', event_controller.index)
+router.get('/api/explore', eventController.index)
 
 module.exports = router

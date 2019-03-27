@@ -48,12 +48,15 @@ const Event = mongoose.model('Event', new Schema({
     type: String,
     default: defaultEventImg
   },
-  genres: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Genre',
-      default: []
-    }],
+  genres: {
+    type: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Genre',
+        default: [],
+      }],
+    validate: [val => val.length <= 5, 'Maximum 5 genres only'],
+  },
   interested: [
     {
       type: Schema.Types.ObjectId,

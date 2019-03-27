@@ -5,13 +5,13 @@
  */
 
 'use strict'
+const auth = require('./auth')
 const express = require('express')
 const router = express.Router()
-const auth = require('./auth')
 
-const user_controller = require('../controllers/user')
+const userController = require('../controllers/user')
 
-/* GET user (stories) profile. */
+/* GET user profile */
 router.get('/:username/?:type(|events|going|interested|went)', (req, res) => {
   res.render('user', {
     title: 'Musicbee',
@@ -20,11 +20,10 @@ router.get('/:username/?:type(|events|going|interested|went)', (req, res) => {
   })
 })
 
-/* AJAX GET user (stories) profile */
-router.get('/api/user/:username/?:type(|events|going|interested|went)',
-  user_controller.get_user_data)
+/* AJAX GET user profile */
+router.get('/api/user/:username/?:type(|events|going|interested|went)', userController.getUserData)
 
 /* AJAX POST for editing user profile */
-router.post('/api/user/edit', auth.checkAuth, user_controller.edit_user_profile)
+router.post('/api/user/edit', auth.checkAuth, userController.editUserProfile)
 
 module.exports = router

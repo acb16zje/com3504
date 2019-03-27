@@ -23,6 +23,7 @@ const FILES = [
   '/stylesheets/style.css',
   '/javascripts/databases/database.mjs',
   '/javascripts/databases/event.mjs',
+  '/javascripts/databases/genre.mjs',
   '/javascripts/databases/user.mjs',
   '/javascripts/script.js',
   '/offline.html',

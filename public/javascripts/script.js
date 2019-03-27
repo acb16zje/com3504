@@ -88,7 +88,19 @@ function convertToJSON (formArray) {
   const formJson = {}
 
   for (let i = 0, n = formArray.length; i < n; i++) {
-    formJson[formArray[i].name] = formArray[i].value
+    const key = formArray[i].name
+    const value = formArray[i].value
+
+    // Combine same name into array
+    if (formJson.hasOwnProperty(key)) {
+      if (!Array.isArray(formJson[key])) {
+        formJson[key] = [formJson[key]]
+      }
+
+      formJson[key].push(value)
+    } else {
+      formJson[key] = value
+    }
   }
 
   return formJson
@@ -160,7 +172,12 @@ if (modalCloses.length) {
 /**
  * Close the user story modal
  */
-const closeModal = () => modals.removeClass('is-active')
+const closeModal = () => {
+  // Reset the field of edit profile modal
+  $(document.getElementById('edit-profile-form'))[0].reset()
+
+  modals.removeClass('is-active')
+}
 
 /************************ Offline notification below ************************/
 const offlineNotification = document.getElementById('offline')
@@ -190,6 +207,22 @@ if (startDate) {
     defaultDate: Date.now(),
     minDate: 'today',
     minTime: Date.now(),
+  })
+}
+
+/**
+ * Show a snackbar notification (polonel/Snackbar)
+ *
+ * @param text The notification text
+ */
+function showSnackbar (text) {
+  Snackbar.show({
+    text: text,
+    pos: 'top-center',
+    textColor: '#000',
+    actionTextColor: '#4240d4',
+    backgroundColor: '#ffdd57',
+    duration: 3000,
   })
 }
 

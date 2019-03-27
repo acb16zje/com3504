@@ -19,8 +19,6 @@ const comment = new Schema({
   },
 })
 
-comment.index({ObjectId: 1, user: 1, story: 1}, { unique: true })
-
 const Comment = mongoose.model('Comment', comment)
 
 module.exports = Comment

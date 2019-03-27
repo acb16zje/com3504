@@ -38,6 +38,10 @@ form ::placeholder {
   color: #81858c !important;
 }
 
+.choices__input {
+  font-family: sans-serif;
+}
+
 .tabs li.is-active a {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
@@ -295,6 +299,11 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   #user-stats nav > div br {
     content: ''
   }
+}
+
+/* User profile page, edit profile modal */
+#edit-profile .modal-content {
+  overflow: visible;
 }
 
 /* User profile page stories */

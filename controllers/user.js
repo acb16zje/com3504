@@ -7,6 +7,7 @@
 'use strict'
 const createError = require('http-errors')
 const Event = require('../models/event')
+const Genre = require('../models/genre')
 const User = require('../models/user')
 
 /**
@@ -16,27 +17,26 @@ const User = require('../models/user')
  * @param {object} res The response header
  * @param {object} next The next middleware function
  */
-exports.get_user_data = function (req, res, next) {
-  User.
-    findOne({ 'username': req.params.username }, '-_id').
-    populate('genres', '-_id genre_name').
-    populate({
-      path:'events going interested',
-      populate: [
-        { path: 'organiser', select: '-_id username' },
-        { path: 'genres', select: '-_id genre_name'},
-      ],
-    }).
-    populate('stories followers following').
-    lean().exec(function (err, doc) {
-      if (err) throw err
+exports.getUserData = function (req, res, next) {
+  const userQuery = User.findOne({ 'username': req.params.username }, '-_id')
+  userQuery.populate('genres', '-_id name')
+  userQuery.populate({
+    path: 'events going interested',
+    populate: [
+      { path: 'organiser', select: '-_id username' },
+      { path: 'genres', select: '-_id name' },
+    ],
+  })
+  userQuery.populate('stories followers following').lean()
 
-      if (doc) {
-        res.json(doc)
-      } else {
-        next(createError(404))
-      }
-    })
+  userQuery.then(user => {
+    // 404 error if the username if not found
+    if (user) {
+      res.json(user)
+    } else {
+      next(createError(404))
+    }
+  }).catch(err => console.log(err))
 }
 
 /**
@@ -46,27 +46,31 @@ exports.get_user_data = function (req, res, next) {
  * @param {object} res The response header
  * @param {object} next The next middleware function
  */
-exports.edit_user_profile = function (req, res, next) {
+exports.editUserProfile = async function (req, res, next) {
   const formJson = req.body
+  const userQuery = User.findOne({ email: req.user.email })
 
-  User.findOne({email: req.user.email}).populate('genres', '-_id').
-    exec(function (err, user) {
-      if (err) throw err
+  userQuery.then(user => {
+    if (user) {
+      user.username = formJson.username
+      user.fullname = formJson.fullname
+      user.description = formJson.description
 
-      if (user) {
-        user.username = formJson.username
-        user.fullname = formJson.fullname
-        user.description = formJson.description
-        // user.genres = formJson.genres
+      // Genre query and validation
+      const formGenres = formJson.genres
+      const genreQuery = Genre.find({ name: { $in: formGenres } })
 
+      genreQuery.then(docs => {
+        user.genres = docs && docs.length ? docs.map(doc => doc.id) : user.genres
+
+        // Save the user document, then response
         user.save().
           then(() => res.sendStatus(200)).
-          catch(err => {
-            console.log(err)
-            res.sendStatus(400)
-          })
-      } else {
-        res.sendStatus(404)
-      }
-  })
+          catch(err => res.status(400).send(err))
+      }).catch(err => console.log(err))
+
+    } else {
+      res.sendStatus(400)
+    }
+  }).catch(err => console.log(err))
 }

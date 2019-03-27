@@ -20,35 +20,33 @@ passport.use(new Strategy({
   function (accessToken, refreshToken, profile, callback) {
     profile = profile._json
 
-    User.findOne({ email: profile.email }).exec(async (err, user) => {
-        if (err) {
-          return callback(null, profile)
-        }
+    const userQuery = User.findOne({ email: profile.email })
 
-        // Check if user is already registered or not
-        if (user) {
-          // Update the profile picture if it isn't the same
-          if (user.image !== profile.picture) {
-            user.image = profile.picture
-            user.save().then(() => {
-              return callback(null, user)
-            })
-          }
-
-          return callback(null, user)
-        } else {
-          user = new User({
-            username: profile.email.match(/^([^@]*)@/)[1],
-            email: profile.email,
-            fullname: profile.name,
-            image: profile.picture,
-          })
-
+    userQuery.then(user => {
+      // Check if user is already registered or not
+      if (user) {
+        // Update the profile picture if it isn't the same
+        if (user.image !== profile.picture) {
+          user.image = profile.picture
           user.save().then(() => {
             return callback(null, user)
           })
         }
-      })
+
+        return callback(null, user)
+      } else {
+        user = new User({
+          username: profile.email.match(/^([^@]*)@/)[1],
+          email: profile.email,
+          fullname: profile.name,
+          image: profile.picture,
+        })
+
+        user.save().then(() => {
+          return callback(null, user)
+        })
+      }
+    }).catch(err => callback(null, user))
   },
 ))
 

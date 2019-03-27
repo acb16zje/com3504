@@ -5,9 +5,9 @@
  */
 
 'use strict'
+const auth = require('./auth')
 const express = require('express')
 const router = express.Router()
-const auth = require('./auth')
 
 /* GET create story page. */
 router.get('/create', auth.checkAuth, function (req, res, next) {

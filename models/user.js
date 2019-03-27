@@ -28,11 +28,11 @@ const user = new Schema({
       'Username can only use letters, numbers, underscores and periods,' +
       'and must start with a letter or number'],
     required: [true, 'Username is required'],
-    unique: [true, 'Username already exist']
+    unique: true,
   },
   email: {
     type: String,
-    required: [true, 'Please enter an email address'],
+    required: true,
     unique: true,
   },
   fullname: {
@@ -47,12 +47,15 @@ const user = new Schema({
     type: String,
     default: defaultProfileImg,
   },
-  genres: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Genre',
-      default: [],
-    }],
+  genres: {
+    type: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Genre',
+        default: [],
+      }],
+    validate: [val => val.length <= 5, 'Only 5 maximum favourite genres allowed'],
+  },
   stories: [
     {
       type: Schema.Types.ObjectId,
