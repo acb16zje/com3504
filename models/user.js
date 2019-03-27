@@ -1,7 +1,7 @@
 /**
  * User model
  *
- * @author Team Gakki
+ * @author Zer Jun Eng
  */
 
 'use strict'
@@ -28,7 +28,7 @@ const user = new Schema({
       'Username can only use letters, numbers, underscores and periods,' +
       'and must start with a letter or number'],
     required: [true, 'Username is required'],
-    unique: true,
+    unique: [true, 'Username already exist']
   },
   email: {
     type: String,

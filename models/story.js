@@ -1,7 +1,7 @@
 /**
  * Story model
  *
- * @author Team Gakki
+ * @author Zer Jun Eng
  */
 
 'use strict'

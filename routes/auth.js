@@ -20,36 +20,46 @@ passport.use(new Strategy({
   function (accessToken, refreshToken, profile, callback) {
     profile = profile._json
 
-    User.findOne({ email: profile.email }, async function (err, user) {
-      if (err) {
-        return callback(null, profile)
-      }
+    User.findOne({ email: profile.email }).exec(async (err, user) => {
+        if (err) {
+          return callback(null, profile)
+        }
 
-      // Check if user is already registered or not
-      if (user) {
-        return callback(null, user)
-      } else {
-        user = new User({
-          username: profile.email.match(/^([^@]*)@/)[1],
-          email: profile.email,
-          fullname: profile.name,
-          image: profile.picture,
-        })
+        // Check if user is already registered or not
+        if (user) {
+          // Update the profile picture if it isn't the same
+          if (user.image !== profile.picture) {
+            user.image = profile.picture
+            user.save().then(() => {
+              return callback(null, user)
+            })
+          }
 
-        user.save().then(() => {
           return callback(null, user)
-        })
-      }
-    })
+        } else {
+          user = new User({
+            username: profile.email.match(/^([^@]*)@/)[1],
+            email: profile.email,
+            fullname: profile.name,
+            image: profile.picture,
+          })
+
+          user.save().then(() => {
+            return callback(null, user)
+          })
+        }
+      })
   },
 ))
 
-passport.serializeUser(function (user, cb) {
+// Determines which data of the user should be stored in the session
+passport.serializeUser((user, cb) => {
   cb(null, user)
 })
 
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj)
+// Determines which data to be returned in req.user
+passport.deserializeUser((user, cb) => {
+  cb(null, user)
 })
 
 /* Passport will redirect to Google login */

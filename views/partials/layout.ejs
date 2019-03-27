@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="author" content="Team Gakki">
+  <meta name="author" content="Zer Jun Eng">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!--Favicon-->
@@ -21,6 +21,8 @@
   <!--CSS-->
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css">
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.min.css">
   <link rel="stylesheet" href='/stylesheets/style.css'>
 
@@ -34,12 +36,16 @@
     No internet connection
   </div>
 
+  <div id="snackbar"></div>
+
   <%- body %>
 
   <!--JavaScripts-->
   <script crossorigin src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
   <script crossorigin src="https://cdn.jsdelivr.net/npm/@iconify/iconify/dist/iconify.min.js"></script>
   <script crossorigin src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script>
   <script crossorigin src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.min.js"></script>
 
   <% if (/create_/.test(path)) { %>

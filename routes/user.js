@@ -7,6 +7,7 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
+const auth = require('./auth')
 
 const user_controller = require('../controllers/user')
 
@@ -23,8 +24,7 @@ router.get('/:username/?:type(|events|going|interested|went)', (req, res) => {
 router.get('/api/user/:username/?:type(|events|going|interested|went)',
   user_controller.get_user_data)
 
-router.get('/account/edit', function (req, res, next) {
-
-})
+/* AJAX POST for editing user profile */
+router.post('/api/user/edit', auth.checkAuth, user_controller.edit_user_profile)
 
 module.exports = router

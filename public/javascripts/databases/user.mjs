@@ -11,38 +11,6 @@ import { renderEventCard, storeExplorePage } from './event.mjs'
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
 
-/**
- * Initialise the user IndexedDB
- *
- * @param {object} db The DB object
- * @returns {Promise<void>} The Promise
- */
-export async function initUserDatabase (db) {
-  if (!db.objectStoreNames.contains(USER_STORE)) {
-    const store = db.createObjectStore(USER_STORE, {
-      keyPath: 'username',
-    })
-    store.createIndex('username', 'username', {
-      unique: true,
-    })
-    store.createIndex('email', 'email', {
-      unique: true,
-    })
-    store.createIndex('fullname', 'fullname')
-    store.createIndex('description', 'description')
-    store.createIndex('image', 'image')
-    store.createIndex('genres', 'genres', {
-      multiEntry: true,
-    })
-    store.createIndex('followers', 'followers', {
-      multiEntry: true,
-    })
-    store.createIndex('following', 'following', {
-      multiEntry: true,
-    })
-  }
-}
-
 if (userSection) {
   $(userSection).ready(async function () {
     // Path will always be /:username/
@@ -75,6 +43,73 @@ if (userSection) {
   })
 }
 
+$(document.getElementById('edit-profile-form')).submit(function (e) {
+  e.preventDefault()
+
+  const formJson = convertToJSON($(this).serializeArray())
+
+  Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    url: '/api/user/edit',
+  })).then(() => {
+    // Update the user profile page without refresh
+    document.getElementById('edit-profile').classList.remove('is-active')
+    document.getElementById('user-name').textContent = formJson.username
+    document.getElementById('fullname').textContent = formJson.fullname
+    document.getElementById('description').textContent = formJson.description
+
+    // Show a notification
+    Snackbar.show({
+      text: 'Changes saved',
+      pos: 'top-center',
+      actionTextColor: '#f66496',
+      duration: 3000
+    })
+  }).catch(() => {
+    Snackbar.show({
+      text: 'Unable to save changes',
+      pos: 'top-center',
+      actionTextColor: '#f66496',
+      duration: 3000
+    })
+  })
+})
+
+/************************ Functions below ************************/
+/**
+ * Initialise the user IndexedDB
+ *
+ * @param {object} db The DB object
+ * @returns {Promise<void>} The Promise
+ */
+export async function initUserDatabase (db) {
+  if (!db.objectStoreNames.contains(USER_STORE)) {
+    const store = db.createObjectStore(USER_STORE, {
+      keyPath: 'username',
+    })
+    store.createIndex('username', 'username', {
+      unique: true,
+    })
+    store.createIndex('email', 'email', {
+      unique: true,
+    })
+    store.createIndex('fullname', 'fullname')
+    store.createIndex('description', 'description')
+    store.createIndex('image', 'image')
+    store.createIndex('genres', 'genres', {
+      multiEntry: true,
+    })
+    store.createIndex('followers', 'followers', {
+      multiEntry: true,
+    })
+    store.createIndex('following', 'following', {
+      multiEntry: true,
+    })
+  }
+}
+
 /**
  * Load the user profile data from MongoDB
  *
@@ -87,26 +122,6 @@ async function loadUserProfile (username) {
     dataType: 'json',
     url: `/api/user/${username}`,
   }))
-}
-
-/**
- * Store the user profile data into IndexedDB
- *
- * @param {object} doc The user document retrieved
- * @return {Promise<void>} The Promise
- */
-async function storeUserProfile (doc) {
-  if (dbPromise) {
-    dbPromise.then(async db => {
-      const tx = db.transaction(USER_STORE, 'readwrite')
-      doc.genres = doc.genres.map(genre => {return genre.genre_name})
-      doc.followers = doc.followers.map(follower => {return follower.username})
-      doc.following = doc.following.map(
-        following => {return following.username})
-      await tx.store.put(doc)
-      await tx.done
-    }).catch(err => console.log(err))
-  }
 }
 
 /**
@@ -128,6 +143,26 @@ async function loadUserProfileLocal (tab, username) {
           'Unable to load page</p>'
         userSection.classList.remove('is-hidden')
       }
+    }).catch(err => console.log(err))
+  }
+}
+
+/**
+ * Store the user profile data into IndexedDB
+ *
+ * @param {object} doc The user document retrieved
+ * @return {Promise<void>} The Promise
+ */
+async function storeUserProfile (doc) {
+  if (dbPromise) {
+    dbPromise.then(async db => {
+      const tx = db.transaction(USER_STORE, 'readwrite')
+      doc.genres = doc.genres.map(genre => {return genre.genre_name})
+      doc.followers = doc.followers.map(follower => {return follower.username})
+      doc.following = doc.following.map(
+        following => {return following.username})
+      await tx.store.put(doc)
+      await tx.done
     }).catch(err => console.log(err))
   }
 }
@@ -158,11 +193,20 @@ function displayUserProfile (tab, doc) {
   const genre = $(document.getElementById('genre'))
 
   if (doc.genres.length) {
-    doc.genres.forEach(tag => {
-      genre.append(`<span class="tag">${tag}</span>`)
-    })
+    for (let i = 0, n = doc.genres.length; i < n; i++) {
+      genre.append(`<span class="tag">${doc.genres[i]}</span>`)
+    }
   } else {
     genre.addClass('is-hidden')
+  }
+
+  // Edit profile modal
+  const usernameInput = document.getElementsByName('username')[0]
+
+  if (usernameInput) {
+    usernameInput.value = doc.username
+    document.getElementsByName('fullname')[0].value = doc.fullname
+    document.getElementsByName('description')[0].value = doc.description
   }
 
   // User links
@@ -174,25 +218,18 @@ function displayUserProfile (tab, doc) {
   document.getElementById('went-link').href = `/${doc.username}/went`
 
   // Stories, Events, Going, Interested, or Went
-  const eventColumns = document.getElementsByClassName('event-columns')[0]
   switch (tab) {
     case 'events':
-      doc.events.forEach(
-        event => eventColumns.innerHTML += renderEventCard(event))
+      renderEventColumns(doc.events)
       break
     case 'interested':
-      doc.interested.forEach(
-        event => eventColumns.innerHTML += renderEventCard(event))
+      renderEventColumns(doc.interested)
       break
     case 'going':
-      doc.going.forEach(event => {
-        eventColumns.innerHTML += renderEventCard(event)
-      })
+      renderEventColumns(doc.going)
       break
     case 'went':
-      doc.going.forEach(event => {
-        eventColumns.innerHTML += renderEventCard(event)
-      })
+      renderEventColumns(doc.going)
       break
     default:
       // Stories tab, tab is undefined
@@ -201,4 +238,17 @@ function displayUserProfile (tab, doc) {
 
   // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')
+}
+
+/**
+ * Render and append the event card to the event columns
+ *
+ * @param {object} events An array of event documents
+ */
+function renderEventColumns (events) {
+  const eventColumns = document.getElementsByClassName('event-columns')[0]
+
+  for (let i = 0, n = events.length; i < n; i++) {
+    eventColumns.innerHTML += renderEventCard(events[i])
+  }
 }

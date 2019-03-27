@@ -44,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(passport.initialize())
 app.use(passport.session())
 
+// Default locals to prevent undefined error
 app.locals.title = 'Musicbee'
 app.locals.path = ''
 
@@ -51,6 +52,7 @@ app.locals.path = ''
 app.use(function(req, res, next) {
   res.locals.authenticated = req.isAuthenticated()
   res.locals.username = req.isAuthenticated() ? req.user.username : ''
+  res.locals.userImgSrc = req.isAuthenticated() ? req.user.image : ''
   next()
 })
 

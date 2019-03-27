@@ -13,7 +13,7 @@ const Event = require('../models/event')
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The redirect handler
+ * @param {object} next The next middleware function
  */
 exports.index = function (req, res, next) {
   Event.

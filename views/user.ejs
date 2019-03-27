@@ -16,7 +16,7 @@
         <div id="user-name-follow">
           <p id="user-name" class="subtitle is-4"></p>
           <% if (username_path === `/${username}`) { %>
-            <a id="user-follow" class="button is-fullwidth">Edit Profile</a>
+            <a id="user-follow" class="button is-fullwidth modal-button" data-target="edit-profile">Edit Profile</a>
           <% } else { %>
             <a id="user-follow" class="button is-info is-fullwidth">Follow</a>
           <% } %>
@@ -51,6 +51,91 @@
       </div>
     </div>
 
+    <!--Edit profile modal-->
+    <% if (authenticated && username_path === `/${username}`) { %>
+      <div id="edit-profile" class="modal">
+        <div class="modal-background"></div>
+
+        <div class="modal-content">
+          <div class="card">
+            <div class="card-content">
+              <form id="edit-profile-form">
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label">Username</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <p class="control is-expanded">
+                        <input name="username" class="input" type="text" maxlength="30" required>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label">Fullname</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <p class="control is-expanded">
+                        <input name="fullname" class="input" type="text" maxlength="30" required>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label">Description</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <p class="control is-expanded">
+                        <textarea name="description" class="textarea has-fixed-size"></textarea>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field is-horizontal">
+                  <div class="field-label">
+                    <label class="label">Favourite genres</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <p class="control is-expanded">
+                        <input name="genres" class="input" type="text">
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field is-horizontal">
+                  <div class="field-label">
+                    <!-- Left empty for spacing -->
+                  </div>
+                  <div class="field-body">
+                    <div class="field is-grouped">
+                      <div class="control">
+                        <button type="submit" class="button is-primary">Save changes</button>
+                      </div>
+                      <div class="control">
+                        <button type="button" class="button is-light button-close">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
+    <% } %>
+
     <!--Tabs-->
     <div class="columns is-centered">
       <div class="column is-two-thirds">
@@ -76,6 +161,7 @@
       </div>
     </div>
 
+    <!--Tab content-->
     <% if (path === 'user_') { %>
       <!--User profile page: Stories-->
       <% include ./partials/user_story_columns.ejs %>

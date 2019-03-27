@@ -14,7 +14,7 @@ const User = require('../models/user')
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The redirect handler
+ * @param {object} next The next middleware function
  */
 exports.get_user_data = function (req, res, next) {
   User.
@@ -37,4 +37,36 @@ exports.get_user_data = function (req, res, next) {
         next(createError(404))
       }
     })
+}
+
+/**
+ * Edit the profile of current logged in user
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ * @param {object} next The next middleware function
+ */
+exports.edit_user_profile = function (req, res, next) {
+  const formJson = req.body
+
+  User.findOne({email: req.user.email}).populate('genres', '-_id').
+    exec(function (err, user) {
+      if (err) throw err
+
+      if (user) {
+        user.username = formJson.username
+        user.fullname = formJson.fullname
+        user.description = formJson.description
+        // user.genres = formJson.genres
+
+        user.save().
+          then(() => res.sendStatus(200)).
+          catch(err => {
+            console.log(err)
+            res.sendStatus(400)
+          })
+      } else {
+        res.sendStatus(404)
+      }
+  })
 }

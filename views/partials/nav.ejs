@@ -31,17 +31,32 @@
           <a class="navbar-item has-text-weight-bold <%= /create_/.test(path) ? "is-active" : '' %>" href="/create">
               Create
           </a>
-        <% } %>
-        <div class="navbar-item">
-          <div class="buttons">
-            <% if (!authenticated) { %>
-              <a class="login-button button is-medium" href="/login">
+
+          <div class="dropdown is-right">
+            <div class="dropdown-trigger">
+              <a aria-haspopup="true" aria-controls="user-control">
+                <figure class="image is-48x48">
+                  <img class="is-rounded" src="<%= userImgSrc %>"  alt="User profile image">
+                </figure>
+              </a>
+            </div>
+            <div class="dropdown-menu" id="user-control" role="menu">
+              <div class="dropdown-content">
+                <a href="/<%= username %>" class="dropdown-item">My Account</a>
+                <a href="/logout" class="dropdown-item">Log Out</a>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="login-button button" href="/login">
                 <span>Sign in with</span>
                 <span class="icon iconify" data-icon="flat-color-icons:google"></span>
               </a>
-            <% } %>
+            </div>
           </div>
-        </div>
+        <% } %>
       </div>
     </div>
   </div>

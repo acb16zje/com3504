@@ -1,7 +1,7 @@
 /**
  * Database file for connecting to MongoDB using Mongoose
  *
- * @author Team Gakki
+ * @author Zer Jun Eng
  */
 
 'use strict'

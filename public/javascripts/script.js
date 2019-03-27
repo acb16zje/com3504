@@ -17,6 +17,8 @@ Iconify.preloadImages([
   'zmdi:notifications-none',
   'fa-solid:user',
   'fa-regular:user',
+  'ic:sharp-star-border',
+  'flat-color-icons:google'
 ])
 Iconify.setConfig('localStorage', true)
 
@@ -32,11 +34,22 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-// Localise number format
+/**
+ * Convert the number to Intl number format
+ *
+ * @param {number} num The number
+ * @return {*} The Intl number format
+ */
 function intlFormat (num) {
   return new Intl.NumberFormat().format(Math.round(num * 10) / 10)
 }
 
+/**
+ * Convert large number to human-friendly format (1,000,000 to 1M etc.)
+ *
+ * @param {number} num The number
+ * @return {*} The friendly format of the number
+ */
 function makeFriendly (num) {
   if (num >= 1000000)
     return intlFormat(num / 1000000) + 'M'
@@ -45,7 +58,9 @@ function makeFriendly (num) {
   return intlFormat(num)
 }
 
-// Dislpay placeholder image if original image failed to load
+/**
+ * Dislpay placeholder image if original image failed to load
+ */
 $(function () {
   $('img').each(
     function () {
@@ -58,10 +73,52 @@ $(function () {
   )
 })
 
+/************************ Form below ************************/
+$(document).on('keypress', 'form', function (event) {
+  return event.key !== 'Enter'
+})
+
+/**
+ * Convert serialized array to JSON
+ *
+ * @param {array} formArray
+ * @return {string} The stringified JSON
+ */
+function convertToJSON (formArray) {
+  const formJson = {}
+
+  for (let i = 0, n = formArray.length; i < n; i++) {
+    formJson[formArray[i].name] = formArray[i].value
+  }
+
+  return formJson
+}
+
+/************************ Dropdowns below ************************/
+const dropdowns = document.getElementsByClassName('dropdown')
+
+if (dropdowns.length > 0) {
+  const dropDownsArray = Array.from(dropdowns)
+
+  for (let i = 0, n = dropDownsArray.length; i < n; i++) {
+    dropDownsArray[i].addEventListener('click', (e) => {
+      e.stopPropagation()
+      dropDownsArray[i].classList.toggle('is-active')
+    })
+  }
+
+  document.addEventListener('click', () => {
+    for (let i = 0, n = dropDownsArray.length; i < n; i++) {
+      dropDownsArray[i].classList.remove('is-active')
+    }
+  })
+}
+
+/************************ Modals below ************************/
 // Launch and close the user story modal
 const modals = $(document.getElementsByClassName('modal'))
 const modalButtons = $(document.getElementsByClassName('modal-button'))
-const modalCloses = $('.modal-close, .modal-background')
+const modalCloses = $('.modal-close, .modal-background, .button-close')
 
 // Open the modal
 if (modalButtons.length) {
@@ -70,18 +127,21 @@ if (modalButtons.length) {
     const target = $(document.getElementById(`${targetID}`))
     target.addClass('is-active')
 
-    // Add the image source
-    const profileImgSrc = $('#user-image img').attr('src')
-    const imgSrc = $(this).children(':first').attr('src')
+    // Story modal
+    if (targetID === 'story') {
+      // Add the image source
+      const profileImgSrc = $('#user-image img').attr('src')
+      const imgSrc = $(this).children(':first').attr('src')
 
-    const imgChild = $(document.getElementById(`${targetID}-image`))
-    imgChild.attr('src', imgSrc)
+      const imgChild = $(document.getElementById(`${targetID}-image`))
+      imgChild.attr('src', imgSrc)
 
-    const profileImgModal = $(document.getElementById('user-image-modal'))
-    profileImgModal.attr('src', profileImgSrc)
+      const profileImgModal = $(document.getElementById('user-image-modal'))
+      profileImgModal.attr('src', profileImgSrc)
 
-    // Reset comments scroll to top
-    $('#story div.card-content')[0].scrollTop = 0
+      // Reset comments scroll to top
+      $('#story div.card-content')[0].scrollTop = 0
+    }
   })
 }
 
@@ -102,7 +162,7 @@ if (modalCloses.length) {
  */
 const closeModal = () => modals.removeClass('is-active')
 
-// Offline notification
+/************************ Offline notification below ************************/
 const offlineNotification = document.getElementById('offline')
 
 if (!navigator.onLine) {
@@ -115,10 +175,6 @@ window.addEventListener('online', () => {
 
 window.addEventListener('offline', () => {
   offlineNotification.style.display = 'block'
-})
-
-$(document).on('keypress', 'form', function (event) {
-  return event.key !== 'Enter'
 })
 
 /************************ Plugins below ************************/
@@ -156,32 +212,30 @@ try {
 } catch (e) {}
 
 /************************ WebRTC below ************************/
-// WebRTC
 // Checks for browser support
-// function hasGetUserMedia(){
-//   if (navigator.mediaDevices === undefined) {
-//     navigator.mediaDevices = {}
-//   }
-//   if (navigator.mediaDevices.getUserMedia === undefined) {
-//     navigator.mediaDevices.getUserMedia = function(constraints) {
-//       const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+async function hasGetUserMedia () {
+  if (navigator.mediaDevices === undefined) {
+    navigator.mediaDevices = {}
+  }
 
-//       // Return rejected promise with an error
-//       if (!getUserMedia) {
-//         return Promise.reject(new Error('getUserMedia is not implemented in this browser'))
-//       }
+  if (navigator.mediaDevices.getUserMedia === undefined) {
+    navigator.mediaDevices.getUserMedia = function (constraints) {
+      const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
 
-//       // Wrap the call to the old navigator.getUserMedia with a Promise
-//       return new Promise(function(resolve, reject) {
-//         getUserMedia.call(navigator, constraints, resolve, reject);
-//       })
-//     }
-//   }
-// }
+      // Return rejected promise with an error
+      if (!getUserMedia) {
+        return Promise.reject(
+          new Error('getUserMedia is not implemented in this browser'))
+      }
 
-// $("form").submit(function(e){
-//   return false
-// })
+      // Wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function (resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject)
+      })
+    }
+  }
+}
+
 
 // // Switch on camera to take snapshots
 // const video = document.querySelector('video')

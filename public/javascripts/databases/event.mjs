@@ -10,6 +10,26 @@ import { dbPromise } from './database.mjs'
 const EVENT_STORE = 'event_store'
 const exploreSection = document.getElementById('explore')
 
+if (exploreSection) {
+  $(exploreSection).ready(async function () {
+    loadExplorePage().then(docs => {
+      console.log('Loaded /explore from server')
+
+      storeExplorePage(docs).then(() => {
+        console.log('Stored /explore')
+        displayExplorePage(docs)
+      })
+    }).catch(() => {
+      console.log('Failed to load /explore from server, loading from local')
+
+      loadExplorePageLocal().then(() => {
+        console.log('Loaded /explore page from local')
+      }).catch(() => console.log('Failed to load /explore page from local'))
+    })
+  })
+}
+
+/************************ Functions below ************************/
 /**
  * Initialise the event IndexedDB
  *
@@ -34,26 +54,6 @@ export async function initEventDatabase (db) {
   }
 }
 
-if (exploreSection) {
-  $(exploreSection).ready(async function () {
-    loadExplorePage().then(docs => {
-      console.log('Loaded /explore from server')
-      console.log(docs)
-
-      storeExplorePage(docs).then(() => {
-        console.log('Stored /explore')
-        displayExplorePage(docs)
-      })
-    }).catch(() => {
-      console.log('Failed to load /explore from server, loading from local')
-
-      loadExplorePageLocal().then(() => {
-        console.log('Loaded /explore page from local')
-      }).catch(() => console.log('Failed to load /explore page from local'))
-    })
-  })
-}
-
 /**
  * Load all events data from MongoDB
  *
@@ -65,27 +65,6 @@ async function loadExplorePage () {
     dataType: 'json',
     url: `/api${window.location.pathname}`,
   }))
-}
-
-/**
- * Store the events data into IndexedDB
- *
- * @param {object} docs The events documents retrieved
- * @return {Promise<void>} The Promise
- */
-export async function storeExplorePage (docs) {
-  docs = JSON.parse(JSON.stringify(docs).split('"_id":').join('"id":'))
-  if (dbPromise) {
-    dbPromise.then(async db => {
-      const tx = db.transaction(EVENT_STORE, 'readwrite')
-      docs.forEach(async doc => {
-        doc.organiser = doc.organiser.username
-        doc.address = doc.location.address
-        await tx.store.put(doc)
-        await tx.done
-      })
-    }).catch(err => console.log(err))
-  }
 }
 
 /**
@@ -110,6 +89,32 @@ async function loadExplorePageLocal () {
 }
 
 /**
+ * Store the events data into IndexedDB
+ *
+ * @param {object} docs The events documents retrieved
+ * @return {Promise<void>} The Promise
+ */
+export async function storeExplorePage (docs) {
+  docs = JSON.parse(JSON.stringify(docs).split('"_id":').join('"id":'))
+  if (dbPromise) {
+    dbPromise.then(async db => {
+      const tx = db.transaction(EVENT_STORE, 'readwrite')
+
+      for (let i = 0, n = docs.length; i < n; i++) {
+        (async () => {
+          docs[i].organiser = docs[i].organiser.username
+          docs[i].address = docs[i].location.address
+          await tx.store.put(docs[i])
+          await tx.done
+        })()
+      }
+    }).catch(err => console.log(err))
+  }
+}
+
+
+
+/**
  * Display all events data on /explore page
  *
  * @param {object} docs The events documents retrieved
@@ -117,9 +122,9 @@ async function loadExplorePageLocal () {
 function displayExplorePage (docs) {
   const exploreColumns = exploreSection.children[0].children[0]
 
-  docs.forEach(doc => {
-    exploreColumns.innerHTML += renderEventCard(doc)
-  })
+  for (let i = 0, n = docs.length; i < n; i++) {
+    exploreColumns.innerHTML += renderEventCard(docs[i])
+  }
 }
 
 /**
