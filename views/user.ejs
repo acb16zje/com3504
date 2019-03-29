@@ -56,80 +56,78 @@
       <div id="edit-profile" class="modal">
         <div class="modal-background"></div>
 
-        <div class="modal-content">
-          <div class="card">
-            <div class="card-content">
-              <form id="edit-profile-form">
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">Username</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <p class="control is-expanded">
-                        <input name="username" class="input" type="text" maxlength="30" required>
-                      </p>
-                    </div>
+        <div class="modal-card">
+          <section class="modal-card-body">
+            <form id="edit-profile-form">
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Username</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded">
+                      <input name="username" class="input" type="text" maxlength="30" required>
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">Fullname</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <p class="control is-expanded">
-                        <input name="fullname" class="input" type="text" maxlength="30" required>
-                      </p>
-                    </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Fullname</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded">
+                      <input name="fullname" class="input" type="text" maxlength="30" required>
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">Description</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <p class="control is-expanded">
-                        <textarea name="description" class="textarea has-fixed-size"></textarea>
-                      </p>
-                    </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Description</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded">
+                      <textarea name="description" class="textarea has-fixed-size"></textarea>
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div class="field is-horizontal">
-                  <div class="field-label">
-                    <label class="label">Favourite genres</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <p class="control is-expanded">
-                        <select name="genres" placeholder="Maximum 5 favourite genres" multiple></select>
-                      </p>
-                    </div>
+              <div class="field is-horizontal">
+                <div class="field-label">
+                  <label class="label">Favourite genres</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control">
+                      <select name="genres" placeholder="Maximum 5 favourite genres" multiple></select>
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div class="field is-horizontal">
-                  <div class="field-label">
-                    <!-- Left empty for spacing -->
-                  </div>
-                  <div class="field-body">
-                    <div class="field is-grouped">
-                      <div class="control">
-                        <button type="submit" class="button is-primary">Save changes</button>
-                      </div>
-                      <div class="control">
-                        <button type="button" class="button is-light button-close">Cancel</button>
-                      </div>
+              <div class="field is-horizontal">
+                <div class="field-label">
+                  <!-- Left empty for spacing -->
+                </div>
+                <div class="field-body">
+                  <div class="field is-grouped">
+                    <div class="control">
+                      <button type="submit" class="button is-primary">Save changes</button>
+                    </div>
+                    <div class="control">
+                      <button type="button" class="button is-light button-close">Cancel</button>
                     </div>
                   </div>
                 </div>
-              </form>
-            </div>
-          </div>
+              </div>
+            </form>
+          </section>
         </div>
 
         <button class="modal-close is-large" aria-label="close"></button>

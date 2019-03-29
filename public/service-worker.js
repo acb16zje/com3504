@@ -9,6 +9,7 @@ const CACHENAME = 'MusicbeePWA-v1'
 const FILES = [
   '/',
   '/events',
+  '/event',
   '/explore',
   '/create',
   '/create/event',
@@ -76,10 +77,25 @@ self.addEventListener('fetch', function (event) {
             return cachedResponse
           } else if (event.request.method === 'GET' && event.request.mode === 'navigate' &&
             event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('offline.html')
+
+            if (isEventURL(event.request.url)) {
+              return caches.match('/event')
+            } else {
+              return caches.match('offline.html')
+            }
           }
         })
       }),
     )
   }
 })
+
+/**
+ * Check if the request URL is an event page
+ *
+ * @param {string} url
+ * @returns {boolean} True if the request URL is an event page
+ */
+function isEventURL (url) {
+  return url.includes('/event/')
+}

@@ -61,7 +61,7 @@ exports.editUserProfile = async function (req, res, next) {
       const genreQuery = Genre.find({ name: { $in: formGenres } })
 
       genreQuery.then(docs => {
-        user.genres = docs && docs.length ? docs.map(doc => doc.id) : user.genres
+        user.genres = docs && docs.length ? docs.map(doc => doc.id) : []
 
         // Save the user document, then response
         user.save().

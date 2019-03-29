@@ -51,13 +51,14 @@ passport.use(new Strategy({
 ))
 
 // Determines which data of the user should be stored in the session
-passport.serializeUser((user, cb) => {
-  cb(null, user)
-})
+passport.serializeUser((user, cb) => cb(null, user))
 
 // Determines which data to be returned in req.user
 passport.deserializeUser((user, cb) => {
-  cb(null, user)
+  // Reflect the changes immediately after username changes
+  User.findOne({email: user.email}, function (err, user) {
+    cb(null, user)
+  })
 })
 
 /* Passport will redirect to Google login */

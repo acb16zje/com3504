@@ -94,7 +94,7 @@ mongoose.connect(URL, {
       description: 'Super Mario Bros. theme song everyday',
       organiser: mario.id,
       start_datetime: new Date().setHours(new Date().getHours() + 3),
-      end_datetime: new Date().setHours(new Date().getDay() + 3),
+      end_datetime: new Date().setHours(new Date().getHours() + 7),
       image: marioImg,
       genres: [classical.id, electronic.id],
       interested: [gakki.id]

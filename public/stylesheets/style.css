@@ -28,6 +28,14 @@ html, body {
   height: 26px;
 }
 
+.choices__input {
+  font-family: sans-serif;
+}
+
+.choices__list--dropdown {
+  position: relative;
+}
+
 /* Bulma adjustments below */
 :root {
   --primary-color: #5755d9;
@@ -38,13 +46,13 @@ form ::placeholder {
   color: #81858c !important;
 }
 
-.choices__input {
-  font-family: sans-serif;
-}
-
 .tabs li.is-active a {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
+}
+
+.button.is-light {
+  border-color: #dbdbdb;
 }
 
 /* Offline and section padding fix on tablet and mobile */
@@ -142,8 +150,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   margin-top: auto;
 }
 
-.event-columns img {
+.event-columns img, #event img {
   object-fit: cover;
+}
+
+.month-date {
+  align-items: center;
 }
 
 .media-content {
@@ -169,6 +181,29 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 100%;
 }
 
+/* Event page */
+#event div.card {
+  max-width: 550px;
+  margin: auto auto 1rem;
+  display: grid;
+}
+
+#event div.card:last-child {
+  margin-bottom: 0;
+}
+
+#event div.media-left {
+  margin-right: 1.3rem;
+}
+
+#event div.card-content .media:first-child {
+  margin-bottom: 1rem;
+}
+
+#event .media-content {
+  overflow-x: visible;
+}
+
 /* Notification page columns*/
 #notification .card {
   margin: auto;
@@ -191,16 +226,14 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 #user-profile {
-  margin-bottom: 1.5rem;
+  margin: 0 auto 1.5rem auto;
   max-width: 935px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 #user-profile-content {
+  padding: 1rem 1.5rem;
   margin: auto;
   display: grid;
-  grid-template-rows: auto;
   grid-template-columns: 120px minmax(0, 1fr);
   grid-template-areas: "user-image user-name-follow" "user-description user-description" "user-stats user-stats";
 }
@@ -287,7 +320,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     border: none;
     flex-grow: 1;
     padding: 0;
-    justify-content: left;
+    justify-content: flex-start;
     text-align: left !important;
   }
 
@@ -455,8 +488,13 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     padding-right: 10px;
   }
 
+  /* Event page */
+  #event div.card {
+    max-width: 550px;
+  }
+
   /* User profile */
-  #user-profile div.card-content:first-child {
+  #user-profile-content {
     padding: .5rem .25rem 0;
   }
 

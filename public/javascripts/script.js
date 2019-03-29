@@ -17,7 +17,9 @@ Iconify.preloadImages([
   'zmdi:notifications-none',
   'fa-solid:user',
   'fa-regular:user',
+  'ic:sharp-star',
   'ic:sharp-star-border',
+  'ic:round-check',
   'flat-color-icons:google'
 ])
 Iconify.setConfig('localStorage', true)
@@ -213,7 +215,7 @@ if (startDate) {
 /**
  * Show a snackbar notification (polonel/Snackbar)
  *
- * @param text The notification text
+ * @param {string} text The notification text
  */
 function showSnackbar (text) {
   Snackbar.show({

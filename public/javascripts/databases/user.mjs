@@ -5,7 +5,7 @@
  */
 
 'use strict'
-import { dbPromise } from './database.mjs'
+import { dbPromise, unableToLoadPage } from './database.mjs'
 import { renderEventCard, storeExplorePage } from './event.mjs'
 import { getGenres } from './genre.mjs'
 
@@ -53,7 +53,7 @@ if (userSection) {
 export function initUserDatabase (db) {
   if (!db.objectStoreNames.contains(USER_STORE)) {
     const store = db.createObjectStore(USER_STORE, {
-      keyPath: 'username',
+      keyPath: 'email',
     })
     store.createIndex('username', 'username', {
       unique: true,
@@ -93,7 +93,7 @@ function loadUserProfile (username) {
 /**
  * Get the user profile data from IndexedDB
  *
- * @param tab The user tab to display (stories, events, going, interested, went)
+ * @param {string} tab The user tab to display (events, going, interested, went)
  * @param {string} username The username in the URL
  * @return {Promise<void>} The Promise
  */
@@ -105,9 +105,7 @@ async function loadUserProfileLocal (tab, username) {
       if (doc) {
         return Promise.resolve(displayUserProfile(tab, doc))
       } else {
-        userSection.innerHTML = '<p class=\'title has-text-centered\'>' +
-          'Unable to load page</p>'
-        userSection.classList.remove('is-hidden')
+        unableToLoadPage(userSection)
       }
     }).catch(err => console.log(err))
   }
@@ -136,7 +134,7 @@ async function storeUserProfile (doc) {
 /**
  * Display the user data on the page
  *
- * @param tab The user tab to display (stories, events, going, interested, went)
+ * @param {string} tab The user tab to display (events, going, interested, went)
  * @param {object} doc The user document retrieved
  */
 function displayUserProfile (tab, doc) {
@@ -213,22 +211,26 @@ function renderEditProfileModal (doc) {
   const descriptionInput = document.getElementsByName('description')[0]
   const genresInput = document.getElementsByName('genres')[0]
 
+  // Set default values of input
   usernameInput.setAttribute('value', doc.username)
   fullnameInput.setAttribute('value', doc.fullname)
   descriptionInput.innerText = doc.description
 
   getGenres().then(genres => {
-    new Choices(genresInput, {
+    return new Choices(genresInput, {
       duplicateItemsAllowed: false,
       maxItemCount: 5,
       removeItemButton: true,
       choices: genres.map(genre => ({
         value: genre.name,
         option: genre.name,
-        selected : doc.genres.includes(genre.name),
+        selected: doc.genres.includes(genre.name),
       })),
     })
   })
+
+  // TODO: refactor this function
+
 
   // Edit profile form submitted
   $(editProfileForm).submit(function (e) {
@@ -241,27 +243,68 @@ function renderEditProfileModal (doc) {
       data: JSON.stringify(formJson),
       url: '/api/user/edit',
     })).then(() => {
+      // Update the IndexedDB
+      if (dbPromise) {
+        dbPromise.then(async db => {
+          const user = await db.getFromIndex(USER_STORE, 'username', doc.username)
+
+          const tx = db.transaction(USER_STORE, 'readwrite')
+          user.username = formJson.username
+          user.fullname = formJson.fullname
+          user.description = formJson.description
+          user.genres = formJson.genres
+
+          await tx.store.put(user)
+          await tx.done
+        }).then(() => {
+          console.log(`Updated ${doc.username} IndexedDB`)
+        }).catch(err => console.log(err))
+      }
+
       // Update the user profile page without refresh
-      document.getElementById('edit-profile').classList.remove('is-active')
       document.getElementById('user-name').textContent = formJson.username
       document.getElementById('fullname').textContent = formJson.fullname
       document.getElementById('description').textContent = formJson.description
 
-      const genre = $(document.getElementById('genre')).empty()
+      const genre = $(document.getElementById('genre'))
 
-      for (let i = 0, n = genresInput.options.length; i < n; i++) {
-        genre.append(`<span class="tag">${genresInput.options[i].text}</span>`)
+      if (formJson.genres) {
+        genre.find('span').remove()
+
+        for (let i = 0, n = formJson.genres.length; i < n; i++) {
+          genre.append(`<span class="tag">${formJson.genres[i]}</span>`)
+        }
+        genre.removeClass('is-hidden')
+      } else {
+        genre.addClass('is-hidden')
       }
 
+      // Update the input value
+      usernameInput.setAttribute('value', formJson.username)
+      fullnameInput.setAttribute('value', formJson.fullname)
+      descriptionInput.innerText = formJson.description
+
+      // Change My Account href
+      document.getElementById('my-account').href = `/${formJson.username}`
+
+      // Show a notification and close the modal
       showSnackbar('Changes saved')
+      document.getElementById('edit-profile').classList.remove('is-active')
+
     }).catch(err => {
-      err = err.responseJSON
+      if (err.responseJSON) {
+        // Model unique validation error
+        err = err.responseJSON
 
-      // Username unique error
-      const text = err.name === 'MongoError' && err.code === 11000 ?
-        'Username already exist' : 'Error occurred, failed to save changes'
+        const text =
+          err.name === 'MongoError' && err.code === 11000
+            ? 'Username already exist'
+            : ''
 
-      showSnackbar(text)
+        showSnackbar(text)
+      } else {
+        showSnackbar('Error occurred, failed to save changes')
+      }
     })
   })
 }

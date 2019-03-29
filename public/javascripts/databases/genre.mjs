@@ -92,8 +92,8 @@ async function storeGenres (genres) {
 export async function getGenres () {
   return await loadGenres().then(genres => {
     return genres
-  }).catch(() => {
-    loadGenresLocal().then(genres => {
+  }).catch(async () => {
+    return await loadGenresLocal().then(genres => {
       return genres
     })
   })
