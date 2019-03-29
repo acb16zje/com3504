@@ -6,6 +6,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{parskip}
+\usepackage{graphicx}
+\usepackage{caption}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -17,16 +19,36 @@
 \begin{document}
 
 \section{Introduction}
-The Progressive Web App (PWA) allows users to create, post and search for events. Users are able to
-take selfies through the use of WebRTC or select a photo from a folder to be posted, where each post
-can receive likes and comments which is implemented with SocketIO. Each user can follow other users
-and vice versa. Attended and interested events are stored and displayed for each user. Web workers
-are used to allow offline usage with IndexedDB used to store data locally. MongoDB is used to store
-data which can only be retrieved online. The search function (via location) was implemented with the
-use of Google API, allowing selected location to be displayed on the map.
+The Progressive Web App (PWA) allows users to create, post and search for events. WebRTC was implemented 
+for users to take pictures with front and environment camera. Uploads are made available for photo 
+selection from a folder. Each story can receive likes and comments which is implemented with SocketIO 
+and users are able to follow one another. Attended and interested events are stored and displayed for 
+each user. Web workers are used to allow offline usage with IndexedDB used to store data locally. MongoDB 
+is used to store data but can only be retrieved when user is online. The search function (via location) was 
+implemented with Google API, allowing selected location to be displayed on the map. For security purposes, 
+users can only login with respective Google Account.
 
 \section{Diagrams}
-Diagram 1 displays the flow of each web page and the transmission and retrieval of data.
+\begin{figure}[H]
+  \begin{center}
+    \begin{minipage}[b]{0.4\textwidth}
+      \includegraphics[width=6.8cm]{site_map.jpg}
+      \caption{Demonstrates the flow of each web page in this PWA system along with the respective partial 
+      pages and external content pages.}
+      \label{site_map}
+    \end{minipage}
+    %
+    \qquad
+    \begin{minipage}[b]{0.4\textwidth}
+      \includegraphics[width=6.8cm]{uml.jpg}
+      \caption{Displays the structure of the database along with the types of content stored.}
+      \label{uml}
+    \end{minipage}
+  \end{center}
+\end{figure}
+Figure~\ref{site_map} and figure~\ref{uml} are the detailed description of the PWA system structure 
+with figure~\ref{site_map} describing the front-end, data storage and data retrieval, while figure~\ref{uml} 
+describe the types of data stored in the database along with the relationship between the documents.
 
 \section{Interface to Insert and Search Data via Forms}
 \begin{itemize}
