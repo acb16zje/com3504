@@ -384,7 +384,8 @@ function displayEventPage (event) {
 
   // Number of people going and interested
   document.getElementById('people').textContent =
-    `${makeFriendly(event.going.length)} going ·
+    `${makeFriendly(event.going.length)} 
+    ${new Date(event.startDate) < new Date() ? 'went' : 'going'} ·
     ${makeFriendly(event.interested.length)} interested`
 
   // Genre tags

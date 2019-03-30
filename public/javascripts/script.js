@@ -80,7 +80,9 @@ $(function () {
 
 /************************ Form below ************************/
 $(document).on('keypress', 'form', function (event) {
-  return event.key !== 'Enter'
+  if (document.activeElement.tagName !== 'TEXTAREA') {
+    return event.key !== 'Enter'
+  }
 })
 
 /**
@@ -177,9 +179,6 @@ if (modalCloses.length) {
  * Close the user story modal
  */
 const closeModal = () => {
-  // Reset the field of edit profile modal
-  $(document.getElementById('edit-profile-form'))[0].reset()
-
   modals.removeClass('is-active')
 }
 
@@ -203,15 +202,28 @@ window.addEventListener('offline', () => {
 const startDate = document.getElementById('startDate')
 
 if (startDate) {
-  $(startDate).flatpickr({
+  const fp = $(startDate).flatpickr({
     altInput: true,
     altFormat: 'j F Y, h:i K',
     enableTime: true,
     time_24hr: true,
-    defaultDate: Date.now(),
+    // defaultDate: Date.now(),
     minDate: 'today',
     minTime: Date.now(),
   })
+
+  fp.config.onValueUpdate = [ function(selectedDates, dateStr, instance) {
+    const today = new Date()
+
+    if (selectedDates[0].getDate() === today.getDate() &&
+      selectedDates[0].getMonth() === today.getMonth() &&
+      selectedDates[0].getFullYear() === today.getFullYear()) {
+
+      fp.set('minTime', Date.now())
+    } else {
+      fp.set('minTime', undefined)
+    }
+  }]
 }
 
 /**

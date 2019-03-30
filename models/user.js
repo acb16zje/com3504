@@ -41,6 +41,7 @@ const user = new Schema({
   },
   description: {
     type: String,
+    maxlength: [150, 'Description must be under 150 characters'],
     default: '',
   },
   image: {

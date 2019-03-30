@@ -136,7 +136,6 @@ async function storeUserProfile (doc) {
  * @param {object} doc The user document retrieved
  */
 function displayUserProfile (doc) {
-  console.log(doc)
   document.title = `${doc.fullname} (${username}) - Musicbee`
 
   // User data
@@ -174,18 +173,20 @@ function displayUserProfile (doc) {
         updateUserProfile(doc.username, formJson)
 
       }).catch(err => {
+        console.log(err)
         if (err.responseJSON) {
-          // Model unique validation error
           err = err.responseJSON
 
-          const text =
-            err.name === 'MongoError' && err.code === 11000
-              ? 'Username already exist'
-              : 'Error occurred, failed to save changes'
-
-          showSnackbar(text)
+          // Model validation error
+          if (err.name === 'MongoError' && err.code === 11000) {
+            showSnackbar('Username already exist')
+          } else if (err.errors.description) {
+            showSnackbar(err.errors.description.message)
+          } else {
+            showSnackbar('Error occurred, failed to save changes')
+          }
         } else {
-          showSnackbar('Error occurred, failed to save changes')
+          showSnackbar('Failed to save changes')
         }
       })
     })
@@ -208,10 +209,12 @@ function displayUserProfile (doc) {
       renderEventColumns(doc.interested)
       break
     case 'going':
-      renderEventColumns(doc.going)
+      const going = doc.going.filter(event => new Date() < new Date(event.startDate))
+      renderEventColumns(going)
       break
     case 'went':
-      renderEventColumns(doc.going)
+      const went = doc.going.filter(event => new Date(event.startDate) < new Date())
+      renderEventColumns(went)
       break
     default:
       break // undefined for /:username/stories

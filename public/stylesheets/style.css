@@ -94,9 +94,8 @@ form ::placeholder {
 }
 
 /* Desktop navbar */
-nav.navbar .navbar-brand .navbar-burger {
-  margin-left: 0;
-  width: 1.5rem;
+nav.navbar .navbar-brand .navbar-item:first-child {
+  margin-left: 10px;
 }
 
 nav.navbar .navbar-menu a.navbar-item.is-active {
