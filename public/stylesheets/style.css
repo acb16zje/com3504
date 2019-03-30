@@ -28,6 +28,11 @@ html, body {
   height: 26px;
 }
 
+svg.solid {
+  margin-left: calc(-.375em - 1px);
+  margin-right: .1875em;
+}
+
 .choices__input {
   font-family: sans-serif;
 }
@@ -202,6 +207,10 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 #event .media-content {
   overflow-x: visible;
+}
+
+#event .media {
+  align-items: center;
 }
 
 /* Notification page columns*/

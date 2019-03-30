@@ -20,6 +20,9 @@ Iconify.preloadImages([
   'ic:sharp-star',
   'ic:sharp-star-border',
   'ic:round-check',
+  'ic:round-access-time',
+  'ic:round-location-on',
+  'dashicons:tag',
   'flat-color-icons:google'
 ])
 Iconify.setConfig('localStorage', true)
@@ -137,9 +140,8 @@ const modalCloses = $('.modal-close, .modal-background, .button-close')
 // Open the modal
 if (modalButtons.length) {
   modalButtons.click(function () {
-    const targetID = $(this).data('target')
-    const target = $(document.getElementById(`${targetID}`))
-    target.addClass('is-active')
+    const targetID = this.dataset.target
+    document.getElementById(`${targetID}`).classList.add('is-active')
 
     // Story modal
     if (targetID === 'story') {

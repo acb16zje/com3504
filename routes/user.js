@@ -16,7 +16,7 @@ router.get('/:username/?:type(|events|going|interested|went)', (req, res) => {
   res.render('user', {
     title: 'Musicbee',
     path: `user_${req.params.type}`,
-    username_path: req.path,
+    username_path: req.path.split('/')[1], // /:username/events
   })
 })
 

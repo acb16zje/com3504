@@ -5,7 +5,6 @@
  */
 
 'use strict'
-const createError = require('http-errors')
 const Genre = require('../models/genre')
 
 /**
@@ -23,7 +22,10 @@ exports.index = function (req, res, next) {
     if (genres && genres.length) {
       res.json(genres)
     } else {
-      next(createError(404))
+      res.sendStatus(404)
     }
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
 }

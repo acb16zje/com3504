@@ -1,10 +1,11 @@
 /**
- * Routes handler for explore events page
+ * Routes handler for explore (events) page
  *
  * @author Zer Jun Eng
  */
 
 'use strict'
+const auth = require('./auth')
 const express = require('express')
 const router = express.Router()
 
@@ -30,6 +31,12 @@ router.get('/event/:id?', (req, res) => {
 })
 
 /* AJAX GET the details of a specific event */
-router.get('/api/event/:id', eventController.get_event_data)
+router.get('/api/event/:id', eventController.getEventData)
+
+/* AJAX POST set the event as interested for the user */
+router.post('/api/interested', auth.checkAuth, eventController.setEventInterested)
+
+/* AJAX POST set the event as going for the user */
+router.post('/api/going', auth.checkAuth, eventController.setEventGoing)
 
 module.exports = router

@@ -82,7 +82,7 @@ mongoose.connect(URL, {
 
     // Events data
     const gakkiEvent = await new Event({
-      event_name: 'Gakki Festival',
+      name: 'Gakki Festival',
       description: 'Your daily heavenly days by gakki cute cute cute cute cute cutee',
       organiser: gakki.id,
       image: gakkiImg,
@@ -90,20 +90,20 @@ mongoose.connect(URL, {
       going: [mario.id, luigi.id]
     }).save()
     const marioEvent = await new Event({
-      event_name: 'Mario Festival',
+      name: 'Mario Festival',
       description: 'Super Mario Bros. theme song everyday',
       organiser: mario.id,
-      start_datetime: new Date().setHours(new Date().getHours() + 3),
-      end_datetime: new Date().setHours(new Date().getHours() + 7),
+      startDate: new Date().setHours(new Date().getHours() + 3),
+      endDate: new Date().setHours(new Date().getHours() + 7),
       image: marioImg,
       genres: [classical.id, electronic.id],
       interested: [gakki.id]
     }).save()
     const luigiEvent = await new Event({
-      event_name: 'Luigi Festival',
+      name: 'Luigi Festival',
       description: 'Super Luigi Bros. theme song everyday',
       organiser: luigi.id,
-      end_datetime: new Date().setHours(new Date().getHours() + 25),
+      endDate: new Date().setHours(new Date().getHours() + 25),
       image: luigiImg,
       genres: [classical.id, electronic.id, pop.id],
       interested: [gakki.id]

@@ -6,28 +6,28 @@
 
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
-import { renderEventCard, storeExplorePage } from './event.mjs'
+import { renderEventCard, storeExplorePage, addClickListener } from './event.mjs'
 import { getGenres } from './genre.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
 const editProfileForm = document.getElementById('edit-profile-form')
 
+// Path will always be /:username/
+const path = window.location.pathname.split('/')
+const username = path[1]
+const tab = path[2] // The user tab to display (events, going, interested, went)
+
 // Loading, storing, and displaying user profile (Promise based)
 if (userSection) {
   $(userSection).ready(() => {
-    // Path will always be /:username/
-    const path = window.location.pathname.split('/')
-    const username = path[1]
-    const tab = path[2] // undefined for /:username (stories)
-
     loadUserProfile(username).then(doc => {
       console.log(`Loaded ${username} from server`)
 
       storeUserProfile(doc).then(() => {
         console.log(`Stored ${username}`)
 
-        Promise.resolve(displayUserProfile(tab, doc)).then(() => {
+        Promise.resolve(displayUserProfile(doc)).then(() => {
           storeExplorePage(doc.events.concat(doc.interested, doc.going)).
             then(() => console.log(`Pre-stored ${username}'s events`)).
             catch(() => console.log('Failed to pre-store events'))
@@ -36,7 +36,7 @@ if (userSection) {
     }).catch(() => {
       console.log(`Failed to load ${username} from server, loading from local`)
 
-      loadUserProfileLocal(tab, username).
+      loadUserProfileLocal(username).
         then(() => console.log(`Loaded ${username} from local`)).
         catch(() => console.log(`Failed to load ${username} from local`))
     })
@@ -93,17 +93,16 @@ function loadUserProfile (username) {
 /**
  * Get the user profile data from IndexedDB
  *
- * @param {string} tab The user tab to display (events, going, interested, went)
  * @param {string} username The username in the URL
  * @return {Promise<void>} The Promise
  */
-async function loadUserProfileLocal (tab, username) {
+async function loadUserProfileLocal (username) {
   if (dbPromise) {
     dbPromise.then(async db => {
       return await db.getFromIndex(USER_STORE, 'username', username)
     }).then(doc => {
       if (doc) {
-        return Promise.resolve(displayUserProfile(tab, doc))
+        return Promise.resolve(displayUserProfile(doc))
       } else {
         unableToLoadPage(userSection)
       }
@@ -134,14 +133,14 @@ async function storeUserProfile (doc) {
 /**
  * Display the user data on the page
  *
- * @param {string} tab The user tab to display (events, going, interested, went)
  * @param {object} doc The user document retrieved
  */
-function displayUserProfile (tab, doc) {
-  document.title = `${doc.fullname} (${doc.username}) - Musicbee`
+function displayUserProfile (doc) {
+  console.log(doc)
+  document.title = `${doc.fullname} (${username}) - Musicbee`
 
   // User data
-  document.getElementById('user-name').textContent = doc.username
+  document.getElementById('user-name').textContent = username
   document.getElementById('profile-img').src = `${doc.image}`
   document.getElementById('fullname').textContent = doc.fullname
   document.getElementById('description').textContent = doc.description
@@ -167,15 +166,38 @@ function displayUserProfile (tab, doc) {
   // Edit profile modal
   if (editProfileForm) {
     renderEditProfileModal(doc)
+    $(editProfileForm).submit(function (e) {
+      e.preventDefault()
+
+      const formJson = convertToJSON($(this).serializeArray())
+      editProfileSubmit(formJson).then(() => {
+        updateUserProfile(doc.username, formJson)
+
+      }).catch(err => {
+        if (err.responseJSON) {
+          // Model unique validation error
+          err = err.responseJSON
+
+          const text =
+            err.name === 'MongoError' && err.code === 11000
+              ? 'Username already exist'
+              : 'Error occurred, failed to save changes'
+
+          showSnackbar(text)
+        } else {
+          showSnackbar('Error occurred, failed to save changes')
+        }
+      })
+    })
   }
 
   // User links
-  document.getElementById('stories-link').href = `/${doc.username}`
-  document.getElementById('events-link').href = `/${doc.username}/events`
-  document.getElementById('going-link').href = `/${doc.username}/going`
+  document.getElementById('stories-link').href = `/${username}`
+  document.getElementById('events-link').href = `/${username}/events`
+  document.getElementById('going-link').href = `/${username}/going`
   document.getElementById(
-    'interested-link').href = `/${doc.username}/interested`
-  document.getElementById('went-link').href = `/${doc.username}/went`
+    'interested-link').href = `/${username}/interested`
+  document.getElementById('went-link').href = `/${username}/went`
 
   // Stories, Events, Going, Interested, or Went
   switch (tab) {
@@ -192,12 +214,85 @@ function displayUserProfile (tab, doc) {
       renderEventColumns(doc.going)
       break
     default:
-      // Stories tab, tab is undefined
-      break
+      break // undefined for /:username/stories
   }
 
   // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')
+}
+
+/**
+ * Submit edit profile
+ *
+ * @param {object} formJson THe form data submitted in JSON format
+ * @returns {Promise<any>} The Promise
+ */
+function editProfileSubmit (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    url: '/api/user/edit',
+  }))
+}
+
+/**
+ * Update the IndexedDB and HTML content immediately after submit
+ *
+ * @param {string} username The username to update
+ * @param {string} formJson formJson THe form data submitted in JSON format
+ */
+function updateUserProfile (username, formJson) {
+  // Update IndexedDB
+  if (dbPromise) {
+    dbPromise.then(async db => {
+      const user = await db.getFromIndex(USER_STORE, 'username', username)
+
+      const tx = db.transaction(USER_STORE, 'readwrite')
+      user.username = formJson.username
+      user.fullname = formJson.fullname
+      user.description = formJson.description
+      user.genres = formJson.genres
+
+      await tx.store.put(user)
+      await tx.done
+    }).then(() => {
+      console.log(`Updated ${username} IndexedDB`)
+    }).catch(err => console.log(err))
+  }
+
+  document.getElementById('user-name').textContent = formJson.username
+  document.getElementById('fullname').textContent = formJson.fullname
+  document.getElementById('description').textContent = formJson.description
+
+  const genre = $(document.getElementById('genre'))
+
+  if (formJson.genres) {
+    genre.find('span').remove()
+
+    for (let i = 0, n = formJson.genres.length; i < n; i++) {
+      genre.append(`<span class="tag">${formJson.genres[i]}</span>`)
+    }
+    genre.removeClass('is-hidden')
+  } else {
+    genre.addClass('is-hidden')
+  }
+
+  // Update the input value
+  const usernameInput = document.getElementsByName('username')[0]
+  const fullnameInput = document.getElementsByName('fullname')[0]
+  const descriptionInput = document.getElementsByName('description')[0]
+  usernameInput.setAttribute('value', formJson.username)
+  fullnameInput.setAttribute('value', formJson.fullname)
+  descriptionInput.innerText = formJson.description
+
+  // Change My Account href
+  document.getElementById('my-account').href = `/${formJson.username}`
+  document.getElementById('navbar-user').href = `/${formJson.username}`
+
+  // Show a notification and close the modal
+  showSnackbar('Changes saved')
+  document.getElementById('edit-profile').classList.remove('is-active')
 }
 
 /**
@@ -228,85 +323,6 @@ function renderEditProfileModal (doc) {
       })),
     })
   })
-
-  // TODO: refactor this function
-
-
-  // Edit profile form submitted
-  $(editProfileForm).submit(function (e) {
-    e.preventDefault()
-    const formJson = convertToJSON($(this).serializeArray())
-
-    Promise.resolve($.ajax({
-      method: 'POST',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(formJson),
-      url: '/api/user/edit',
-    })).then(() => {
-      // Update the IndexedDB
-      if (dbPromise) {
-        dbPromise.then(async db => {
-          const user = await db.getFromIndex(USER_STORE, 'username', doc.username)
-
-          const tx = db.transaction(USER_STORE, 'readwrite')
-          user.username = formJson.username
-          user.fullname = formJson.fullname
-          user.description = formJson.description
-          user.genres = formJson.genres
-
-          await tx.store.put(user)
-          await tx.done
-        }).then(() => {
-          console.log(`Updated ${doc.username} IndexedDB`)
-        }).catch(err => console.log(err))
-      }
-
-      // Update the user profile page without refresh
-      document.getElementById('user-name').textContent = formJson.username
-      document.getElementById('fullname').textContent = formJson.fullname
-      document.getElementById('description').textContent = formJson.description
-
-      const genre = $(document.getElementById('genre'))
-
-      if (formJson.genres) {
-        genre.find('span').remove()
-
-        for (let i = 0, n = formJson.genres.length; i < n; i++) {
-          genre.append(`<span class="tag">${formJson.genres[i]}</span>`)
-        }
-        genre.removeClass('is-hidden')
-      } else {
-        genre.addClass('is-hidden')
-      }
-
-      // Update the input value
-      usernameInput.setAttribute('value', formJson.username)
-      fullnameInput.setAttribute('value', formJson.fullname)
-      descriptionInput.innerText = formJson.description
-
-      // Change My Account href
-      document.getElementById('my-account').href = `/${formJson.username}`
-
-      // Show a notification and close the modal
-      showSnackbar('Changes saved')
-      document.getElementById('edit-profile').classList.remove('is-active')
-
-    }).catch(err => {
-      if (err.responseJSON) {
-        // Model unique validation error
-        err = err.responseJSON
-
-        const text =
-          err.name === 'MongoError' && err.code === 11000
-            ? 'Username already exist'
-            : ''
-
-        showSnackbar(text)
-      } else {
-        showSnackbar('Error occurred, failed to save changes')
-      }
-    })
-  })
 }
 
 /**
@@ -318,6 +334,10 @@ function renderEventColumns (events) {
   const eventColumns = document.getElementsByClassName('event-columns')[0]
 
   for (let i = 0, n = events.length; i < n; i++) {
+    // renderEventCard from event.mjs
     eventColumns.innerHTML += renderEventCard(events[i])
   }
+
+  // Click listener for interested buttons
+  addClickListener()
 }

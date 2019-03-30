@@ -17,7 +17,7 @@ const defaultEventImg = `data:image/webp;base64, ${fs.readFileSync(
   { encoding: 'base64' })}`
 
 const Event = mongoose.model('Event', new Schema({
-  event_name: {
+  name: {
     type: String,
     required: [true, 'Event name is required'],
     maxlength: [64, 'Event name must be shorter than 64 characters'],
@@ -30,12 +30,12 @@ const Event = mongoose.model('Event', new Schema({
     ref: 'User',
     required: [true, 'Event must have an organiser'],
   },
-  start_datetime: {
+  startDate: {
     type: Date,
     required: true,
     default: Date.now,
   },
-  end_datetime: Date,
+  endDate: Date,
   location: {
     latitude: Number,
     longitude: Number,

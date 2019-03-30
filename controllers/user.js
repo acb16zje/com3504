@@ -5,7 +5,6 @@
  */
 
 'use strict'
-const createError = require('http-errors')
 const Event = require('../models/event')
 const Genre = require('../models/genre')
 const User = require('../models/user')
@@ -25,6 +24,8 @@ exports.getUserData = function (req, res, next) {
     populate: [
       { path: 'organiser', select: '-_id username' },
       { path: 'genres', select: '-_id name' },
+      { path: 'interested', select: '-_id username' },
+      { path: 'going', select: '-_id username' },
     ],
   })
   userQuery.populate('stories followers following').lean()
@@ -34,9 +35,12 @@ exports.getUserData = function (req, res, next) {
     if (user) {
       res.json(user)
     } else {
-      next(createError(404))
+      res.sendStatus(404)
     }
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
 }
 
 /**
@@ -67,10 +71,17 @@ exports.editUserProfile = async function (req, res, next) {
         user.save().
           then(() => res.sendStatus(200)).
           catch(err => res.status(400).send(err))
-      }).catch(err => console.log(err))
+
+      }).catch(err => {
+        console.log(err)
+        res.sendStatus(500)
+      })
 
     } else {
-      res.sendStatus(400)
+      res.sendStatus(404)
     }
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
 }

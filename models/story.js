@@ -26,7 +26,7 @@ const Story = mongoose.model('Story', new Schema({
     }
   },
   caption: String,
-  datetime: {
+  date: {
     type: Date,
     required: true,
     default: Date.now,
