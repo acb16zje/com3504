@@ -6,18 +6,12 @@
 
 'use strict'
 const mongoose = require('mongoose')
-const fs = require('fs')
-const path = require('path')
 const Schema = mongoose.Schema
 
 // Models required for population
 require('../models/event')
 require('../models/genre')
 require('../models/story')
-
-const defaultProfileImg = `data:image/webp;base64, ${fs.readFileSync(
-  path.join(__dirname, '../public/images/default.webp'),
-  { encoding: 'base64' })}`
 
 const user = new Schema({
   username: {
@@ -47,7 +41,7 @@ const user = new Schema({
   },
   image: {
     type: String,
-    default: defaultProfileImg,
+    default: '/images/default.webp',
   },
   genres: {
     type: [

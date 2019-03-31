@@ -471,6 +471,7 @@ function displayEventPage (event) {
   // Description
   document.getElementById('description').textContent = event.description
 
+  eventSection.classList.remove('is-hidden')
   // click listener for interested and going
   addClickListener()
 }

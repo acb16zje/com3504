@@ -104,7 +104,6 @@ if (fileInput) {
   }
 }
 
-
 /**
  * Convert the image file to base64 format
  *
@@ -252,7 +251,7 @@ if (startDate && endDate) {
 
   const fp = $(startDate).flatpickr(options)
   const fpEnd = $(endDate).flatpickr(options)
-
+  fpEnd.clear()
 
   $('#add-end-time a').click(function () {
     const endTimeField = document.getElementById('end-time-field')

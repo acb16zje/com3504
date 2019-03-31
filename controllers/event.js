@@ -7,6 +7,7 @@
 'use strict'
 const Event = require('../models/event')
 const User = require('../models/user')
+const imageController = require('../controllers/image')
 
 /**
  * Explore page (/explore) with featured and suggested events
@@ -67,11 +68,13 @@ exports.getEventData = (req, res, next) => {
  * @param {object} res The response header
  * @param {object} next The next middleware function
  */
-exports.createEvent = (req, res, next) => {
+exports.createEvent = async (req, res, next) => {
   const json = req.body
   const genres = json.genres && json.genres.length ? json.genres : []
+  const eventImage = await imageController.createImage(json.image)
 
   const userQuery = User.findOne({ email: req.user.email })
+  console.log(json)
   userQuery.then(async user => {
     const event = await new Event({
       name: json.name,
@@ -82,10 +85,10 @@ exports.createEvent = (req, res, next) => {
       location: {
         latitude: json.latitude ? json.latitude : undefined,
         longitude: json.longitude ? json.longitude : undefined,
-        address: json.address,
+        address: json.address ? json.address : 'No location'
       },
-      image: json.image ? json.image : undefined,
-      genres: [],
+      image: eventImage ? `/image/${eventImage._id}` : undefined,
+      genres: genres,
     }).save().catch(err => {
       console.log(err)
       res.status(400).send(err)

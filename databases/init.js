@@ -15,6 +15,7 @@ const URL = `mongodb://localhost:27017/${DB_NAME}`
 // Models
 const Event = require('../models/event')
 const Genre = require('../models/genre')
+const Image = require('../models/image')
 const User = require('../models/user')
 
 // Connect to MongoDB
@@ -40,17 +41,26 @@ mongoose.connect(URL, {
     const rock = await new Genre({ name: 'Rock' }).save()
 
     // Image data
-    const gakkiImg = `data:image/webp;base64, ${fs.readFileSync(
-      path.join(__dirname, '../public/images/gakki.webp'),
-      { encoding: 'base64' })}`
+    const gakkiImg = await new Image({
+      content: Buffer.from(fs.readFileSync(
+        path.join(__dirname, '../public/images/gakki.webp'),
+        { encoding: 'base64' }), 'base64'),
+      contentType: 'image/webp',
+    }).save()
 
-    const marioImg = `data:image/webp;base64, ${fs.readFileSync(
-      path.join(__dirname, '../public/images/mario.webp'),
-      { encoding: 'base64' })}`
+    const marioImg = await new Image({
+      content: Buffer.from(fs.readFileSync(
+        path.join(__dirname, '../public/images/mario.webp'),
+        { encoding: 'base64' }), 'base64'),
+      contentType: 'image/webp',
+    }).save()
 
-    const luigiImg = `data:image/webp;base64, ${fs.readFileSync(
-      path.join(__dirname, '../public/images/luigi.webp'),
-      { encoding: 'base64' })}`
+    const luigiImg = await new Image({
+      content: Buffer.from(fs.readFileSync(
+        path.join(__dirname, '../public/images/luigi.webp'),
+        { encoding: 'base64' }), 'base64'),
+      contentType: 'image/webp'
+    }).save()
 
     // User data, NOTE: username has to follow the RegEx format in model
     const gakki = await new User({
@@ -58,7 +68,7 @@ mongoose.connect(URL, {
       fullname: 'Aragaki Yui',
       email: 'yui-aragaki@lespros.co.jp',
       description: 'I am Gakki',
-      image: gakkiImg,
+      image: `/image/${gakkiImg.id}`,
       genres: [pop.id],
     }).save()
     const mario = await new User({
@@ -66,7 +76,7 @@ mongoose.connect(URL, {
       fullname: 'Mario Mario',
       email: 'mario@nintendo.com',
       description: 'I am Mario',
-      image: marioImg,
+      image: `/image/${marioImg.id}`,
       genres: [classical.id, electronic.id],
       following: [gakki.id],
     }).save()
@@ -75,7 +85,7 @@ mongoose.connect(URL, {
       fullname: 'Luigi Mario',
       email: 'luigi@nintendo.com',
       description: 'I am Luigi',
-      image: luigiImg,
+      image: `/image/${luigiImg.id}`,
       genres: [classical.id, electronic.id, pop.id],
       following: [gakki.id],
     }).save()
@@ -85,9 +95,9 @@ mongoose.connect(URL, {
       name: 'Gakki Festival',
       description: 'Your daily heavenly days by gakki cute cute cute cute cute cutee',
       organiser: gakki.id,
-      image: gakkiImg,
+      image: `/image/${gakkiImg.id}`,
       genres: pop.id,
-      going: [mario.id, luigi.id]
+      going: [mario.id, luigi.id],
     }).save()
     const marioEvent = await new Event({
       name: 'Mario Festival',
@@ -95,18 +105,18 @@ mongoose.connect(URL, {
       organiser: mario.id,
       startDate: new Date().setHours(new Date().getHours() + 3),
       endDate: new Date().setHours(new Date().getHours() + 7),
-      image: marioImg,
+      image: `/image/${marioImg.id}`,
       genres: [classical.id, electronic.id],
-      interested: [gakki.id]
+      interested: [gakki.id],
     }).save()
     const luigiEvent = await new Event({
       name: 'Luigi Festival',
       description: 'Super Luigi Bros. theme song everyday',
       organiser: luigi.id,
       endDate: new Date().setHours(new Date().getHours() + 25),
-      image: luigiImg,
+      image: `/image/${luigiImg.id}`,
       genres: [classical.id, electronic.id, pop.id],
-      interested: [gakki.id]
+      interested: [gakki.id],
     }).save()
 
     // Update the users followers and events details
