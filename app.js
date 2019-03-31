@@ -18,7 +18,7 @@ const path = require('path')
 
 const authRouter = require('./routes/auth')
 const createRouter = require('./routes/create')
-const exploreRouter = require('./routes/explore')
+const eventRouter = require('./routes/event')
 const genreRouter = require('./routes/genre')
 const indexRouter = require('./routes/index')
 const userRouter = require('./routes/user')
@@ -59,7 +59,7 @@ app.use(function(req, res, next) {
 
 app.use(authRouter.router)
 app.use(createRouter)
-app.use(exploreRouter)
+app.use(eventRouter)
 app.use(genreRouter)
 app.use(indexRouter)
 app.use(userRouter)

@@ -23,7 +23,7 @@ Iconify.preloadImages([
   'ic:round-access-time',
   'ic:round-location-on',
   'dashicons:tag',
-  'flat-color-icons:google'
+  'flat-color-icons:google',
 ])
 Iconify.setConfig('localStorage', true)
 
@@ -84,6 +84,41 @@ $(document).on('keypress', 'form', function (event) {
     return event.key !== 'Enter'
   }
 })
+
+// Text area auto expane
+autosize(document.getElementsByClassName('autosize'))
+
+// File upload
+const fileInput = document.getElementById('file-input')
+if (fileInput) {
+  fileInput.onchange = function () {
+    if (this.files.length > 0) {
+      const file = this.files[0]
+      document.getElementById('file-name').textContent = file.name
+
+      getBase64(file).then(data => {
+        document.getElementsByName('image')[0].
+          setAttribute('value', data)
+      })
+    }
+  }
+}
+
+
+/**
+ * Convert the image file to base64 format
+ *
+ * @param {object} file The image file
+ * @returns {Promise<any>} Base64 of the image if resolved
+ */
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
 
 /**
  * Convert serialized array to JSON
@@ -200,30 +235,69 @@ window.addEventListener('offline', () => {
 /************************ Plugins below ************************/
 // Datepicker settings
 const startDate = document.getElementById('startDate')
+const endDate = document.getElementById('endDate')
 
-if (startDate) {
-  const fp = $(startDate).flatpickr({
+if (startDate && endDate) {
+  const today = new Date()
+
+  const options = {
     altInput: true,
     altFormat: 'j F Y, h:i K',
     enableTime: true,
     time_24hr: true,
-    // defaultDate: Date.now(),
+    defaultDate: today,
     minDate: 'today',
-    minTime: Date.now(),
+    minTime: today,
+  }
+
+  const fp = $(startDate).flatpickr(options)
+  const fpEnd = $(endDate).flatpickr(options)
+
+
+  $('#add-end-time a').click(function () {
+    const endTimeField = document.getElementById('end-time-field')
+
+    if (endTimeField.classList.contains('is-hidden')) {
+      this.textContent = '– End Date'
+      fpEnd.setDate(today.setHours(today.getHours() + 3))
+    } else {
+      this.textContent = '+ End Date'
+      fpEnd.setDate(undefined)
+    }
+
+    endTimeField.classList.toggle('is-hidden')
   })
 
-  fp.config.onValueUpdate = [ function(selectedDates, dateStr, instance) {
-    const today = new Date()
+  fp.config.onValueUpdate = [
+    function (selectedDates) {
+      // Start time cannot be in the past
+      if (selectedDates[0].getDate() === today.getDate() &&
+        selectedDates[0].getMonth() === today.getMonth() &&
+        selectedDates[0].getFullYear() === today.getFullYear()) {
 
-    if (selectedDates[0].getDate() === today.getDate() &&
-      selectedDates[0].getMonth() === today.getMonth() &&
-      selectedDates[0].getFullYear() === today.getFullYear()) {
+        fp.set('minTime', Date.now())
+      } else {
+        fp.set('minTime', undefined)
+      }
 
-      fp.set('minTime', Date.now())
-    } else {
-      fp.set('minTime', undefined)
+      // End date cannot be earlier than start date
+      fpEnd.set('minDate', new Date(selectedDates))
+      fpEnd.changeMonth(fp.currentMonth - fpEnd.currentMonth)
+    }]
+
+  // End time cannot be earlier than start time on the same date
+  fpEnd.config.onValueUpdate = [
+    function (selectedDates) {
+      if (selectedDates[0].getDate() === fp.selectedDates[0].getDate() &&
+        selectedDates[0].getMonth() === fp.selectedDates[0].getMonth() &&
+        selectedDates[0].getFullYear() === fp.selectedDates[0].getFullYear()) {
+
+        fpEnd.set('minTime', new Date(fp.selectedDates[0]))
+      } else {
+        fpEnd.set('minTime', undefined)
+      }
     }
-  }]
+  ]
 }
 
 /**
@@ -242,24 +316,6 @@ function showSnackbar (text) {
   })
 }
 
-// Google Maps JavaScript API
-try {
-  (function () {
-    const input = document.getElementById('autocomplete')
-
-    const autocomplete = new google.maps.places.Autocomplete(input)
-
-    $(input).change(function () {
-      const place = autocomplete.getPlace()
-      const latitude = place.geometry.location.lat()
-      const longitude = place.geometry.location.lng()
-      console.log(latitude)
-      console.log(longitude)
-    })
-
-  })()
-} catch (e) {}
-
 /************************ WebRTC below ************************/
 // Checks for browser support
 async function hasGetUserMedia () {
@@ -269,7 +325,8 @@ async function hasGetUserMedia () {
 
   if (navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = function (constraints) {
-      const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+      const getUserMedia = navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia
 
       // Return rejected promise with an error
       if (!getUserMedia) {
@@ -284,7 +341,6 @@ async function hasGetUserMedia () {
     }
   }
 }
-
 
 // // Switch on camera to take snapshots
 // const video = document.querySelector('video')

@@ -15,7 +15,7 @@ const Genre = require('../models/genre')
  * @param {object} next The next middleware function
  */
 exports.index = function (req, res, next) {
-  const genreQuery = Genre.find({}, '-_id').lean()
+  const genreQuery = Genre.find({}).lean()
 
   genreQuery.then(genres => {
     // 404 error if no genres if found (extreme case)

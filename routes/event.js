@@ -1,5 +1,5 @@
 /**
- * Routes handler for explore (events) page
+ * Routes handler for explore page and individual event page
  *
  * @author Zer Jun Eng
  */
@@ -32,6 +32,9 @@ router.get('/event/:id?', (req, res) => {
 
 /* AJAX GET the details of a specific event */
 router.get('/api/event/:id', eventController.getEventData)
+
+/* AJAX POST create an event */
+router.post('/api/event/create', auth.checkAuth, eventController.createEvent)
 
 /* AJAX POST set the event as interested for the user */
 router.post('/api/interested', auth.checkAuth, eventController.setEventInterested)

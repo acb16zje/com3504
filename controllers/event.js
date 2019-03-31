@@ -61,6 +61,48 @@ exports.getEventData = (req, res, next) => {
 }
 
 /**
+ * POST create an event
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ * @param {object} next The next middleware function
+ */
+exports.createEvent = (req, res, next) => {
+  const json = req.body
+  const genres = json.genres && json.genres.length ? json.genres : []
+
+  const userQuery = User.findOne({ email: req.user.email })
+  userQuery.then(async user => {
+    const event = await new Event({
+      name: json.name,
+      descrption: json.description,
+      organiser: user.id,
+      startDate: json.startDate,
+      endDate: json.endDate ? json.endDate : undefined,
+      location: {
+        latitude: json.latitude ? json.latitude : undefined,
+        longitude: json.longitude ? json.longitude : undefined,
+        address: json.address,
+      },
+      image: json.image ? json.image : undefined,
+      genres: [],
+    }).save().catch(err => {
+      console.log(err)
+      res.status(400).send(err)
+    })
+
+    if (event) {
+      await user.events.push(event.id)
+      await user.save()
+      res.status(200).json({ eventID: event.id })
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * POST set the event as interested for the user
  *
  * @param {object} req The request header
@@ -69,18 +111,12 @@ exports.getEventData = (req, res, next) => {
  */
 exports.setEventInterested = (req, res, next) => {
   const json = req.body
-
-  // Trying to set interested while not authenticated / impersonating
-  if (req.user.username !== json.username) {
-    res.sendStatus(400)
-  }
-
   const eventQuery = Event.findById(json.id, 'interested going')
 
   eventQuery.then(event => {
     // 404 error if event is not found
     if (event) {
-      const userQuery = User.findOne({ username: req.user.username },
+      const userQuery = User.findOne({ email: req.user.email },
         'interested going')
 
       userQuery.then(async user => {
@@ -129,18 +165,12 @@ exports.setEventInterested = (req, res, next) => {
  */
 exports.setEventGoing = (req, res, next) => {
   const json = req.body
-
-  // Trying to set going while not authenticated / impersonating
-  if (req.user.username !== json.username) {
-    res.sendStatus(400)
-  }
-
   const eventQuery = Event.findById(json.id, 'interested going')
 
   eventQuery.then(event => {
     // 404 error if event is not found
     if (event) {
-      const userQuery = User.findOne({ username: req.user.username },
+      const userQuery = User.findOne({ email: req.user.email },
         'interested going')
 
       userQuery.then(async user => {

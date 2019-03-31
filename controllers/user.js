@@ -5,8 +5,6 @@
  */
 
 'use strict'
-const Event = require('../models/event')
-const Genre = require('../models/genre')
 const User = require('../models/user')
 
 /**
@@ -18,7 +16,7 @@ const User = require('../models/user')
  */
 exports.getUserData = function (req, res, next) {
   const userQuery = User.findOne({ 'username': req.params.username }, '-_id')
-  userQuery.populate('genres', '-_id name')
+  userQuery.populate('genres', 'id name')
   userQuery.populate({
     path: 'events going interested',
     populate: [
@@ -62,20 +60,12 @@ exports.editUserProfile = async function (req, res, next) {
 
       // Genre query and validation
       const formGenres = formJson.genres
-      const genreQuery = Genre.find({ name: { $in: formGenres } })
+      user.genres = formGenres && formGenres.length ? formGenres : []
 
-      genreQuery.then(docs => {
-        user.genres = docs && docs.length ? docs.map(doc => doc.id) : []
-
-        // Save the user document, then response
-        user.save().
-          then(() => res.sendStatus(200)).
-          catch(err => res.status(400).send(err))
-
-      }).catch(err => {
-        console.log(err)
-        res.sendStatus(500)
-      })
+      // Save the user document, then response
+      user.save().
+        then(() => res.sendStatus(200)).
+        catch(err => res.status(400).send(err))
 
     } else {
       res.sendStatus(404)

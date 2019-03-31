@@ -38,6 +38,7 @@ const user = new Schema({
   fullname: {
     type: String,
     required: true,
+    maxlength: [30, 'Enter a name under 30 characters'],
   },
   description: {
     type: String,

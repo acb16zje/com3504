@@ -6,11 +6,13 @@
 
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
+import { initGenresInput } from './genre.mjs'
 
 const EVENT_STORE = 'event_store'
 const exploreSection = document.getElementById('explore')
 const eventSection = document.getElementById('event')
 const currentUser = $(document.getElementById('my-account')).data('user')
+const createEventForm = document.getElementById('create-event')
 
 // Loading, storing, and displaying events at /explore
 if (exploreSection) {
@@ -48,6 +50,46 @@ if (eventSection) {
     loadEventPageLocal(eventID).then(() => {
       console.log('Loaded event from local')
     }).catch(() => console.log('Failed to load event from local'))
+  })
+}
+
+// Create event
+if (createEventForm) {
+  // Google Maps JavaScript API
+  try {
+    (function () {
+      const input = document.getElementById('autocomplete')
+
+      const autocomplete = new google.maps.places.Autocomplete(input)
+
+      $(input).change(function () {
+        const place = autocomplete.getPlace()
+
+        if (place) {
+          document.getElementsByName('latitude')[0].
+            setAttribute('value', place.geometry.location.lat())
+          document.getElementsByName('longitude')[0].
+            setAttribute('value', place.geometry.location.lng())
+        }
+      })
+
+    })()
+  } catch (e) {}
+
+  const genresInput = document.getElementsByName('genres')[0]
+  initGenresInput(genresInput).then().catch()
+
+  $(createEventForm).submit(function (e) {
+    e.preventDefault()
+
+    const formJson = convertToJSON($(this).serializeArray())
+
+    createEvent(formJson).then(res => {
+      window.location.href = `/event/${res.eventID}`
+    }).catch(err => {
+      console.log(err)
+      showSnackbar('Cannot create event')
+    })
   })
 }
 
@@ -169,6 +211,22 @@ export async function storeExplorePage (events) {
 }
 
 /**
+ * Create an event
+ *
+ * @param {object} formJson THe form data submitted in JSON format
+ * @returns {Promise<any>} The Promise
+ */
+function createEvent (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    dataType: 'json',
+    url: '/api/event/create',
+  }))
+}
+
+/**
  * Record the event as interested for the user
  *
  * @param {string} eventID The ID of the event the user is interested
@@ -178,8 +236,8 @@ function submitInterested (eventID) {
   return Promise.resolve($.ajax({
     method: 'POST',
     contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify({username: currentUser, id: eventID}),
-    url: `/api/interested`,
+    data: JSON.stringify({ id: eventID }),
+    url: '/api/interested',
   }))
 }
 
@@ -193,8 +251,8 @@ function submitGoing (eventID) {
   return Promise.resolve($.ajax({
     method: 'POST',
     contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify({username: currentUser, id: eventID}),
-    url: '/api/going'
+    data: JSON.stringify({ id: eventID }),
+    url: '/api/going',
   }))
 }
 
@@ -308,7 +366,9 @@ export function renderEventCard (event) {
             <p class="title is-4"><a href="/event/${event._id}">${event.name}</a></p>
             <p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>
             <p class="location subtitle is-6">${address}</p>
-            <p class="subtitle is-6">${prettifyTime(event.startDate, event.endDate)}</p>
+            <p class="subtitle is-6">
+                ${prettifyTime(event.startDate, event.endDate)}
+            </p>
           </div>
         </div>
 
@@ -320,9 +380,18 @@ export function renderEventCard (event) {
           </div>
           <div class="level-right">
             <div class="level-item">
-              <button class="button interested-button ${isUserInterested ? 'is-light' : ''}" data-id="${event._id}">
-                <span class="border icon iconify ${isUserInterested ? 'is-hidden' : ''}" data-icon="ic:sharp-star-border"></span>
-                <span class="solid icon iconify ${isUserInterested ? '' : 'is-hidden'}" data-icon="ic:sharp-star"></span>
+              <button class=
+              "button interested-button ${isUserInterested ? 'is-light' : ''}" 
+              data-id="${event._id}">
+              
+                <span class=
+                "border icon iconify ${isUserInterested ? 'is-hidden' : ''}" 
+                data-icon="ic:sharp-star-border"></span>
+                
+                <span class=
+                "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}" 
+                data-icon="ic:sharp-star"></span>
+                
                 <span>Interested</span>
               </button>
             </div>

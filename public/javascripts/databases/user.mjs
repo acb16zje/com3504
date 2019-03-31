@@ -7,7 +7,7 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import { renderEventCard, storeExplorePage, addClickListener } from './event.mjs'
-import { getGenres } from './genre.mjs'
+import { initGenresInput } from './genre.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
@@ -120,11 +120,11 @@ async function storeUserProfile (doc) {
   if (dbPromise) {
     dbPromise.then(async db => {
       const tx = db.transaction(USER_STORE, 'readwrite')
-      doc.genres = doc.genres.map(genre => {return genre.name})
-      doc.followers = doc.followers.map(follower => {return follower.username})
-      doc.following = doc.following.map(
-        following => {return following.username})
-      await tx.store.put(doc)
+      const user = Object.assign({}, doc) // map will modify object
+      user.genres = user.genres.map(genre => genre.name)
+      user.followers = doc.followers.map(follower => follower.username)
+      user.following = doc.following.map(following => following.username)
+      await tx.store.put(user)
       await tx.done
     }).catch(err => console.log(err))
   }
@@ -156,7 +156,7 @@ function displayUserProfile (doc) {
 
   if (doc.genres.length) {
     for (let i = 0, n = doc.genres.length; i < n; i++) {
-      genre.append(`<span class="tag">${doc.genres[i]}</span>`)
+      genre.append(`<span class="tag">${doc.genres[i].name}</span>`)
     }
   } else {
     genre.addClass('is-hidden')
@@ -173,7 +173,6 @@ function displayUserProfile (doc) {
         updateUserProfile(doc.username, formJson)
 
       }).catch(err => {
-        console.log(err)
         if (err.responseJSON) {
           err = err.responseJSON
 
@@ -312,19 +311,10 @@ function renderEditProfileModal (doc) {
   // Set default values of input
   usernameInput.setAttribute('value', doc.username)
   fullnameInput.setAttribute('value', doc.fullname)
-  descriptionInput.innerText = doc.description
+  descriptionInput.textContent = doc.description
 
-  getGenres().then(genres => {
-    return new Choices(genresInput, {
-      duplicateItemsAllowed: false,
-      maxItemCount: 5,
-      removeItemButton: true,
-      choices: genres.map(genre => ({
-        value: genre.name,
-        option: genre.name,
-        selected: doc.genres.includes(genre.name),
-      })),
-    })
+  initGenresInput(genresInput).then(choices => {
+    choices.setChoiceByValue(doc.genres.map(genre => genre._id))
   })
 }
 

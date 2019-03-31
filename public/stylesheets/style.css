@@ -212,6 +212,11 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   align-items: center;
 }
 
+/* Create event form adjustment */
+#add-end-time {
+  align-self: center;
+}
+
 /* Notification page columns*/
 #notification .card {
   margin: auto;
@@ -271,6 +276,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 #user-description {
   padding-left: .75rem;
   grid-area: user-description;
+}
+
+#user #description {
+  white-space: pre-line;
+  line-height: 24px;
+  max-height: 264px;
 }
 
 #user-description #genre p.title {

@@ -13,16 +13,14 @@ const GENRE_STORE = 'genre_store'
  * Initialise the genre IndexedDB
  *
  * @param {object} db The DB object
- * @returns {Promise<void>} The Promise
  */
 export function initGenreDatabase (db) {
   if (!db.objectStoreNames.contains(GENRE_STORE)) {
     const store = db.createObjectStore(GENRE_STORE, {
-      keyPath: 'name',
+      keyPath: '_id',
     })
-    store.createIndex('name', 'name', {
-      unique: true,
-    })
+    store.createIndex('_id', '_id', { unique: true, })
+    store.createIndex('name', 'name', { unique: true, })
   }
 
   // Reload the genre database for every version changes
@@ -40,7 +38,7 @@ export function initGenreDatabase (db) {
 /**
  * Load the genres from MongoDB
  *
- * @returns {Promise<any>} The Promise
+ * @returns {Promise<any>} The AJAX Promise
  */
 export function loadGenres () {
   return Promise.resolve($.ajax({
@@ -95,6 +93,26 @@ export async function getGenres () {
   }).catch(async () => {
     return await loadGenresLocal().then(genres => {
       return genres
+    })
+  })
+}
+
+/**
+ * Initialise the <select> element with genres options
+ *
+ * @param input The <select> element to load
+ * @returns {Promise<object>} A Choices.js object
+ */
+export async function initGenresInput (input) {
+  return await getGenres().then(genres => {
+    return new Choices(input, {
+      duplicateItemsAllowed: false,
+      maxItemCount: 5,
+      removeItemButton: true,
+      choices: genres.map(genre => ({
+        value: genre._id,
+        label: genre.name
+      })),
     })
   })
 }

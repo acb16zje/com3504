@@ -9,9 +9,11 @@
         <input class="input" type="search" placeholder="Search for events">
       </div>
 
-      <a class="navbar-end navbar-item is-hidden-desktop" href="/logout">
-        <button class="button">Log Out</button>
-      </a>
+      <% if (authenticated) { %>
+        <a class="navbar-end navbar-item is-hidden-desktop" href="/logout">
+          <button class="button">Log Out</button>
+        </a>
+      <% } %>
     </div>
 
     <div id="navbar-menu" class="navbar-menu">

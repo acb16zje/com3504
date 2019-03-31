@@ -1,13 +1,14 @@
-<form class="box">
+<form id="create-event" class="box">
   <div class="field is-horizontal">
     <div class="field-label is-normal">
       <label class="label">Event Photo</label>
     </div>
     <div class="field-body">
       <div class="field">
-        <div class="file">
+        <div class="file has-name">
           <label class="file-label">
-            <input class="file-input" type="file" name="photo">
+            <input id="file-input" class="file-input" type="file" accept="image/*">
+            <input name="image" type="hidden">
             <span class="file-cta">
               <span class="file-icon">
                 <span class="iconify" data-icon="fa-solid:camera"></span>
@@ -16,6 +17,7 @@
                 Upload photo
               </span>
             </span>
+            <span id="file-name" class="file-name">No file chosen</span>
           </label>
         </div>
       </div>
@@ -29,7 +31,7 @@
     <div class="field-body">
       <div class="field">
         <p class="control is-expanded">
-          <input class="input" type="text" maxlength="64" placeholder="Add a short, clear name">
+          <input name="name" class="input" type="text" maxlength="64" placeholder="Add a short, clear name" required>
         </p>
       </div>
     </div>
@@ -42,7 +44,9 @@
     <div class="field-body">
       <div class="field">
         <div class="control ">
-          <input id="autocomplete" class="input" type="search" placeholder="Enter a place or address">
+          <input name="address" id="autocomplete" class="input" type="search" placeholder="Enter a place or address">
+          <input name="latitude" type="hidden">
+          <input name="longitude" type="hidden">
         </div>
       </div>
     </div>
@@ -55,7 +59,7 @@
     <div class="field-body">
       <div class="field">
         <div class="control">
-          <textarea class="textarea has-fixed-size" placeholder="Tell people more about the event" rows="3"></textarea>
+          <textarea name="description" class="textarea has-fixed-size autosize" placeholder="Tell people more about the event" rows="3"></textarea>
         </div>
       </div>
     </div>
@@ -63,33 +67,41 @@
 
   <div class="field is-horizontal">
     <div class="field-label is-normal">
-      <label class="label">Date/Time</label>
+      <label class="label">Start Date</label>
     </div>
-    <div class="field-body">
+    <div class="field-body is-vcentered">
       <div class="field">
         <p class="control">
-          <input id="startDate" class="input flatpickr flatpickr-input" type="text" placeholder="">
+          <input name="startDate" id="startDate" class="input flatpickr flatpickr-input" type="text" required>
+        </p>
+      </div>
+      <div id="add-end-time" class="field is-narrow">
+        <a>+ End Date</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="end-time-field" class="field is-horizontal is-hidden">
+    <div class="field-label is-normal">
+      <label class="label">End Date</label>
+    </div>
+    <div class="field-body is-vcentered">
+      <div class="field">
+        <p class="control">
+          <input name="endDate" id="endDate" class="input flatpickr flatpickr-input" type="text">
         </p>
       </div>
     </div>
   </div>
 
   <div class="field is-horizontal">
-    <div class="field-label is-normal">
-      <label class="label">Genre</label>
+    <div class="field-label">
+      <label class="label">Genres</label>
     </div>
     <div class="field-body">
       <div class="field">
         <div class="control">
-          <div class="select">
-            <label>
-              <select>
-                <option>Jazz</option>
-                <option>Funk</option>
-                <option>Classic</option>
-              </select>
-            </label>
-          </div>
+          <select name="genres" placeholder="Maximum 5 genres" multiple></select>
         </div>
       </div>
     </div>
@@ -102,9 +114,7 @@
     <div class="field-body">
       <div class="field">
         <div class="control">
-          <button class="button is-primary">
-            Create
-          </button>
+          <button type="submit" class="button is-primary">Create</button>
         </div>
       </div>
     </div>
