@@ -1,12 +1,15 @@
 \documentclass[11pt, a4paper]{article}
+\usepackage[UKenglish]{babel}
+\usepackage[bibstyle=ieee, dashed=false, sorting=nty]{biblatex}
 \usepackage[labelfont=bf]{caption}
+\usepackage{csquotes}
 \usepackage{fancyhdr}
 \usepackage{float}
+\usepackage{graphicx}
 \usepackage[top=25mm, right=20mm, bottom=25mm, left=20mm]{geometry}
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{parskip}
-\usepackage{graphicx}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -15,25 +18,36 @@
 \fancyhead[R]{Team: Gakki}
 \fancyfoot[C]{\thepage}
 
-\begin{document}
+\addbibresource{references.bib}
 
+\begin{document}
 \section{Introduction}
-The Progressive Web App (PWA) allows users to create, post and search for events. WebRTC is implemented 
-for users to take pictures with front and environment camera. Uploads are made available for photo selection 
-from a folder. Each story can receive likes and comments which is implemented with SocketIO and users are 
-able to follow one another. Attended and interested events are stored and displayed for each user. Web 
-workers are used to allow offline usage with IndexedDB used to store data locally. MongoDB is used to store 
-data but can only be retrieved when user is online. The search function (via location) was implemented with 
-Google API, allowing selected location to be displayed on the map. For security purposes, users can only 
-login with respective Google Account.
+The PWA allows user to search, create, and add comments to both events and user stories. Social
+features such as like, follow, interested, and going are integrated. Users are able to tag an event
+with their stories, which will appear in the event page. Users can create a story by taking a
+picture with their camera or upload a picture locally. Each user story can receive likes and
+comments, which the latter is implemented using Socket.IO \cite{socketio, week6}. Service worker is
+implemented to cache requests for offline usage. MongoDB is used to store and synchronise data
+between the client and server. IndexedDB is used to store data loaded from MongoDB for offline
+usage.
+
+The Progressive Web App (PWA) allows users to search, create, tag events with stories. WebRTC is
+implemented for users to take pictures with front and environment camera. Uploads are made available
+for photo selection from a folder. Each story can receive likes and comments which is implemented
+with SocketIO and users are able to follow one another. Attended and interested events are stored
+and displayed for each user. Service worker is implemented to allow offline usage with IndexedDB
+used to store data locally. MongoDB is used to store data but can only be retrieved when user is
+online. The search function (via location) was implemented with Google API, allowing selected
+location to be displayed on the map. For security purposes, users can only login with respective
+Google Account.
 
 \section{Diagrams}
 \begin{figure}[H]
   \begin{center}
     \begin{minipage}[b]{0.4\textwidth}
       \includegraphics[width=6.8cm]{site_map.jpg}
-      \caption{Demonstrates the flow of each web page in this PWA system along with the respective partial 
-      pages and external content pages.}
+      \caption{Demonstrates the flow of each web page in this PWA system along with the respective
+      partial pages and external content pages.}
       \label{site_map}
     \end{minipage}
     %
@@ -45,9 +59,10 @@ login with respective Google Account.
     \end{minipage}
   \end{center}
 \end{figure}
-Figure~\ref{site_map} and figure~\ref{uml} are the detailed description of the PWA system structure with 
-figure~\ref{site_map} describing the front-end, data storage and data retrieval, while figure~\ref{uml} 
-describe the types of data stored in the database along with the relationship between the documents.
+Figure~\ref{site_map} and figure~\ref{uml} are the detailed description of the PWA system structure
+with figure~\ref{site_map} describing the front-end, data storage and data retrieval, while
+figure~\ref{uml} describe the types of data stored in the database along with the relationship
+between the documents.
 
 \section{Interface to Insert and Search Data via Forms}
 \begin{itemize}
@@ -60,6 +75,7 @@ describe the types of data stored in the database along with the relationship be
   \begin{itemize}
     \item Online library that would support offline searching so that users can make use of this 
     functionality both during online and offline
+    \item Not yet implemented
   \end{itemize}
   \item \textbf{Requirements}: 
   \begin{itemize}
@@ -77,8 +93,7 @@ describe the types of data stored in the database along with the relationship be
   \begin{itemize}
     \item Implementation of Google API could not be cached. 
   \end{itemize}
-  \item \textbf{Solution}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus bibendum
-  turpis in sollicitudin molestie.
+  \item \textbf{Solution}: Not yet implemented
   \item \textbf{Requirements}: 
   \begin{itemize}
     \item Allow users to search for events' location using map.
@@ -114,14 +129,12 @@ describe the types of data stored in the database along with the relationship be
 \begin{itemize}
   \item \textbf{Challenges}:
   \begin{itemize}
-    \item The usage of IndexedDB increases with every $put(key, value)$ operation. This increase in 
-    disk space usage is due to a Chrome IndexedDB bug. 
+    \item The usage of IndexedDB increases with every $put()$ operation. \cite{leveldb_593, leveldb_603}. 
+    
   \end{itemize}
   \item \textbf{Solution}:
   \begin{itemize}
-    \item There is no known solution at the moment, please refer to the links for more information:\\
-    https://github.com/google/leveldb/issues/593\\
-    https://github.com/google/leveldb/issues/603
+    \item There is no known solution at the moment, please refer to the links for more informat
   \end{itemize}
   \item \textbf{Requirements}:
   \begin{itemize}
@@ -197,5 +210,7 @@ molestie.
   \item \textbf{Initial population of MongoDB}: run 'npm run initdb' to drop database and
   repopulate database with default data.
 \end{itemize}
+
+\printbibliography
 
 \end{document}
