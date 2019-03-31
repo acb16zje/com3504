@@ -7,7 +7,6 @@
 \usepackage{microtype}
 \usepackage{parskip}
 \usepackage{graphicx}
-\usepackage{caption}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -19,14 +18,14 @@
 \begin{document}
 
 \section{Introduction}
-The Progressive Web App (PWA) allows users to create, post and search for events. WebRTC was implemented 
-for users to take pictures with front and environment camera. Uploads are made available for photo 
-selection from a folder. Each story can receive likes and comments which is implemented with SocketIO 
-and users are able to follow one another. Attended and interested events are stored and displayed for 
-each user. Web workers are used to allow offline usage with IndexedDB used to store data locally. MongoDB 
-is used to store data but can only be retrieved when user is online. The search function (via location) was 
-implemented with Google API, allowing selected location to be displayed on the map. For security purposes, 
-users can only login with respective Google Account.
+The Progressive Web App (PWA) allows users to create, post and search for events. WebRTC is implemented 
+for users to take pictures with front and environment camera. Uploads are made available for photo selection 
+from a folder. Each story can receive likes and comments which is implemented with SocketIO and users are 
+able to follow one another. Attended and interested events are stored and displayed for each user. Web 
+workers are used to allow offline usage with IndexedDB used to store data locally. MongoDB is used to store 
+data but can only be retrieved when user is online. The search function (via location) was implemented with 
+Google API, allowing selected location to be displayed on the map. For security purposes, users can only 
+login with respective Google Account.
 
 \section{Diagrams}
 \begin{figure}[H]
@@ -46,60 +45,94 @@ users can only login with respective Google Account.
     \end{minipage}
   \end{center}
 \end{figure}
-Figure~\ref{site_map} and figure~\ref{uml} are the detailed description of the PWA system structure 
-with figure~\ref{site_map} describing the front-end, data storage and data retrieval, while figure~\ref{uml} 
+Figure~\ref{site_map} and figure~\ref{uml} are the detailed description of the PWA system structure with 
+figure~\ref{site_map} describing the front-end, data storage and data retrieval, while figure~\ref{uml} 
 describe the types of data stored in the database along with the relationship between the documents.
 
 \section{Interface to Insert and Search Data via Forms}
 \begin{itemize}
-  \item \textbf{Challenges}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
-  \item \textbf{Solution}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus bibendum
-  turpis in sollicitudin molestie.
-  \item \textbf{Requirements}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Challenges}: 
+  \begin{itemize}
+    \item Usage of search libraries which would allow suggestions and auto complete. 
+    \item ElasticSearch only allowed online searching and would cause errors when users are offline.
+  \end{itemize}
+  \item \textbf{Solution}: 
+  \begin{itemize}
+    \item Online library that would support offline searching so that users can make use of this 
+    functionality both during online and offline
+  \end{itemize}
+  \item \textbf{Requirements}: 
+  \begin{itemize}
+    \item Users should be able to search for events both during online and offline.
+    \item Users should be able to search events based on events based on partial event names.
+  \end{itemize}
+  
   \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
   bibendum turpis in sollicitudin molestie.
 \end{itemize}
 
 \section{Interface to Search Data via Map}
 \begin{itemize}
-  \item \textbf{Challenges}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Challenges}:
+  \begin{itemize}
+    \item Implementation of Google API could not be cached. 
+  \end{itemize}
   \item \textbf{Solution}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus bibendum
   turpis in sollicitudin molestie.
-  \item \textbf{Requirements}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Requirements}: 
+  \begin{itemize}
+    \item Allow users to search for events' location using map.
+    \item Users should be able to use this search both offline and online.
+  \end{itemize}
   \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
   bibendum turpis in sollicitudin molestie.
 \end{itemize}
 
 \section{PWA – Caching of the App Template Using a Web Worker}
 \begin{itemize}
-  \item \textbf{Challenges}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Challenges}: 
+  \begin{itemize}
+    \item Image of events are not cached on initial load.
+    \item Unable to cache user page through the use of service worker.
+  \end{itemize}
   \item \textbf{Solution}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus bibendum
   turpis in sollicitudin molestie.
-  \item \textbf{Requirements}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
-  \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Requirements}: 
+  \begin{itemize}
+    \item Users should be able to view a basic template with required data for when offline.
+    \item Users should be able to previously loaded events and stories without the ability to make any 
+    changes to the events, stories, or their profiles.
+  \end{itemize}
+  \item \textbf{Limitations}: 
+  \begin{itemize}
+    \item Users are only able to view a basic offline template if no data were loaded in the past when 
+    the user was online.
+  \end{itemize}
 \end{itemize}
 
 \section{PWA: Caching Data Using IndexedDB}
 \begin{itemize}
-  \item \textbf{Challenges}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
-  \item \textbf{Solution}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus bibendum
-  turpis in sollicitudin molestie.
-  \item \textbf{Requirements}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
-  \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
-
-  Chrome IDB bug: disk space increases for every put
-  https://github.com/google/leveldb/issues/593
-  https://github.com/google/leveldb/issues/603
+  \item \textbf{Challenges}:
+  \begin{itemize}
+    \item The usage of IndexedDB increases with every $put(key, value)$ operation. This increase in 
+    disk space usage is due to a Chrome IndexedDB bug. 
+  \end{itemize}
+  \item \textbf{Solution}:
+  \begin{itemize}
+    \item There is no known solution at the moment, please refer to the links for more information:\\
+    https://github.com/google/leveldb/issues/593\\
+    https://github.com/google/leveldb/issues/603
+  \end{itemize}
+  \item \textbf{Requirements}:
+  \begin{itemize}
+    \item Optimise IndexedDB to cache data to allow offline usage with limited data available.
+    \item Users should be able to access essential data when offline for the application to serve its 
+    purpose.
+  \end{itemize}
+  \item \textbf{Limitations}: 
+  \begin{itemize}
+    \item IndexedDB is stored locally and could not be updated until user is online.
+  \end{itemize}
 \end{itemize}
 
 \section{NodeJS Server Including Non-Blocking Organisation of Multiple Dedicated Servers}
@@ -132,8 +165,11 @@ describe the types of data stored in the database along with the relationship be
     retrieved offline. When user is online, data is retrieved from the database and displayed on the
     PWA.
   \end{itemize}
-  \item \textbf{Limitations}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-  bibendum turpis in sollicitudin molestie.
+  \item \textbf{Limitations}:
+  \begin{itemize}
+    \item Initialisation of database needs to be run separately (refer to 'Extra Information').
+    \item Data stored on MongoDB can only be accessed when user is online.
+  \end{itemize}
 \end{itemize}
 
 \section{Quality of the Web Solution}
