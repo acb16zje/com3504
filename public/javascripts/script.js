@@ -373,9 +373,12 @@ if (searchInput) {
   }
 
   suggestions.onmousedown = (e) => {
-    console.log(e)
     if (e.target.tagName === 'SPAN') {
       e.target.parentNode.click()
+    } else if (e.target.tagName === 'svg' ) {
+      e.target.parentNode.parentNode.click()
+    } else if (e.target.tagName === 'path' ) {
+      e.target.parentNode.parentNode.parentNode.click()
     } else {
       e.target.click()
     }
