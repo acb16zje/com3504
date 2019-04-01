@@ -9,19 +9,20 @@
 Iconify.preloadImages([
   'ant-design:home',
   'ant-design:home-outline',
-  'fa-solid:search',
   'ion:ios-search',
   'entypo:squared-plus',
-  'fa-regular:plus-square',
   'zmdi:notifications',
   'zmdi:notifications-none',
+  'fa-solid:search',
   'fa-solid:user',
   'fa-regular:user',
+  'fa-regular:plus-square',
   'ic:sharp-star',
   'ic:sharp-star-border',
   'ic:round-check',
   'ic:round-access-time',
   'ic:round-location-on',
+  'ic:baseline-event',
   'dashicons:tag',
   'flat-color-icons:google',
 ])
@@ -110,13 +111,13 @@ if (fileInput) {
  * @param {object} file The image file
  * @returns {Promise<any>} Base64 of the image if resolved
  */
-function getBase64(file) {
+function getBase64 (file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  })
 }
 
 /**
@@ -232,7 +233,7 @@ window.addEventListener('offline', () => {
 })
 
 /************************ Plugins below ************************/
-// Datepicker settings
+/*------------------ DatePicker -----------------*/
 const startDate = document.getElementById('startDate')
 const endDate = document.getElementById('endDate')
 
@@ -295,12 +296,13 @@ if (startDate && endDate) {
       } else {
         fpEnd.set('minTime', undefined)
       }
-    }
+    },
   ]
 }
 
+/*------------------ polonel/Snackbar -----------------*/
 /**
- * Show a snackbar notification (polonel/Snackbar)
+ * Show a snackbar notification
  *
  * @param {string} text The notification text
  */
@@ -313,6 +315,74 @@ function showSnackbar (text) {
     backgroundColor: '#ffdd57',
     duration: 3000,
   })
+}
+
+/*------------------ flexsearch -----------------*/
+const index = new FlexSearch({
+  encode: 'advanced',
+  tokenize: 'reverse',
+  suggest: true,
+  doc: {
+    id: 'data:_id',
+    field: [
+      'data:name',
+      'data:description',
+      'data:organiser',
+      'data:address',
+      'data:genres',
+    ],
+  },
+})
+
+const searchInput = document.getElementById('search-input')
+
+if (searchInput) {
+  const suggestions = document.getElementById('search-suggestion')
+
+  searchInput.oninput = function () {
+    const result = index.search(this.value, 20)
+
+    while (suggestions.firstChild)
+      suggestions.removeChild(suggestions.firstChild)
+
+    for (let i = 0, n = result.length; i < n; i++) {
+      const link = document.createElement('a')
+      link.className = 'panel-block'
+      link.href = `/event/${result[i]._id}`
+      suggestions.appendChild(link)
+
+      const icon = document.createElement('span')
+      icon.className = 'panel-icon'
+      link.appendChild(icon)
+
+      const iconify = document.createElement('span')
+      iconify.className = 'iconify'
+
+      // Event icon or User icon
+      if ('organiser' in result[i]) {
+        iconify.dataset.icon = 'ic:baseline-event'
+      } else if ('email' in result[i]) {
+        iconify.dataset.icon = 'fa-solid:user'
+      }
+      icon.appendChild(iconify)
+
+      const text = document.createElement('span')
+      text.textContent = result[i].name
+      link.appendChild(text)
+    }
+  }
+
+  suggestions.onmousedown = (e) => {
+    console.log(e)
+    if (e.target.tagName === 'SPAN') {
+      e.target.parentNode.click()
+    } else {
+      e.target.click()
+    }
+  }
+
+  searchInput.onfocus = () => suggestions.classList.remove('is-hidden')
+  searchInput.onblur = () => suggestions.classList.add('is-hidden')
 }
 
 /************************ WebRTC below ************************/

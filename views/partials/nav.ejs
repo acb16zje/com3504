@@ -5,10 +5,6 @@
         <img src="/images/logo_text.webp" width="122" alt="Musicbee logo">
       </a>
 
-      <div class="navbar-item is-expanded is-flex is-hidden-desktop" style="align-items: center">
-        <input class="input" type="search" placeholder="Search for events">
-      </div>
-
       <% if (authenticated) { %>
         <a class="navbar-end navbar-item is-hidden-desktop" href="/logout">
           <button class="button">Log Out</button>
@@ -26,14 +22,20 @@
         </a>
       </div>
 
-      <div class="navbar-item is-expanded is-flex" style="align-items: center">
-        <input class="input" type="search" placeholder="Search for events">
+      <div class="navbar-item is-expanded">
+        <div id="search-control" class="control has-icons-left">
+          <input id="search-input" class="input" type="search" placeholder="Search for events">
+          <span class="icon is-small is-left">
+            <span class="iconify" data-icon="ion:ios-search" data-height="24"></span>
+          </span>
+          <div id="search-suggestion" class="panel is-hidden"></div>
+        </div>
       </div>
 
       <div class="navbar-end">
         <% if (authenticated) { %>
           <a class="navbar-item has-text-weight-bold <%= /create_/.test(path) ? "is-active" : '' %>" href="/create">
-              Create
+            Create
           </a>
 
           <div class="dropdown is-right">

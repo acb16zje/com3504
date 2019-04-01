@@ -27,8 +27,15 @@ if (exploreSection) {
   }).catch(() => {
     console.log('Failed to load /explore from server, loading from local')
 
-    loadExplorePageLocal().then(() => {
+    loadExplorePageLocal().then(events => {
       console.log('Loaded /explore page from local')
+
+      if (events && events.length) {
+        displayExplorePage(events)
+      } else {
+        unableToLoadPage(exploreSection)
+      }
+
     }).catch(() => console.log('Failed to load /explore page from local'))
   })
 }
@@ -132,6 +139,19 @@ function loadExplorePage () {
 }
 
 /**
+ * Load the /explore page from IndexedDB
+ *
+ * @return {Promise<* | void>} The Promise
+ */
+export async function loadExplorePageLocal () {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      return await db.getAll(EVENT_STORE)
+    }).catch(err => console.log(err))
+  }
+}
+
+/**
  * Load the event data from MongoDB
  *
  * @param {string} eventID The ID of the event
@@ -161,26 +181,6 @@ async function loadEventPageLocal (eventID) {
         displayEventPage(event)
       } else {
         unableToLoadPage(eventSection)
-      }
-    }).catch(err => console.log(err))
-  }
-}
-
-/**
- * Load the /explore page from IndexedDB
- *
- * @return {Promise<void>} The Promise
- */
-async function loadExplorePageLocal () {
-  if (dbPromise) {
-    dbPromise.then(async db => {
-      return await db.getAll(EVENT_STORE)
-
-    }).then(events => {
-      if (events && events.length) {
-        displayExplorePage(events)
-      } else {
-        unableToLoadPage(exploreSection)
       }
     }).catch(err => console.log(err))
   }
