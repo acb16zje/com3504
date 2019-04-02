@@ -16,28 +16,31 @@ const createEventForm = document.getElementById('create-event')
 
 // Loading, storing, and displaying events at /explore
 if (exploreSection) {
-  loadExplorePage().then(events => {
-    console.log('Loaded /explore from server')
+  loadExplorePage().
+    then(events => {
+      console.log('Loaded /explore from server')
 
-    storeExplorePage(events).then(() => {
-      console.log('Stored /explore')
+      return storeExplorePage(events).then(() => {
+        console.log('Stored /explore')
+        return events
+      }).catch(() => console.log('Failed to store /explore'))
+    }).
+    then(events => {
       displayExplorePage(events)
-    }).catch(() => console.log('Failed to store /explore'))
+    }).
+    catch(() => {
+      console.log('Failed to load /explore from server, loading from local')
 
-  }).catch(() => {
-    console.log('Failed to load /explore from server, loading from local')
+      loadExplorePageLocal().then(events => {
+        console.log('Loaded /explore page from local')
 
-    loadExplorePageLocal().then(events => {
-      console.log('Loaded /explore page from local')
-
-      if (events && events.length) {
-        displayExplorePage(events)
-      } else {
-        unableToLoadPage(exploreSection)
-      }
-
-    }).catch(() => console.log('Failed to load /explore page from local'))
-  })
+        if (events && events.length) {
+          displayExplorePage(events)
+        } else {
+          unableToLoadPage(exploreSection)
+        }
+      }).catch(() => console.log('Failed to load /explore page from local'))
+    })
 }
 
 // Loading, storing, and displaying individual event
@@ -49,7 +52,7 @@ if (eventSection) {
 
     storeExplorePage(event).then(() => {
       displayEventPage(event)
-    }).catch(() => console.log('Failed to store event'))
+    }).catch((err) => console.log(err))
 
   }).catch(() => {
     console.log('Failed to load event from server, loading from local')
@@ -90,6 +93,7 @@ if (createEventForm) {
     e.preventDefault()
 
     const formJson = convertToJSON($(this).serializeArray())
+    formJson.genres = JSON.parse(formJson.genres).map(genre => genre.id)
 
     createEvent(formJson).then(res => {
       window.location.href = `/event/${res.eventID}`
@@ -105,7 +109,6 @@ if (createEventForm) {
  * Initialise the event IndexedDB
  *
  * @param {object} db The DB object
- * @returns {Promise<void>} The Promise
  */
 export function initEventDatabase (db) {
   if (!db.objectStoreNames.contains(EVENT_STORE)) {
@@ -272,9 +275,9 @@ export function addClickListener () {
 
       // Set the event as interested, will replace going status
       submitInterested(this.dataset.id).then(() => {
-        $(this).toggleClass('is-light')
-        $(this).find('svg.border').toggleClass('is-hidden')
-        $(this).find('svg.solid').toggleClass('is-hidden')
+        this.classList.toggle('is-light')
+        this.querySelector('svg.border').classList.toggle('is-hidden')
+        this.querySelector('svg.solid').classList.toggle('is-hidden')
 
         // If the event is set as going
         const going = document.getElementById('going')
@@ -298,16 +301,19 @@ export function addClickListener () {
 
       // Set the event as going, will replace interested status
       submitGoing(this.dataset.id).then(() => {
-        $(this).toggleClass('is-light')
+        this.classList.toggle('is-light')
 
         // If the event is set as interested
         const interested = document.getElementById('interested')
         if (interested) {
           interested.classList.remove('is-light')
+          interested.querySelector('svg.solid').classList.add('is-hidden')
+          interested.querySelector('svg.border').classList.remove('is-hidden')
         }
 
         showSnackbar('Request successful')
-      }).catch(() => {
+      }).catch((err) => {
+        console.log(err)
         showSnackbar('Failed to process the request')
       })
     })
@@ -327,6 +333,81 @@ function displayExplorePage (events) {
   }
 
   addClickListener() // click listener for interested and going
+}
+
+/**
+ * Display the page of an event
+ *
+ * @param {object} event The event document to display
+ */
+function displayEventPage (event) {
+  const host = document.getElementById('host')
+  const genre = document.getElementById('genre')
+  const startDate = new Date(event.startDate)
+
+  // Event basic details
+  document.getElementById('event-image').src = event.image
+  document.getElementById('start-month').textContent = getStartMonth(startDate)
+  document.getElementById('start-date').textContent = startDate.getDate()
+  document.getElementById('event-name').textContent = event.name
+  host.textContent = `@${event.organiser.username}`
+  host.href = `/${event.organiser.username}`
+
+  // Interested and Going buttons
+  const interested = document.getElementById('interested')
+  const going = document.getElementById('going')
+
+  interested.dataset.id = event._id
+  going.dataset.id = event._id
+
+  const isUserInterested =
+    event.interested.some(user => user.username === currentUser)
+  const isUserGoing =
+    event.going.some(user => user.username === currentUser)
+
+  /* Assume that the server does not go wrong, a user can only be
+  * interested or going to an event */
+  if (isUserInterested) {
+    interested.classList.add('is-light')
+    interested.children[0].classList.add('is-hidden')
+    interested.children[1].classList.remove('is-hidden')
+  }
+
+  if (isUserGoing) {
+    going.classList.add('is-light')
+  }
+
+  // Time
+  document.getElementById('time').textContent =
+    prettifyTime(event.startDate, event.endDate)
+
+  // Location
+  document.getElementById('location').textContent = event.location.address
+
+  // Number of people going and interested
+  document.getElementById('people').textContent =
+    `${makeFriendly(event.going.length)} 
+    ${new Date(event.startDate) < new Date() ? 'went' : 'going'} ·
+    ${makeFriendly(event.interested.length)} interested`
+
+  // Genre tags
+  if (event.genres.length) {
+    genre.classList.remove('is-hidden')
+    genre.innerHTML += '<div id="tags" class="tags"></div>'
+
+    const tags = document.getElementById('tags')
+
+    for (let i = 0, n = event.genres.length; i < n; i++) {
+      tags.innerHTML += `<span class="tag">${event.genres[i].name}</span>`
+    }
+  }
+
+  // Description
+  document.getElementById('description').textContent = event.description
+
+  eventSection.classList.remove('is-hidden')
+  // click listener for interested and going
+  addClickListener()
 }
 
 /**
@@ -402,80 +483,7 @@ export function renderEventCard (event) {
   </div>`
 }
 
-/**
- * Display the page of an event
- *
- * @param {object} event The event document to display
- */
-function displayEventPage (event) {
-  const host = document.getElementById('host')
-  const genre = $(document.getElementById('genre'))
-  const startDate = new Date(event.startDate)
-
-  // Event basic details
-  document.getElementById('event-image').src = event.image
-  document.getElementById('start-month').textContent = getStartMonth(startDate)
-  document.getElementById('start-date').textContent = startDate.getDate()
-  document.getElementById('event-name').textContent = event.name
-  host.textContent = `@${event.organiser.username}`
-  host.href = `/${event.organiser.username}`
-
-  // Interested and Going buttons
-  const interested = document.getElementById('interested')
-  const going = document.getElementById('going')
-
-  interested.dataset.id = event._id
-  going.dataset.id = event._id
-
-  const isUserInterested =
-    event.interested.some(user => user.username === currentUser)
-  const isUserGoing =
-    event.going.some(user => user.username === currentUser)
-
-  /* Assume that the server does not go wrong, a user can only be
-  * interested or going to an event */
-  if (isUserInterested) {
-    interested.classList.add('is-light')
-    interested.children[0].classList.add('is-hidden')
-    interested.children[1].classList.remove('is-hidden')
-  }
-
-  if (isUserGoing) {
-    going.classList.add('is-light')
-  }
-
-  // Time
-  document.getElementById('time').textContent =
-    prettifyTime(event.startDate, event.endDate)
-
-  // Location
-  document.getElementById('location').textContent = event.location.address
-
-  // Number of people going and interested
-  document.getElementById('people').textContent =
-    `${makeFriendly(event.going.length)} 
-    ${new Date(event.startDate) < new Date() ? 'went' : 'going'} ·
-    ${makeFriendly(event.interested.length)} interested`
-
-  // Genre tags
-  if (event.genres.length) {
-    genre.removeClass('is-hidden')
-    genre.append('<div id="tags" class="tags"></div>')
-    const tags = $(document.getElementById('tags'))
-
-    for (let i = 0, n = event.genres.length; i < n; i++) {
-      tags.append(`<span class="tag">${event.genres[i].name}</span>`)
-    }
-  }
-
-  // Description
-  document.getElementById('description').textContent = event.description
-
-  eventSection.classList.remove('is-hidden')
-  // click listener for interested and going
-  addClickListener()
-}
-
+/************************ Helper Functions below ************************/
 /**
  * Get the month of the start date
  *
@@ -507,10 +515,7 @@ function prettifyTime (startDate, endDate) {
   }
 
   if (end) {
-    if (start.getDate() === end.getDate() &&
-      start.getMonth() === end.getMonth() &&
-      start.getFullYear() === end.getFullYear()) {
-
+    if (isSameDate(start, end)) {
       // Format: 27 Mar 2019 10:30 - 13:30 GMT
       return `${start.toLocaleString(undefined, {
         year: 'numeric',

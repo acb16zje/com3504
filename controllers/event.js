@@ -14,9 +14,8 @@ const imageController = require('../controllers/image')
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.index = (req, res, next) => {
+exports.index = (req, res) => {
   const eventQuery = Event.find({})
   eventQuery.populate('organiser', '-_id')
   eventQuery.populate('genres', '-_id name')
@@ -40,9 +39,8 @@ exports.index = (req, res, next) => {
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.getEventData = (req, res, next) => {
+exports.getEventData = (req, res) => {
   const eventQuery = Event.findById(req.params.id)
   eventQuery.populate('organiser', '-_id')
   eventQuery.populate('genres', '-_id name')
@@ -56,8 +54,9 @@ exports.getEventData = (req, res, next) => {
       res.sendStatus(404)
     }
   }).catch(err => {
+    // Cast to ObjectId failed
     console.log(err)
-    res.sendStatus(500)
+    res.sendStatus(400)
   })
 }
 
@@ -66,15 +65,14 @@ exports.getEventData = (req, res, next) => {
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.createEvent = async (req, res, next) => {
+exports.createEvent = async (req, res) => {
   const json = req.body
   const genres = json.genres && json.genres.length ? json.genres : []
   const eventImage = await imageController.createImage(json.image)
 
   const userQuery = User.findOne({ email: req.user.email })
-  console.log(json)
+
   userQuery.then(async user => {
     const event = await new Event({
       name: json.name,
@@ -110,9 +108,8 @@ exports.createEvent = async (req, res, next) => {
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.setEventInterested = (req, res, next) => {
+exports.setEventInterested = (req, res) => {
   const json = req.body
   const eventQuery = Event.findById(json.id, 'interested going')
 
@@ -130,14 +127,14 @@ exports.setEventInterested = (req, res, next) => {
           event.going.pull({ _id: user.id })
 
           // Remove from interested if already in the list, otherwise add
-          if (user.interested.indexOf(event.id) === -1 &&
-            event.interested.indexOf(user.id) === -1) {
-
-            user.interested.push(event.id)
-            event.interested.push(user.id)
-          } else {
+          if (user.interested.indexOf(event.id) > -1 &&
+            event.interested.indexOf(user.id) > -1) {
+            
             user.interested.pull({ _id: event.id })
             event.interested.pull({ _id: user.id })
+          } else {
+            user.interested.push(event.id)
+            event.interested.push(user.id)
           }
 
           await user.save()
@@ -184,14 +181,14 @@ exports.setEventGoing = (req, res, next) => {
           event.interested.pull({ _id: user.id })
 
           // Remove from going if already in the list, otherwise add
-          if (user.going.indexOf(event.id) === -1 &&
-            event.going.indexOf(user.id) === -1) {
+          if (user.going.indexOf(event.id) > -1 &&
+            event.going.indexOf(user.id) > -1) {
 
-            user.going.push(event.id)
-            event.going.push(user.id)
-          } else {
             user.going.pull({ _id: event.id })
             event.going.pull({ _id: user.id })
+          } else {
+            user.going.push(event.id)
+            event.going.push(user.id)
           }
 
           await user.save()

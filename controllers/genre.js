@@ -12,9 +12,8 @@ const Genre = require('../models/genre')
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.index = function (req, res, next) {
+exports.index = function (req, res) {
   const genreQuery = Genre.find({}).lean()
 
   genreQuery.then(genres => {

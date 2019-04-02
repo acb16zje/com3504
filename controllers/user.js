@@ -12,9 +12,8 @@ const User = require('../models/user')
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.getUserData = function (req, res, next) {
+exports.getUserData = function (req, res) {
   const userQuery = User.findOne({ 'username': req.params.username }, '-_id')
   userQuery.populate('genres', 'id name')
   userQuery.populate({
@@ -46,13 +45,12 @@ exports.getUserData = function (req, res, next) {
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.editUserProfile = async function (req, res, next) {
+exports.editUserProfile = function (req, res) {
   const formJson = req.body
   const userQuery = User.findOne({ email: req.user.email })
 
-  userQuery.then(user => {
+  userQuery.then(async user => {
     if (user) {
       user.username = formJson.username
       user.fullname = formJson.fullname
@@ -66,7 +64,6 @@ exports.editUserProfile = async function (req, res, next) {
       user.save().
         then(() => res.sendStatus(200)).
         catch(err => res.status(400).send(err))
-
     } else {
       res.sendStatus(404)
     }

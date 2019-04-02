@@ -19,8 +19,8 @@ export function initGenreDatabase (db) {
     const store = db.createObjectStore(GENRE_STORE, {
       keyPath: '_id',
     })
-    store.createIndex('_id', '_id', { unique: true, })
-    store.createIndex('name', 'name', { unique: true, })
+    store.createIndex('_id', '_id', { unique: true })
+    store.createIndex('name', 'name', { unique: true })
   }
 
   // Reload the genre database for every version changes
@@ -101,18 +101,20 @@ export async function getGenres () {
  * Initialise the <select> element with genres options
  *
  * @param input The <select> element to load
- * @returns {Promise<object>} A Choices.js object
  */
 export async function initGenresInput (input) {
-  return await getGenres().then(genres => {
-    return new Choices(input, {
-      duplicateItemsAllowed: false,
-      maxItemCount: 5,
-      removeItemButton: true,
-      choices: genres.map(genre => ({
-        value: genre._id,
-        label: genre.name
+  await getGenres().then(genres => {
+    return new Tagify(input, {
+      delimiters: ',| ',
+      maxTags: 5,
+      enforceWhitelist: true,
+      whitelist: genres.map(genre => ({
+        value: genre.name,
+        id: genre._id
       })),
+      dropdown: {
+        enabled: 1
+      }
     })
   })
 }

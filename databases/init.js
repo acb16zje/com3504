@@ -31,11 +31,16 @@ mongoose.connect(URL, {
   db.dropDatabase().then(async () => {
     console.log('Inserting default data...')
 
+    const blues = await new Genre({ name: 'Blues' }).save()
     const classical = await new Genre({ name: 'Classical' }).save()
+    const comedy = await new Genre({ name: 'Comedy' }).save()
     const country = await new Genre({ name: 'Country' }).save()
     const electronic = await new Genre({ name: 'Electronic' }).save()
+    const folk = await new Genre({ name: 'Folk' }).save()
     const funk = await new Genre({ name: 'Funk' }).save()
+    const hiphop = await new Genre({ name: 'Hiphop' }).save()
     const jazz = await new Genre({ name: 'Jazz' }).save()
+    const latin = await new Genre({ name: 'Latin' }).save()
     const metal = await new Genre({ name: 'Metal' }).save()
     const pop = await new Genre({ name: 'Pop' }).save()
     const rock = await new Genre({ name: 'Rock' }).save()
@@ -59,7 +64,7 @@ mongoose.connect(URL, {
       content: Buffer.from(fs.readFileSync(
         path.join(__dirname, '../public/images/luigi.webp'),
         { encoding: 'base64' }), 'base64'),
-      contentType: 'image/webp'
+      contentType: 'image/webp',
     }).save()
 
     // User data, NOTE: username has to follow the RegEx format in model

@@ -32,12 +32,10 @@ if (window.indexedDB) {
  * @param {Element} section A DOM element object
  */
 export function unableToLoadPage(section) {
-  section.innerHTML =
-    '<p class="title has-text-centered">' +
-      'Unable to load page' +
-    '</p>' +
-    '<p class="subtitle has-text-centered">' +
-      'Go back to <a href="/">home page</a>' +
-    '</p>'
+  section.innerHTML = `
+    <p class="title has-text-centered">Unable to load page</p>
+    <p class="subtitle has-text-centered">
+      Go back to <a href="/">home page</a>
+    </p>`
   section.classList.remove('is-hidden')
 }

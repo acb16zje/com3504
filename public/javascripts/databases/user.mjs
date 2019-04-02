@@ -6,7 +6,11 @@
 
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
-import { renderEventCard, storeExplorePage, addClickListener } from './event.mjs'
+import {
+  addClickListener,
+  renderEventCard,
+  storeExplorePage,
+} from './event.mjs'
 import { initGenresInput } from './genre.mjs'
 
 const USER_STORE = 'user_store'
@@ -48,7 +52,6 @@ if (userSection) {
  * Initialise the user IndexedDB
  *
  * @param {object} db The DB object
- * @returns {Promise<void>} The Promise
  */
 export function initUserDatabase (db) {
   if (!db.objectStoreNames.contains(USER_STORE)) {
@@ -165,30 +168,11 @@ function displayUserProfile (doc) {
   // Edit profile modal
   if (editProfileForm) {
     renderEditProfileModal(doc)
-    $(editProfileForm).submit(function (e) {
+
+    editProfileForm.onsubmit = function (e) {
       e.preventDefault()
-
-      const formJson = convertToJSON($(this).serializeArray())
-      editProfileSubmit(formJson).then(() => {
-        updateUserProfile(doc.username, formJson)
-
-      }).catch(err => {
-        if (err.responseJSON) {
-          err = err.responseJSON
-
-          // Model validation error
-          if (err.name === 'MongoError' && err.code === 11000) {
-            showSnackbar('Username already exist')
-          } else if (err.errors.description) {
-            showSnackbar(err.errors.description.message)
-          } else {
-            showSnackbar('Error occurred, failed to save changes')
-          }
-        } else {
-          showSnackbar('Failed to save changes')
-        }
-      })
-    })
+      editProfileSubmit(doc.username, convertToJSON($(this).serializeArray()))
+    }
   }
 
   // User links
@@ -208,11 +192,13 @@ function displayUserProfile (doc) {
       renderEventColumns(doc.interested)
       break
     case 'going':
-      const going = doc.going.filter(event => new Date() < new Date(event.startDate))
+      const going = doc.going.filter(
+        event => new Date() < new Date(event.startDate))
       renderEventColumns(going)
       break
     case 'went':
-      const went = doc.going.filter(event => new Date(event.startDate) < new Date())
+      const went = doc.going.filter(
+        event => new Date(event.startDate) < new Date())
       renderEventColumns(went)
       break
     default:
@@ -226,16 +212,45 @@ function displayUserProfile (doc) {
 /**
  * Submit edit profile
  *
+ * @param {string} username The username to update in IndexedDB if success
  * @param {object} formJson THe form data submitted in JSON format
- * @returns {Promise<any>} The Promise
  */
-function editProfileSubmit (formJson) {
-  return Promise.resolve($.ajax({
+function editProfileSubmit (username, formJson) {
+  const submitForm = Object.assign({}, formJson)
+  const displayForm = Object.assign({}, formJson)
+
+  // Genres field is empty is no option is selected
+  if (formJson.genres) {
+    submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
+    displayForm.genres = JSON.parse(displayForm.genres).map(genre => genre.value)
+  }
+
+  const ajax = Promise.resolve($.ajax({
     method: 'POST',
     contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(formJson),
+    data: JSON.stringify(submitForm),
     url: '/api/user/edit',
   }))
+
+  ajax.then(() => {
+    updateUserProfile(username, displayForm)
+  }).catch(err => {
+    console.log(err)
+    if (err.responseJSON) {
+      err = err.responseJSON
+
+      // Model validation error
+      if (err.name === 'MongoError' && err.code === 11000) {
+        showSnackbar('Username already exist')
+      } else if (err.errors.description) {
+        showSnackbar(err.errors.description.message)
+      } else {
+        showSnackbar('Error occurred, failed to save changes')
+      }
+    } else {
+      showSnackbar('Failed to save changes')
+    }
+  })
 }
 
 /**
@@ -313,9 +328,9 @@ function renderEditProfileModal (doc) {
   fullnameInput.setAttribute('value', doc.fullname)
   descriptionInput.textContent = doc.description
 
-  initGenresInput(genresInput).then(choices => {
-    choices.setChoiceByValue(doc.genres.map(genre => genre._id))
-  })
+  const userGenres = doc.genres.map(genre => genre.name).join(' ')
+  genresInput.setAttribute('value', userGenres)
+  initGenresInput(genresInput).then().catch()
 }
 
 /**

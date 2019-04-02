@@ -33,12 +33,14 @@ svg.solid {
   margin-right: .1875em;
 }
 
-.choices__input {
-  font-family: sans-serif;
+.tagify {
+  line-height: normal;
+  height: auto;
 }
 
-.choices__list--dropdown {
-  position: relative;
+.tagify tag:hover:not([readonly]) div::before {
+  -webkit-box-shadow: 0 0 0 20px #d3e2e2 inset;
+  box-shadow: 0 0 0 20px #d3e2e2 inset
 }
 
 /* Bulma adjustments below */

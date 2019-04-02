@@ -32,14 +32,15 @@ Iconify.setConfig('localStorage', true)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').
-      then(function (registration) {
+      then(() =>  {
         console.log('SW registration successful')
-      }, function (err) {
+      }, (err) => {
         console.log('SW registration failed: ', err)
       })
   })
 }
 
+/************************ Helper functions below ************************/
 /**
  * Convert the number to Intl number format
  *
@@ -62,6 +63,20 @@ function makeFriendly (num) {
   if (num >= 1000)
     return intlFormat(num / 1000) + 'k'
   return intlFormat(num)
+}
+
+/**
+ * Checks if two date are the same (does not include time)
+ *
+ * @param {Date} date1 The first date
+ * @param {Date} date2 The second date
+ * @returns {boolean} True if two dates are the same
+ */
+function isSameDate (date1, date2) {
+  const startCompare = new Date(date1).setHours(0, 0, 0, 0)
+  const endCompare = new Date(date2).setHours(0, 0, 0, 0)
+
+  return startCompare === endCompare
 }
 
 /**
@@ -161,60 +176,62 @@ if (dropdowns.length > 0) {
     })
   }
 
-  document.addEventListener('click', () => {
+  document.onclick = () => {
     for (let i = 0, n = dropDownsArray.length; i < n; i++) {
       dropDownsArray[i].classList.remove('is-active')
     }
-  })
+  }
 }
 
 /************************ Modals below ************************/
 // Launch and close the user story modal
-const modals = $(document.getElementsByClassName('modal'))
-const modalButtons = $(document.getElementsByClassName('modal-button'))
-const modalCloses = $('.modal-close, .modal-background, .button-close')
+const modals = document.getElementsByClassName('modal')
+const modalButtons = document.getElementsByClassName('modal-button')
+const modalCloses = document.querySelectorAll('.modal-close, .modal-background, .button-close')
 
 // Open the modal
 if (modalButtons.length) {
-  modalButtons.click(function () {
-    const targetID = this.dataset.target
-    document.getElementById(`${targetID}`).classList.add('is-active')
+  for (let i = 0, n = modalButtons.length; i < n; i++) {
+    modalButtons[i].onclick = function () {
+      const targetID = this.dataset.target
+      document.getElementById(`${targetID}`).classList.add('is-active')
 
-    // Story modal
-    if (targetID === 'story') {
-      // Add the image source
-      const profileImgSrc = $('#user-image img').attr('src')
-      const imgSrc = $(this).children(':first').attr('src')
+      // Story modal
+      if (targetID === 'story') {
+        // Add the image source
+        const profileImgModal = document.getElementById('user-image-modal')
+        profileImgModal.src = document.querySelector('#user-image img').src
 
-      const imgChild = $(document.getElementById(`${targetID}-image`))
-      imgChild.attr('src', imgSrc)
+        const imgChild = document.getElementById(`${targetID}-image`)
+        imgChild.src = this.children[0].src
 
-      const profileImgModal = $(document.getElementById('user-image-modal'))
-      profileImgModal.attr('src', profileImgSrc)
-
-      // Reset comments scroll to top
-      $('#story div.card-content')[0].scrollTop = 0
+        // Reset comments scroll to top
+        document.querySelector('#story div.card-content').scrollTop = 0
+      }
     }
-  })
+  }
 }
 
-// Close modal when click outside of story
+// Close modal when click outside of story or Esc pressed
 if (modalCloses.length) {
-  modalCloses.click(() => closeModal())
+  for (let i = 0, n = modalCloses.length; i < n; i++) {
+    modalCloses[i].onclick = () => closeModal()
+  }
 
-  // Close modal when Esc is pressed or click outside of story
-  document.addEventListener('keydown', e => {
+  document.onkeydown = e => {
     if (e.key === 'Escape') {
       closeModal()
     }
-  })
+  }
 }
 
 /**
  * Close the user story modal
  */
 const closeModal = () => {
-  modals.removeClass('is-active')
+  for (let i = 0, n = modals.length; i < n; i++) {
+    modals[i].classList.remove('is-active')
+  }
 }
 
 /************************ Offline notification below ************************/
@@ -254,27 +271,24 @@ if (startDate && endDate) {
   const fpEnd = $(endDate).flatpickr(options)
   fpEnd.clear()
 
-  $('#add-end-time a').click(function () {
+  document.getElementById('add-end-time').onclick = function () {
     const endTimeField = document.getElementById('end-time-field')
 
     if (endTimeField.classList.contains('is-hidden')) {
       this.textContent = '– End Date'
-      fpEnd.setDate(today.setHours(today.getHours() + 3))
+      fpEnd.setDate(new Date().setHours(today.getHours() + 3))
     } else {
       this.textContent = '+ End Date'
       fpEnd.setDate(undefined)
     }
 
     endTimeField.classList.toggle('is-hidden')
-  })
+  }
 
   fp.config.onValueUpdate = [
     function (selectedDates) {
       // Start time cannot be in the past
-      if (selectedDates[0].getDate() === today.getDate() &&
-        selectedDates[0].getMonth() === today.getMonth() &&
-        selectedDates[0].getFullYear() === today.getFullYear()) {
-
+      if (isSameDate(selectedDates[0], today)) {
         fp.set('minTime', Date.now())
       } else {
         fp.set('minTime', undefined)
@@ -288,10 +302,7 @@ if (startDate && endDate) {
   // End time cannot be earlier than start time on the same date
   fpEnd.config.onValueUpdate = [
     function (selectedDates) {
-      if (selectedDates[0].getDate() === fp.selectedDates[0].getDate() &&
-        selectedDates[0].getMonth() === fp.selectedDates[0].getMonth() &&
-        selectedDates[0].getFullYear() === fp.selectedDates[0].getFullYear()) {
-
+      if (isSameDate(selectedDates[0], fp.selectedDates[0])) {
         fpEnd.set('minTime', new Date(fp.selectedDates[0]))
       } else {
         fpEnd.set('minTime', undefined)
@@ -340,7 +351,7 @@ if (searchInput) {
   const suggestions = document.getElementById('search-suggestion')
 
   searchInput.oninput = function () {
-    const result = index.search(this.value, 20)
+    const result = index.search(this.value, 6)
 
     while (suggestions.firstChild)
       suggestions.removeChild(suggestions.firstChild)
@@ -351,10 +362,12 @@ if (searchInput) {
       link.href = `/event/${result[i]._id}`
       suggestions.appendChild(link)
 
+      // Icon container
       const icon = document.createElement('span')
       icon.className = 'panel-icon'
       link.appendChild(icon)
 
+      // Icon
       const iconify = document.createElement('span')
       iconify.className = 'iconify'
 
@@ -372,6 +385,7 @@ if (searchInput) {
     }
   }
 
+  // Clicking the dropdown links
   suggestions.onmousedown = (e) => {
     if (e.target.tagName === 'SPAN') {
       e.target.parentNode.click()
@@ -384,6 +398,7 @@ if (searchInput) {
     }
   }
 
+  // Show or hide the dropdown
   searchInput.onfocus = () => suggestions.classList.remove('is-hidden')
   searchInput.onblur = () => suggestions.classList.add('is-hidden')
 }
