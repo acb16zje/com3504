@@ -331,16 +331,18 @@ function showSnackbar (text) {
 /*------------------ flexsearch -----------------*/
 const index = new FlexSearch({
   encode: 'advanced',
-  tokenize: 'reverse',
+  tokenize: 'full',
   suggest: true,
   doc: {
     id: 'data:_id',
     field: [
+      // Event field
       'data:name',
-      'data:description',
-      'data:organiser',
       'data:address',
       'data:genres',
+      // User field
+      'data:username',
+      'data:fullname',
     ],
   },
 })
@@ -351,7 +353,7 @@ if (searchInput) {
   const suggestions = document.getElementById('search-suggestion')
 
   searchInput.oninput = function () {
-    const result = index.search(this.value, 6)
+    const result = index.search(this.value)
 
     while (suggestions.firstChild)
       suggestions.removeChild(suggestions.firstChild)
@@ -359,7 +361,6 @@ if (searchInput) {
     for (let i = 0, n = result.length; i < n; i++) {
       const link = document.createElement('a')
       link.className = 'panel-block'
-      link.href = `/event/${result[i]._id}`
       suggestions.appendChild(link)
 
       // Icon container
@@ -369,18 +370,28 @@ if (searchInput) {
 
       // Icon
       const iconify = document.createElement('span')
-      iconify.className = 'iconify'
 
       // Event icon or User icon
       if ('organiser' in result[i]) {
+        iconify.className = 'iconify'
         iconify.dataset.icon = 'ic:baseline-event'
+        link.href = `/event/${result[i]._id}`
       } else if ('email' in result[i]) {
-        iconify.dataset.icon = 'fa-solid:user'
+        const img = document.createElement('img')
+        img.className = 'is-rounded'
+        img.src = result[i].image
+
+        const figure = document.createElement('figure')
+        figure.className = 'image is-24x24'
+        figure.appendChild(img)
+
+        iconify.appendChild(figure)
+        link.href = `/${result[i].username}`
       }
       icon.appendChild(iconify)
 
       const text = document.createElement('span')
-      text.textContent = result[i].name
+      text.textContent = result[i].name || result[i].username
       link.appendChild(text)
     }
   }
@@ -400,7 +411,7 @@ if (searchInput) {
 
   // Show or hide the dropdown
   searchInput.onfocus = () => suggestions.classList.remove('is-hidden')
-  searchInput.onblur = () => suggestions.classList.add('is-hidden')
+  // searchInput.onblur = () => suggestions.classList.add('is-hidden')
 }
 
 /************************ WebRTC below ************************/

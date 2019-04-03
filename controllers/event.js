@@ -129,7 +129,7 @@ exports.setEventInterested = (req, res) => {
           // Remove from interested if already in the list, otherwise add
           if (user.interested.indexOf(event.id) > -1 &&
             event.interested.indexOf(user.id) > -1) {
-            
+
             user.interested.pull({ _id: event.id })
             event.interested.pull({ _id: user.id })
           } else {

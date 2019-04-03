@@ -50,15 +50,21 @@ if (eventSection) {
   loadEventPage(eventID).then(event => {
     console.log('Loaded event from server')
 
-    storeExplorePage(event).then(() => {
-      displayEventPage(event)
-    }).catch((err) => console.log(err))
+    storeExplorePage([event]).
+      then(() => displayEventPage(event)).
+      catch(err => console.log(err))
 
   }).catch(() => {
     console.log('Failed to load event from server, loading from local')
 
-    loadEventPageLocal(eventID).then(() => {
+    loadEventPageLocal(eventID).then(event => {
       console.log('Loaded event from local')
+
+      if (event) {
+        displayEventPage(event)
+      } else {
+        unableToLoadPage(eventSection)
+      }
     }).catch(() => console.log('Failed to load event from local'))
   })
 }
@@ -87,7 +93,7 @@ if (createEventForm) {
   } catch (e) {}
 
   const genresInput = document.getElementsByName('genres')[0]
-  initGenresInput(genresInput).then().catch()
+  initGenresInput(genresInput).finally()
 
   $(createEventForm).submit(function (e) {
     e.preventDefault()
@@ -133,7 +139,7 @@ export function initEventDatabase (db) {
  *
  * @return {Promise<any>} The Promise
  */
-function loadExplorePage () {
+export function loadExplorePage () {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
@@ -176,15 +182,8 @@ function loadEventPage (eventID) {
  */
 async function loadEventPageLocal (eventID) {
   if (dbPromise) {
-    dbPromise.then(async db => {
+    return dbPromise.then(async db => {
       return await db.getFromIndex(EVENT_STORE, '_id', eventID)
-    }).then(event => {
-      console.log(event)
-      if (event) {
-        displayEventPage(event)
-      } else {
-        unableToLoadPage(eventSection)
-      }
     }).catch(err => console.log(err))
   }
 }
@@ -192,7 +191,7 @@ async function loadEventPageLocal (eventID) {
 /**
  * Store the events data into IndexedDB
  *
- * @param {object} events The events documents retrieved
+ * @param {Array} events An array of events documents retrieved
  * @return {Promise<void>} The Promise
  */
 export async function storeExplorePage (events) {
@@ -260,67 +259,6 @@ function submitGoing (eventID) {
 }
 
 /**
- * Add click listener to interested and going buttons after page load
- */
-export function addClickListener () {
-  const interestedButtons = $('.interested-button')
-  const goingButtons = $('.going-button')
-
-  if (interestedButtons.length) {
-    interestedButtons.click(function () {
-      if (!currentUser) {
-        showSnackbar('Please sign in to continue')
-        return
-      }
-
-      // Set the event as interested, will replace going status
-      submitInterested(this.dataset.id).then(() => {
-        this.classList.toggle('is-light')
-        this.querySelector('svg.border').classList.toggle('is-hidden')
-        this.querySelector('svg.solid').classList.toggle('is-hidden')
-
-        // If the event is set as going
-        const going = document.getElementById('going')
-        if (going) {
-          going.classList.remove('is-light')
-        }
-
-        showSnackbar('Request successful')
-      }).catch(() => {
-        showSnackbar('Failed to process the request')
-      })
-    })
-  }
-
-  if (goingButtons.length) {
-    goingButtons.click(function () {
-      if (!currentUser) {
-        showSnackbar('Please sign in to continue')
-        return
-      }
-
-      // Set the event as going, will replace interested status
-      submitGoing(this.dataset.id).then(() => {
-        this.classList.toggle('is-light')
-
-        // If the event is set as interested
-        const interested = document.getElementById('interested')
-        if (interested) {
-          interested.classList.remove('is-light')
-          interested.querySelector('svg.solid').classList.add('is-hidden')
-          interested.querySelector('svg.border').classList.remove('is-hidden')
-        }
-
-        showSnackbar('Request successful')
-      }).catch((err) => {
-        console.log(err)
-        showSnackbar('Failed to process the request')
-      })
-    })
-  }
-}
-
-/**
  * Display all events data on /explore page
  *
  * @param {object} events The events documents retrieved
@@ -350,8 +288,9 @@ function displayEventPage (event) {
   document.getElementById('start-month').textContent = getStartMonth(startDate)
   document.getElementById('start-date').textContent = startDate.getDate()
   document.getElementById('event-name').textContent = event.name
-  host.textContent = `@${event.organiser.username}`
-  host.href = `/${event.organiser.username}`
+  const organiser = event.organiser.username || event.organiser
+  host.textContent = `@${organiser}`
+  host.href = `/${organiser}`
 
   // Interested and Going buttons
   const interested = document.getElementById('interested')
@@ -406,8 +345,7 @@ function displayEventPage (event) {
   document.getElementById('description').textContent = event.description
 
   eventSection.classList.remove('is-hidden')
-  // click listener for interested and going
-  addClickListener()
+  addClickListener() // click listener for interested and going
 }
 
 /**
@@ -536,5 +474,66 @@ function prettifyTime (startDate, endDate) {
     }
   } else {
     return start.toLocaleString(undefined, localeOptions)
+  }
+}
+
+/**
+ * Add click listener to interested and going buttons after page load
+ */
+export function addClickListener () {
+  const interestedButtons = $('.interested-button')
+  const goingButtons = $('.going-button')
+
+  if (interestedButtons.length) {
+    interestedButtons.click(function () {
+      if (!currentUser) {
+        showSnackbar('Please sign in to continue')
+        return
+      }
+
+      // Set the event as interested, will replace going status
+      submitInterested(this.dataset.id).then(() => {
+        this.classList.toggle('is-light')
+        this.querySelector('svg.border').classList.toggle('is-hidden')
+        this.querySelector('svg.solid').classList.toggle('is-hidden')
+
+        // If the event is set as going
+        const going = document.getElementById('going')
+        if (going) {
+          going.classList.remove('is-light')
+        }
+
+        showSnackbar('Request successful')
+      }).catch(() => {
+        showSnackbar('Failed to process the request')
+      })
+    })
+  }
+
+  if (goingButtons.length) {
+    goingButtons.click(function () {
+      if (!currentUser) {
+        showSnackbar('Please sign in to continue')
+        return
+      }
+
+      // Set the event as going, will replace interested status
+      submitGoing(this.dataset.id).then(() => {
+        this.classList.toggle('is-light')
+
+        // If the event is set as interested
+        const interested = document.getElementById('interested')
+        if (interested) {
+          interested.classList.remove('is-light')
+          interested.querySelector('svg.solid').classList.add('is-hidden')
+          interested.querySelector('svg.border').classList.remove('is-hidden')
+        }
+
+        showSnackbar('Request successful')
+      }).catch((err) => {
+        console.log(err)
+        showSnackbar('Failed to process the request')
+      })
+    })
   }
 }

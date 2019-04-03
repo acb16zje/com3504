@@ -24,26 +24,33 @@ const tab = path[2] // The user tab to display (events, going, interested, went)
 
 // Loading, storing, and displaying user profile (Promise based)
 if (userSection) {
-  $(userSection).ready(() => {
-    loadUserProfile(username).then(doc => {
-      console.log(`Loaded ${username} from server`)
+  loadUserProfile(username).then(user => {
+    console.log(`Loaded ${username} from server`)
+    const relatedUsers = user.following.concat(user.followers)
 
-      storeUserProfile(doc).then(() => {
-        console.log(`Stored ${username}`)
+    storeUserProfile([user].concat(relatedUsers)).then(() => {
+      console.log(`Stored ${username}, Pre-stored related users`)
 
-        Promise.resolve(displayUserProfile(doc)).then(() => {
-          storeExplorePage(doc.events.concat(doc.interested, doc.going)).
-            then(() => console.log(`Pre-stored ${username}'s events`)).
-            catch(() => console.log('Failed to pre-store events'))
-        })
-      }).catch(() => console.log(`Failed to store ${username}`))
-    }).catch(() => {
-      console.log(`Failed to load ${username} from server, loading from local`)
+      Promise.resolve(displayUserProfile(user)).then(() => {
+        storeExplorePage(user.events.concat(user.interested, user.going)).
+          then(() => console.log(`Pre-stored ${username}'s events`)).
+          catch(() => console.log('Failed to pre-store events'))
+      })
+    }).catch(() => console.log(`Failed to store ${username}`))
+  }).catch(() => {
+    console.log(`Failed to load ${username} from server, loading from local`)
 
-      loadUserProfileLocal(username).
-        then(() => console.log(`Loaded ${username} from local`)).
-        catch(() => console.log(`Failed to load ${username} from local`))
-    })
+    loadUserProfileLocal(username).
+      then(user => {
+        console.log(`Loaded ${username} from local`)
+
+        if (user) {
+          displayUserProfile(user)
+        } else {
+          unableToLoadPage(userSection)
+        }
+      }).
+      catch(() => console.log(`Failed to load ${username} from local`))
   })
 }
 
@@ -80,6 +87,32 @@ export function initUserDatabase (db) {
 }
 
 /**
+ * Load all user profiles from MongoDB
+ *
+ * @returns {Promise<any>} The Promise
+ */
+export function loadAllUserProfiles () {
+  return Promise.resolve($.ajax({
+    method: 'GET',
+    dataType: 'json',
+    url: '/api/users'
+  }))
+}
+
+/**
+ * Load all user profiles from local MongoDB
+ *
+ * @returns {Promise<* | void>}
+ */
+export async function loadAllUserProfilesLocal () {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      return await db.getAll(USER_STORE)
+    }).catch(err => console.log(err))
+  }
+}
+
+/**
  * Load the user profile data from MongoDB
  *
  * @param {string} username The username in the URL
@@ -101,14 +134,8 @@ function loadUserProfile (username) {
  */
 async function loadUserProfileLocal (username) {
   if (dbPromise) {
-    dbPromise.then(async db => {
+    return dbPromise.then(async db => {
       return await db.getFromIndex(USER_STORE, 'username', username)
-    }).then(doc => {
-      if (doc) {
-        return Promise.resolve(displayUserProfile(doc))
-      } else {
-        unableToLoadPage(userSection)
-      }
     }).catch(err => console.log(err))
   }
 }
@@ -116,19 +143,24 @@ async function loadUserProfileLocal (username) {
 /**
  * Store the user profile data into IndexedDB
  *
- * @param {object} doc The user document retrieved
+ * @param {Array} users An array of user documents retrieved
  * @return {Promise<void>} The Promise
  */
-async function storeUserProfile (doc) {
+export async function storeUserProfile (users) {
   if (dbPromise) {
     dbPromise.then(async db => {
       const tx = db.transaction(USER_STORE, 'readwrite')
-      const user = Object.assign({}, doc) // map will modify object
-      user.genres = user.genres.map(genre => genre.name)
-      user.followers = doc.followers.map(follower => follower.username)
-      user.following = doc.following.map(following => following.username)
-      await tx.store.put(user)
-      await tx.done
+
+      for (let i = 0, n = users.length; i < n; i++) {
+        (async () => {
+          const user = Object.assign({}, users[i]) // map will modify object
+          user.genres = user.genres.map(genre => genre.name)
+          user.followers = user.followers.map(follower => follower.username)
+          user.following = user.following.map(following => following.username)
+          await tx.store.put(user)
+          await tx.done
+        })()
+      }
     }).catch(err => console.log(err))
   }
 }
@@ -315,28 +347,28 @@ function updateUserProfile (username, formJson) {
 /**
  * Render the edit profile modal, with the user's values set
  *
- * @param {object} doc The user document retrieved
+ * @param {object} user The user document retrieved
  */
-function renderEditProfileModal (doc) {
+function renderEditProfileModal (user) {
   const usernameInput = document.getElementsByName('username')[0]
   const fullnameInput = document.getElementsByName('fullname')[0]
   const descriptionInput = document.getElementsByName('description')[0]
   const genresInput = document.getElementsByName('genres')[0]
 
   // Set default values of input
-  usernameInput.setAttribute('value', doc.username)
-  fullnameInput.setAttribute('value', doc.fullname)
-  descriptionInput.textContent = doc.description
+  usernameInput.setAttribute('value', user.username)
+  fullnameInput.setAttribute('value', user.fullname)
+  descriptionInput.textContent = user.description
 
-  const userGenres = doc.genres.map(genre => genre.name).join(' ')
+  const userGenres = user.genres.map(genre => genre.name).join(' ')
   genresInput.setAttribute('value', userGenres)
-  initGenresInput(genresInput).then().catch()
+  initGenresInput(genresInput).finally()
 }
 
 /**
  * Render and append the event card to the event columns
  *
- * @param {object} events An array of event documents
+ * @param {Array} events An array of event documents
  */
 function renderEventColumns (events) {
   const eventColumns = document.getElementsByClassName('event-columns')[0]
@@ -346,6 +378,5 @@ function renderEventColumns (events) {
     eventColumns.innerHTML += renderEventCard(events[i])
   }
 
-  // Click listener for interested buttons
-  addClickListener()
+  addClickListener() // Click listener for interested buttons
 }

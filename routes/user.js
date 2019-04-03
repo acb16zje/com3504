@@ -20,6 +20,9 @@ router.get('/:username/?:type(|events|going|interested|went)', (req, res) => {
   })
 })
 
+/* AJAX GET all user profile */
+router.get('/api/users/', userController.getUsers)
+
 /* AJAX GET user profile */
 router.get('/api/user/:username/?:type(|events|going|interested|went)', userController.getUserData)
 

@@ -8,6 +8,38 @@
 const User = require('../models/user')
 
 /**
+ * Get the data of all user profiles
+ *
+ * @param req The request header
+ * @param res The response header
+ */
+exports.getUsers = function (req, res) {
+  const userQuery = User.find({})
+  userQuery.populate('genres', 'id name')
+  userQuery.populate({
+    path: 'events going interested',
+    populate: [
+      { path: 'organiser', select: '-_id username' },
+      { path: 'genres', select: '-_id name' },
+      { path: 'interested', select: '-_id username' },
+      { path: 'going', select: '-_id username' },
+    ],
+  })
+  userQuery.populate('followers following', '-_id').lean()
+
+  userQuery.then(users => {
+    if (users && users.length) {
+      res.json(users)
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * Get all the data of the user
  *
  * @param {object} req The request header
@@ -25,7 +57,7 @@ exports.getUserData = function (req, res) {
       { path: 'going', select: '-_id username' },
     ],
   })
-  userQuery.populate('stories followers following').lean()
+  userQuery.populate('followers following', '-_id').lean()
 
   userQuery.then(user => {
     // 404 error if the username if not found
