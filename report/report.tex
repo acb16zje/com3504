@@ -25,18 +25,18 @@
 
 \begin{document}
 \section{Introduction}
-Progressive Web App (PWA) allows users to create and add comments to both events and user stories. 
-Social media features such as `like', `follow', `interested', and `going' are integrated. Users 
-are able to tag an event along with their stories, which will then appear in the event page. Users 
-can create a story by taking a picture with their front or environment camera through the 
-implementation of WebRTC or upload a picture locally. Each user story can receive likes and comments, 
-for which the latter is implemented using Socket.IO \cite{week6, socketio}. Service worker was 
-implemented to cache requests for offline usage. MongoDB is used to store and synchronise data 
-between the client and server, while IndexedDB is used to store data loaded from MongoDB for offline 
-usage. However, data stored in MongoDB can only be retrieved when user is online. The search function 
-(via location) was implemented with Google Maps API, allowing auto complete for the location field 
-and ensuring that it is a valid location. For security purposes, users can only login with their 
-respective Google Account.
+Progressive Web App (PWA) allows users to create and add comments to both events and user stories.
+Social media features such as `like', `follow', `interested', and `going' are integrated. Users are
+able to tag an event along with their stories, which will then appear in the event page. Users can
+create a story by taking a picture with their front or environment camera through the implementation
+of WebRTC or upload a picture locally. Each user story can receive likes and comments, for which the
+latter is implemented using Socket.IO \cite{week6, socketio}. Service worker was implemented to
+cache requests for offline usage. MongoDB is used to store and synchronise data between the client
+and server, while IndexedDB is used to store data loaded from MongoDB for offline usage. However,
+data stored in MongoDB can only be retrieved when user is online. The search function (via location)
+was implemented with Google Maps API, allowing auto complete for the location field and ensuring
+that it is a valid location. For security purposes, users can only login with their respective
+Google Account.
 
 \section{Diagrams}
 \begin{figure}[H]
@@ -59,117 +59,87 @@ respective Google Account.
 \hyperref[figure:site_map]{\textbf{Figure 1}} and \hyperref[figure:uml]{\textbf{Figure 2}} are the
 detailed description of the PWA system structure with \hyperref[figure:site_map]{\textbf{Figure 1}}
 describing the front-end, data storage, caching and data retrieval, while
-\hyperref[figure:uml]{\textbf{Figure 2}} demonstrates the database model along with
-the relationship between documents.
+\hyperref[figure:uml]{\textbf{Figure 2}} demonstrates the database model along with the relationship
+between documents.
 
 \section{Interface to Insert and Search Data via Forms}
 \textbf{Challenges:} The search speed must be efficient, and the search results produced must be
-accurate with respect to the given query. Users must be able to search for events, stories, and
-the profile of other users. Basic text search will allow the user to input any text query and return
-the results sorted by relevance. Advanced search will allow the user to search for events of a
-specific genre or find events between two different dates. Address searching in the event creation
-page is done through Place Autocomplete by Google Maps API \cite{google_maps_api}.
-
-\textbf{Solution:} FlexSearch.js \cite{flexsearch} was chosen to implement basic text searching
-task due to its efficient, lightweight, and flexible properties \cite{flexsearch_benchmarkk}.
-It allows multi-field search and accepts multiple data format types for its data index, hence
-it could be used with both IndexedDB and MongoDB to provide searching functionality in both online
-and offline environment. Advanced searches are yet to be implemented.
-
-\textbf{Requirements:} Users should be able to search for events, stories, and user profiles while
-online and offline. Users should be able to obtain results through querying with partial
-information. The results returned should be sorted according to relevance.
-
-\textbf{Limitations:} On every page load, the data has to be retrieved from IndexedDB to populate
-the FlexSearch.js's search index. The performance loss might be negligible when the total data size
-is small, but it may cause longer loading time when the size of data exceeds a certain size. Google Maps
-API request could not be cached as it generates a random token for every request made, hence it will
-not work offline.
+accurate with respect to the given query. Users must be able to search for events, stories, and the
+profile of other users. Basic text search will allow the user to input any text query and return the
+results sorted by relevance. Advanced search will allow the user to search for events of a specific
+genre or find events between two different dates. Address searching in the event creation page is
+done through Place Autocomplete by Google Maps API \cite{google_maps_api}. \textbf{Solution:}
+FlexSearch.js \cite{flexsearch} was chosen to implement basic text searching task due to its
+efficient, lightweight, and flexible properties \cite{flexsearch_benchmarkk}. It allows multi-field
+search and accepts multiple data format types for its data index, hence it could be used with both
+IndexedDB and MongoDB to provide searching functionality in both online and offline environment.
+Advanced searches are yet to be implemented. \textbf{Requirements:} Users should be able to search
+for events, stories, and user profiles while online and offline. Users should be able to obtain
+results through querying with partial information. The results returned should be sorted according
+to relevance. \textbf{Limitations:} On every page load, the data has to be retrieved from IndexedDB
+to populate the FlexSearch.js's search index. The performance loss might be negligible when the
+total data size is small, but it may cause longer loading time when the size of data exceeds a
+certain size. Google Maps API request could not be cached as it generates a random token for every
+request made, hence it will not work offline.
 
 \section{Interface to Search Data via Map (Yet to Implement)}
-\textbf{Challenges} and \textbf{Solutions:} Not yet implemented.
-
-\textbf{Requirements:} Allow users to search for events using a map in both online and offline
-environment. Past events should not appear on the map. Future and ongoing events should be displayed
-as custom markers on the map with different colours. Custom markers should pop-up to display the
-event information when clicked.
-
+\textbf{Challenges} and \textbf{Solutions:} Not yet implemented. \textbf{Requirements:} Allow users
+to search for events using a map in both online and offline environment. Past events should not
+appear on the map. Future and ongoing events should be displayed as custom markers on the map with
+different colours. Custom markers should pop-up to display the event information when clicked.
 \textbf{Limitations:} Caching the map tiles consumes more storage than other requests as map tiles
-are stored as images. 
+are stored as images.
 
 \section{PWA – Caching of the App Template Using a Web Worker}
 \textbf{Challenges:} Fetching cross-domain response will result in an opaque response, which will
 consume huge storage quota compared to normal responses \cite{opaque_workbox}. Sending a fallback
 offline page response when user is offline and visit a page that does not exist in the cache.
-
-\textbf{Solutions:} `Cache then network' was used and modified according to The Offline
-Cookbook \cite{offline_cookbook}.
-
-\textbf{Requirements:} Users should be able to view a basic offline template with required data
-when not connected to the internet. Users should be able to view previously loaded events and
-stories without the ability to make any changes to the events, stories, or their profiles.
-
-\textbf{Limitations:} Non-static files are not cached in the installation stage of the service
-worker. Page that has never been visited before will not be cached. 
+\textbf{Solutions:} `Cache then network' was used and modified according to The Offline Cookbook
+\cite{offline_cookbook}. \textbf{Requirements:} Users should be able to view a basic offline
+template with required data when not connected to the internet. Users should be able to view
+previously loaded events and stories without the ability to make any changes to the events, stories,
+or their profiles. \textbf{Limitations:} Non-static files are not cached in the installation stage
+of the service worker. Page that has never been visited before will not be cached.
 
 \section{PWA: Caching Data Using IndexedDB}
-\textbf{Challenges:} Retrieving data from MongoDB and store them in IndexedDB. Display page
-content using data loaded from IndexedDB when no internet connection present.
-
-\textbf{Solution:} Retrieve the data from MongoDB using AJAX. Promise is used for both storing and
-loading the data from IndexedDB.
-
-\textbf{Requirements:} Events and user profile data must be stored locally for offline searching.
-Users should be able to access data retrieved from IndexedDB when they are offline.
-
+\textbf{Challenges:} Retrieving data from MongoDB and store them in IndexedDB. Display page content
+using data loaded from IndexedDB when no internet connection present. \textbf{Solution:} Retrieve
+the data from MongoDB using AJAX. Promise is used for both storing and loading the data from
+IndexedDB. \textbf{Requirements:} Events and user profile data must be stored locally for offline
+searching. Users should be able to access data retrieved from IndexedDB when they are offline.
 \textbf{Limitations:} A known bug of IndexedDB storage is usage increases with every $put()$
-operation \cite{leveldb_593, leveldb_603}. 
+operation \cite{leveldb_593, leveldb_603}.
 
 \section{NodeJS Server Including Non-Blocking Organisation of Multiple Dedicated Servers}
 \textbf{Challenges:} Uses asynchronous functions to handle file upload, data retrieval from server,
 or other functions call that requires time to complete. Errors might occurred during the execution
-of asynchronous functions.
-
-\textbf{Solution:} Uses the Promise and async/await features of JavaScript to handle both successful
-and failed function operations. Keep the code nesting shallow to make code more maintainable and
-readable.
-
-\textbf{Requirements:} Able to use Promise to order the sequence of asynchronous processes. Able to
-use callbacks to handle the successful and failure events of asynchronous functions.
-
-\textbf{Limitations:} Single threaded mechanism, not suitable for CPU-intensive operations. Relies
-heaviliy on callbacks, which might possibly result in several callbacks nested within order
-callbacks.
+of asynchronous functions. \textbf{Solution:} Uses the Promise and async/await features of
+JavaScript to handle both successful and failed function operations. Keep the code nesting shallow
+to make code more maintainable and readable. \textbf{Requirements:} Able to use Promise to order the
+sequence of asynchronous processes. Able to use callbacks to handle the successful and failure
+events of asynchronous functions. \textbf{Limitations:} Single threaded mechanism, not suitable for
+CPU-intensive operations. Relies heaviliy on callbacks, which might possibly result in several
+callbacks nested within order callbacks.
 
 \section{MongoDB}
 \textbf{Challenges:} Creating schemas that clearly define the respective models. Verifying user
-inputs when creating a new document. 
-
-\textbf{Solution:} Uses mongoose's validation middleware \cite{validation} to define the values
-allowed for an index.
-
-\textbf{Requirements:} Data stored in MongoDB must be synchronised with IndexedDB when the client
-has connection to the server.
-
+inputs when creating a new document. \textbf{Solution:} Uses mongoose's validation middleware
+\cite{validation} to define the values allowed for an index. \textbf{Requirements:} Data stored in
+MongoDB must be synchronised with IndexedDB when the client has connection to the server.
 \textbf{Limitations:} Lacks flexibility as it does not support joins between multiple documents.
 Document size has a limit of 16MB, additional configurations required for storing large images.
 
 \section{Quality of the Web Solution}
 \textbf{Challenges:} Implementation of an authentication system. Social features such as user
 profile, marking events as interested or going. Ensuring that the features implemented will work and
-do not cause system failure.
-
-\textbf{Solution:} Used passport-google-oauth20 \cite{passport_google} to implement the
-authentication system. AJAX requests are used for a non-page reload form submittion. Exhaustively
-testing the system to minimise the probability of bug occurrences.
-
+do not cause system failure. \textbf{Solution:} Used passport-google-oauth20 \cite{passport_google}
+to implement the authentication system. AJAX requests are used for a non-page reload form
+submittion. Exhaustively testing the system to minimise the probability of bug occurrences.
 \textbf{Requirements:} Users should be able to tag events in their stories, 'like' stories, 'follow'
 other users, click 'interested' or 'going' on events. Events which users attended are recorded in
-their profile. Users require a Google Account to login for security purposes.
-
-\textbf{Limitations:} Users without a Google Account could not sign in into the system and enjoy
-personalised content. User accounts are all public, hence users should be careful when sharing
-personal information.
+their profile. Users require a Google Account to login for security purposes. \textbf{Limitations:}
+Users without a Google Account could not sign in into the system and enjoy personalised content.
+User accounts are all public, hence users should be careful when sharing personal information.
 
 \section{Conclusions (To date of first submission)}
 This assignment highlights the importance of caching and the importance of usability both during
