@@ -157,7 +157,7 @@ export async function storeUserProfile (users) {
           user.genres = user.genres.map(genre => genre.name)
           user.followers = user.followers.map(follower => follower.username)
           user.following = user.following.map(following => following.username)
-          await tx.store.put(user)
+          tx.store.put(user)
           await tx.done
         })()
       }
@@ -303,7 +303,7 @@ function updateUserProfile (username, formJson) {
       user.description = formJson.description
       user.genres = formJson.genres
 
-      await tx.store.put(user)
+      tx.store.put(user)
       await tx.done
     }).then(() => {
       console.log(`Updated ${username} IndexedDB`)

@@ -74,7 +74,7 @@ async function storeGenres (genres) {
 
       for (let i = 0, n = genres.length; i < n; i++) {
         (async () => {
-          await tx.store.put(genres[i])
+          tx.store.put(genres[i])
           await tx.done
         })()
       }

@@ -204,7 +204,7 @@ export async function storeExplorePage (events) {
         (async () => {
           events[i].organiser = events[i].organiser.username
           events[i].address = events[i].location.address
-          await tx.store.put(events[i])
+          tx.store.put(events[i])
           await tx.done
         })()
       }
@@ -325,7 +325,7 @@ function displayEventPage (event) {
 
   // Number of people going and interested
   document.getElementById('people').textContent =
-    `${makeFriendly(event.going.length)} 
+    `${makeFriendly(event.going.length)}
     ${new Date(event.startDate) < new Date() ? 'went' : 'going'} ·
     ${makeFriendly(event.interested.length)} interested`
 
@@ -400,17 +400,17 @@ export function renderEventCard (event) {
           <div class="level-right">
             <div class="level-item">
               <button class=
-              "button interested-button ${isUserInterested ? 'is-light' : ''}" 
+              "button interested-button ${isUserInterested ? 'is-light' : ''}"
               data-id="${event._id}">
-              
+
                 <span class=
-                "border icon iconify ${isUserInterested ? 'is-hidden' : ''}" 
+                "border icon iconify ${isUserInterested ? 'is-hidden' : ''}"
                 data-icon="ic:sharp-star-border"></span>
-                
+
                 <span class=
-                "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}" 
+                "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}"
                 data-icon="ic:sharp-star"></span>
-                
+
                 <span>Interested</span>
               </button>
             </div>
