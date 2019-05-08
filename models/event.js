@@ -40,7 +40,7 @@ const Event = mongoose.model('Event', new Schema({
   },
   image: {
     type: String,
-    default: '/images/default.webp',
+    default: '/images/placeholder.webp',
   },
   genres: {
     type: [

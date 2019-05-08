@@ -253,6 +253,21 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   align-items: center;
 }
 
+/* Create story page */
+#camera div.card-content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#camera video, #camera canvas {
+  background: black;
+  width: 100%;
+}
+
+#camera video {
+  height: 640px;
+}
+
 /* Create event form adjustment */
 #add-end-time {
   align-self: center;
@@ -310,7 +325,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 100%;
 }
 
-#user-follow {
+#user-follow, #user-edit {
   max-width: 180px;
 }
 
@@ -352,7 +367,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
     margin-bottom: 10px;
   }
 
-  #user-name, #user-follow {
+  #user-name, #user-follow, #user-edit {
     margin: .75rem;
     display: block;
     width: auto;

@@ -4,63 +4,65 @@
       <label class="label">Story Photo</label>
     </div>
     <div class="field-body">
-      <div class="field">
-        <div class="file">
+      <div class="field is-narrow">
+        <div class="file has-name">
           <label class="file-label">
-            <input class="file-input" type="file" name="resume">
+            <input id="file-input" class="file-input" type="file" accept="image/*">
+            <input name="image" type="hidden" required>
             <span class="file-cta">
               <span class="file-icon">
-                <span class="iconify" data-icon="fa-solid:camera"></span>
+                <span class="iconify" data-icon="fa-solid:file"></span>
               </span>
               <span class="file-label">
-                Upload photo
+                Upload
               </span>
             </span>
+            <span id="file-name" class="file-name">No file chosen</span>
           </label>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="field is-horizontal">
-    <div class="field-label is-normal">
-      <label class="label">Selfie Cam</label>
-    </div>
-    <div class="field-body">
       <div class="field">
-        <span class="file-cta">
-          <span class="file-label pic-button" data-target="selfie">Take A Selfie</span>
-        </span>
-      </div>
-    </div>
-  </div>
+        <a class="button modal-button is-light" data-target="camera">
+          <span class="icon">
+            <span class="iconify" data-icon="fa-solid:camera"></span>
+          </span>
+          <span>Camera</span>
+        </a>
 
-  <div id="selfie" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content">
-      <div class="card">
-        <div class="card-content">
-          <div class="content">
-            <video autoplay></video>
-            <canvas class="is-hidden"></canvas>
-            <img id="snapshot" src="" alt="The image taken">
-            <button id="camera-button" onclick="capture()"></button>
-            <button id="switch-button">Switch</button>
+        <!--Camera modal-->
+        <div id="camera" class="modal">
+          <div class="modal-background"></div>
+          <div class="modal-content">
+            <div class="card">
+              <div class="card-content">
+                <div class="content">
+                  <video id="video" autoplay></video>
+                  <canvas id="canvas" class="is-hidden"></canvas>
+                  <img id="snapshot" src="" alt="The image taken">
+
+                  <div class="buttons is-centered">
+                    <a id="capture" class="button is-danger">Capture</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <button class="modal-close is-large" aria-label="close"></button>
         </div>
       </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
   </div>
 
   <div class="field is-horizontal">
     <div class="field-label is-normal">
-      <label class="label">Location</label>
+      <label class="label">Event</label>
     </div>
     <div class="field-body">
       <div class="field">
         <p class="control is-expanded">
-          <input id="autocomplete" class="input" type="search" placeholder="Enter a place or address">
+          <div class="select is-fullwidth">
+            <select id="story-event" required></select>
+          </div>
         </p>
       </div>
     </div>
@@ -73,7 +75,7 @@
     <div class="field-body">
       <div class="field">
         <div class="control">
-          <textarea class="textarea has-fixed-size autosize" placeholder="Write a caption" rows="3"></textarea>
+          <textarea class="textarea has-fixed-size autosize" placeholder="Write a caption" rows="3" required></textarea>
         </div>
       </div>
     </div>
@@ -86,7 +88,7 @@
     <div class="field-body">
       <div class="field">
         <div class="control">
-          <button class="button is-primary">
+          <button type="submit" class="button is-primary">
             Post
           </button>
         </div>

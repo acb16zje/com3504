@@ -75,7 +75,8 @@ self.addEventListener('fetch', function (event) {
           // Return cache page if we have one, otherwise return offline page
           if (cachedResponse) {
             return cachedResponse
-          } else if (event.request.method === 'GET' && event.request.mode === 'navigate' &&
+          } else if (event.request.method === 'GET' && event.request.mode ===
+            'navigate' &&
             event.request.headers.get('accept').includes('text/html')) {
 
             if (isEventURL(event.request.url)) {
@@ -83,6 +84,10 @@ self.addEventListener('fetch', function (event) {
             } else {
               return caches.match('offline.html')
             }
+          } else if (event.request.method === 'GET' &&
+            event.request.destination === 'image' &&
+            isImageURL(event.request.url)) {
+              return caches.match('/images/placeholder.webp')
           }
         })
       }),
@@ -98,4 +103,14 @@ self.addEventListener('fetch', function (event) {
  */
 function isEventURL (url) {
   return url.includes('/event/')
+}
+
+/**
+ * Check if the request URL is an image link
+ *
+ * @param {string} url
+ * @returns {boolean} True if the request URL is an image link
+ */
+function isImageURL (url) {
+  return url.includes('/image/')
 }

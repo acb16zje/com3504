@@ -71,7 +71,7 @@ exports.createEvent = async (req, res) => {
   const genres = json.genres && json.genres.length ? json.genres : []
   const eventImage = await imageController.createImage(json.image)
 
-  const userQuery = User.findOne({ email: req.user.email })
+  const userQuery = User.findById(req.user.id)
 
   userQuery.then(async user => {
     const event = await new Event({
@@ -83,7 +83,7 @@ exports.createEvent = async (req, res) => {
       location: {
         latitude: json.latitude ? json.latitude : undefined,
         longitude: json.longitude ? json.longitude : undefined,
-        address: json.address ? json.address : 'No location'
+        address: json.address ? json.address : 'No location',
       },
       image: eventImage ? `/image/${eventImage._id}` : undefined,
       genres: genres,
@@ -116,8 +116,7 @@ exports.setEventInterested = (req, res) => {
   eventQuery.then(event => {
     // 404 error if event is not found
     if (event) {
-      const userQuery = User.findOne({ email: req.user.email },
-        'interested going')
+      const userQuery = User.findById(req.user.id, 'interested going')
 
       userQuery.then(async user => {
         // 404 error if username does not exist
@@ -161,17 +160,15 @@ exports.setEventInterested = (req, res) => {
  *
  * @param {object} req The request header
  * @param {object} res The response header
- * @param {object} next The next middleware function
  */
-exports.setEventGoing = (req, res, next) => {
+exports.setEventGoing = (req, res) => {
   const json = req.body
   const eventQuery = Event.findById(json.id, 'interested going')
 
   eventQuery.then(event => {
     // 404 error if event is not found
     if (event) {
-      const userQuery = User.findOne({ email: req.user.email },
-        'interested going')
+      const userQuery = User.findById(req.user.id, 'interested going')
 
       userQuery.then(async user => {
         // 404 error if username does not exist

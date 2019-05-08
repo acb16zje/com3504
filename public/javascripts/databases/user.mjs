@@ -7,7 +7,7 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import {
-  addClickListener,
+  addInterestedGoingListener,
   renderEventCard,
   storeExplorePage,
 } from './event.mjs'
@@ -15,6 +15,8 @@ import { initGenresInput } from './genre.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
+const currentUser = $(document.getElementById('my-account')).data('user')
+const followButton = document.getElementById('user-follow')
 const editProfileForm = document.getElementById('edit-profile-form')
 
 // Path will always be /:username/
@@ -95,7 +97,7 @@ export function loadAllUserProfiles () {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
-    url: '/api/users'
+    url: '/api/users',
   }))
 }
 
@@ -197,6 +199,18 @@ function displayUserProfile (doc) {
     genre.addClass('is-hidden')
   }
 
+  // Add listener for follow button
+  if (followButton) {
+    addFollowListener()
+
+    const followed = doc.followers.some(user => user.username === currentUser)
+    if (followed && currentUser) {
+      followButton.classList.remove('is-info')
+      followButton.classList.add('is-light')
+      followButton.textContent = 'Followed'
+    }
+  }
+
   // Edit profile modal
   if (editProfileForm) {
     renderEditProfileModal(doc)
@@ -242,6 +256,49 @@ function displayUserProfile (doc) {
 }
 
 /**
+ * Add click listener for follow button
+ */
+function addFollowListener () {
+  followButton.onclick = function () {
+    if (!currentUser) {
+      showSnackbar('Please sign in to continue')
+      return
+    }
+
+    submitFollow().then(() => {
+      const followerCount = document.getElementById('follower-count')
+
+      if (this.textContent === 'Follow') {
+        this.textContent = 'Followed'
+        followerCount.textContent = parseInt(followerCount.textContent) + 1
+      } else {
+        this.textContent = 'Follow'
+        followerCount.textContent = parseInt(followerCount.textContent) - 1
+      }
+
+      this.classList.toggle('is-light')
+      this.classList.toggle('is-info')
+    }).catch(() => {
+      showSnackbar('Failed to process the request')
+    })
+  }
+}
+
+/**
+ * Submit the follow request
+ *
+ * @returns {Promise<any>}
+ */
+function submitFollow () {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({ username: username }),
+    url: '/api/follow_user',
+  }))
+}
+
+/**
  * Submit edit profile
  *
  * @param {string} username The username to update in IndexedDB if success
@@ -254,7 +311,8 @@ function editProfileSubmit (username, formJson) {
   // Genres field is empty is no option is selected
   if (formJson.genres) {
     submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
-    displayForm.genres = JSON.parse(displayForm.genres).map(genre => genre.value)
+    displayForm.genres = JSON.parse(displayForm.genres).
+      map(genre => genre.value)
   }
 
   const ajax = Promise.resolve($.ajax({
@@ -378,5 +436,5 @@ function renderEventColumns (events) {
     eventColumns.innerHTML += renderEventCard(events[i])
   }
 
-  addClickListener() // Click listener for interested buttons
+  addInterestedGoingListener() // Click listener for interested buttons
 }

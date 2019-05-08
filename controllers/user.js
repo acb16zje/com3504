@@ -8,7 +8,7 @@
 const User = require('../models/user')
 
 /**
- * Get the data of all user profiles
+ * GET the data of all user profiles
  *
  * @param req The request header
  * @param res The response header
@@ -40,7 +40,7 @@ exports.getUsers = function (req, res) {
 }
 
 /**
- * Get all the data of the user
+ * GET all the data of the user
  *
  * @param {object} req The request header
  * @param {object} res The response header
@@ -73,14 +73,14 @@ exports.getUserData = function (req, res) {
 }
 
 /**
- * Edit the profile of current logged in user
+ * POSt Edit the profile of current logged in user
  *
  * @param {object} req The request header
  * @param {object} res The response header
  */
 exports.editUserProfile = function (req, res) {
   const formJson = req.body
-  const userQuery = User.findOne({ email: req.user.email })
+  const userQuery = User.findById(req.user.id)
 
   userQuery.then(async user => {
     if (user) {
@@ -98,6 +98,52 @@ exports.editUserProfile = function (req, res) {
         catch(err => res.status(400).send(err))
     } else {
       res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
+ * POST follows the given username
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.followUser = function (req, res) {
+  // userQueryA: The logged in user
+  // userQueryB: The user to be followed
+
+  const json = req.body
+  const userQueryA = User.findById(req.user.id, 'following')
+  const userQueryB = User.findOne({ username: json.username }, 'followers')
+
+  userQueryA.then(userA => {
+    if (userA) {
+      userQueryB.then(async userB => {
+        if (userB) {
+          // Unfollow if already followed, otherwise follow
+          if (userA.following.indexOf(userB.id) > -1 &&
+            userB.followers.indexOf(userA.id) > 1) {
+
+            userA.following.pull({ _id: userB.id })
+            userB.followers.pull({ _id: userA.id })
+          } else {
+            userA.following.push(userB.id)
+            userB.followers.push(userA.id)
+          }
+
+          await userA.save()
+          await userB.save()
+          res.sendStatus(200)
+        } else {
+          res.sendStatus(404)
+        }
+      }).catch(err => {
+        res.sendStatus(500)
+      })
+    } else {
+      res.sendStatus(401)
     }
   }).catch(err => {
     console.log(err)

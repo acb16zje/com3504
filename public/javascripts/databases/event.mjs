@@ -99,7 +99,10 @@ if (createEventForm) {
     e.preventDefault()
 
     const formJson = convertToJSON($(this).serializeArray())
-    formJson.genres = JSON.parse(formJson.genres).map(genre => genre.id)
+
+    if (formJson.genres) {
+      formJson.genres = JSON.parse(formJson.genres).map(genre => genre.id)
+    }
 
     createEvent(formJson).then(res => {
       window.location.href = `/event/${res.eventID}`
@@ -270,7 +273,7 @@ function displayExplorePage (events) {
     exploreColumns.innerHTML += renderEventCard(events[i])
   }
 
-  addClickListener() // click listener for interested and going
+  addInterestedGoingListener() // click listener for interested and going
 }
 
 /**
@@ -345,7 +348,7 @@ function displayEventPage (event) {
   document.getElementById('description').textContent = event.description
 
   eventSection.classList.remove('is-hidden')
-  addClickListener() // click listener for interested and going
+  addInterestedGoingListener() // click listener for interested and going
 }
 
 /**
@@ -480,7 +483,7 @@ function prettifyTime (startDate, endDate) {
 /**
  * Add click listener to interested and going buttons after page load
  */
-export function addClickListener () {
+export function addInterestedGoingListener () {
   const interestedButtons = $('.interested-button')
   const goingButtons = $('.going-button')
 
@@ -503,7 +506,6 @@ export function addClickListener () {
           going.classList.remove('is-light')
         }
 
-        showSnackbar('Request successful')
       }).catch(() => {
         showSnackbar('Failed to process the request')
       })
@@ -529,7 +531,6 @@ export function addClickListener () {
           interested.querySelector('svg.border').classList.remove('is-hidden')
         }
 
-        showSnackbar('Request successful')
       }).catch((err) => {
         console.log(err)
         showSnackbar('Failed to process the request')

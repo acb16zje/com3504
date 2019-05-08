@@ -15,6 +15,8 @@ Iconify.preloadImages([
   'zmdi:notifications-none',
   'fa-solid:search',
   'fa-solid:user',
+  'fa-solid:camera',
+  'fa-solid:file',
   'fa-regular:user',
   'fa-regular:plus-square',
   'ic:sharp-star',
@@ -32,7 +34,7 @@ Iconify.setConfig('localStorage', true)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').
-      then(() =>  {
+      then(() => {
         console.log('SW registration successful')
       }, (err) => {
         console.log('SW registration failed: ', err)
@@ -101,7 +103,7 @@ $(document).on('keypress', 'form', function (event) {
   }
 })
 
-// Text area auto expane
+// Text area auto expand
 autosize(document.getElementsByClassName('autosize'))
 
 // File upload
@@ -133,6 +135,21 @@ function getBase64 (file) {
     reader.onload = () => resolve(reader.result)
     reader.onerror = error => reject(error)
   })
+}
+
+const eventSelect = document.getElementById('story-event')
+
+/**
+ * Create story - append events to select options
+ *
+ * @param {string} text The option text
+ * @param {string} value The option value
+ */
+function appendEventToSelect (text, value) {
+  const option = document.createElement('option')
+  option.text = text
+  option.value = value
+  eventSelect.appendChild(option)
 }
 
 /**
@@ -187,7 +204,8 @@ if (dropdowns.length > 0) {
 // Launch and close the user story modal
 const modals = document.getElementsByClassName('modal')
 const modalButtons = document.getElementsByClassName('modal-button')
-const modalCloses = document.querySelectorAll('.modal-close, .modal-background, .button-close')
+const modalCloses = document.querySelectorAll(
+  '.modal-close, .modal-background, .button-close')
 
 // Open the modal
 if (modalButtons.length) {
@@ -207,6 +225,8 @@ if (modalButtons.length) {
 
         // Reset comments scroll to top
         document.querySelector('#story div.card-content').scrollTop = 0
+      } else if (targetID === 'camera') {
+        startWebRTC()
       }
     }
   }
@@ -400,9 +420,9 @@ if (searchInput) {
   suggestions.onmousedown = (e) => {
     if (e.target.tagName === 'SPAN') {
       e.target.parentNode.click()
-    } else if (e.target.tagName === 'svg' ) {
+    } else if (e.target.tagName === 'svg') {
       e.target.parentNode.parentNode.click()
-    } else if (e.target.tagName === 'path' ) {
+    } else if (e.target.tagName === 'path') {
       e.target.parentNode.parentNode.parentNode.click()
     } else {
       e.target.click()
@@ -415,100 +435,47 @@ if (searchInput) {
 }
 
 /************************ WebRTC below ************************/
-// Checks for browser support
-async function hasGetUserMedia () {
-  if (navigator.mediaDevices === undefined) {
-    navigator.mediaDevices = {}
+/**
+ *
+ */
+function startWebRTC () {
+  const constraints = {
+    audio: false,
+    video: { width: 480, height: 240 },
   }
 
-  if (navigator.mediaDevices.getUserMedia === undefined) {
-    navigator.mediaDevices.getUserMedia = function (constraints) {
-      const getUserMedia = navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia
+  navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+    const video = document.getElementById('video')
+    const capture = document.getElementById('capture')
+    const imageInput = document.getElementsByName('image')[0]
 
-      // Return rejected promise with an error
-      if (!getUserMedia) {
-        return Promise.reject(
-          new Error('getUserMedia is not implemented in this browser'))
+    video.srcObject = stream
+
+    capture.onclick = () => {
+      const canvas = document.getElementById('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      canvas.getContext('2d').
+        drawImage(video, 0, 0, canvas.width, canvas.height)
+
+      // Switch video to canvas when captured
+      video.classList.toggle('is-hidden')
+      canvas.classList.toggle('is-hidden')
+
+      if (capture.textContent === 'Capture') {
+        capture.textContent = 'Capture again'
+
+        // Save the image data
+        const data = canvas.toDataURL('image/webp')
+        imageInput.setAttribute('value', data)
+      } else {
+        capture.textContent = 'Capture'
+
+        // Clear the image data
+        imageInput.setAttribute('value', '')
       }
-
-      // Wrap the call to the old navigator.getUserMedia with a Promise
-      return new Promise(function (resolve, reject) {
-        getUserMedia.call(navigator, constraints, resolve, reject)
-      })
     }
-  }
+  }).catch(err => {
+    showSnackbar('Camera error, try again.')
+  })
 }
-
-// // Switch on camera to take snapshots
-// const video = document.querySelector('video')
-// const button = document.getElementById('camera-button')
-// const snapshot = document.getElementById('snapshot')
-
-// function onCamera(){
-//   // Change button label
-//   if (button.innerHTML == "Take Again"){
-//     button.innerHTML = "Capture"
-//   }
-
-//   // Switch between rear and environment camera
-//   var front = false;
-//   document.getElementById('switch-button').onclick = function() { front = !front; };
-
-//   video.classList.remove('is-hidden')
-//   snapshot.classList.add('is-hidden')
-//   navigator.mediaDevices.getUserMedia({audio: false, video: { facingMode: front ? "user" : "environment" }})
-//   .then(function(stream) {
-//     window.stream = stream;
-//     if ("srcObject" in video) {
-//       video.srcObject = stream
-//     } else {
-//       video.src = window.URL.createObjectURL(stream)
-//     }
-//     button.removeEventListener('click', onCamera)
-//     button.addEventListener('click', capture)
-//   })
-//   .catch(function(error) {
-//     console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name)
-//   })
-// }
-
-// // Takes snapshot
-// function capture(){
-//   // Change button label
-//   if (button.innerHTML == "Capture"){
-//     button.innerHTML = "Take Again"
-//   }
-
-//   const canvas = window.canvas = document.querySelector('canvas')
-//   video.classList.add('is-hidden')
-//   snapshot.classList.remove('is-hidden')
-//   button.addEventListener('click', onCamera)
-//   canvas.width = video.videoWidth
-//   canvas.height = video.videoHeight
-//   canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
-//   snapshot.src = canvas.toDataURL('image/png')
-// }
-
-// // Launch and close selfie camera modal
-// const picButtons = $(document.getElementsByClassName('pic-button'))
-
-// // Check for Canvas support and presence
-// function isCanvas(){
-//   const elem = document.createElement('canvas')
-//   return (elem.getContext && elem.getContext('2d') && document.querySelector('canvas') != null)
-// }
-
-// // Open the modal
-// if (picButtons.length) {
-//   if (isCanvas()){
-//     hasGetUserMedia()
-//     picButtons.click(function () {
-//       button.innerHTML = "Capture"
-//       const targetID = $(this).data('target')
-//       const target = $(document.getElementById(`${targetID}`))
-//       target.addClass('is-active')
-//       onCamera()
-//     })
-//   }
-// }

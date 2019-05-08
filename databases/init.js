@@ -98,7 +98,7 @@ mongoose.connect(URL, {
     // Events data
     const gakkiEvent = await new Event({
       name: 'Gakki Festival',
-      description: 'Your daily heavenly days by gakki cute cute cute cute cute cutee',
+      description: 'Your daily heavenly days by gakki cute cute cute cute cute cute',
       organiser: gakki.id,
       image: `/image/${gakkiImg.id}`,
       genres: pop.id,
