@@ -12,6 +12,7 @@ import {
   storeExplorePage,
 } from './event.mjs'
 import { initGenresInput } from './genre.mjs'
+import { renderStoryColumn, storeStories } from './story.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
@@ -33,12 +34,16 @@ if (userSection) {
     storeUserProfile([user].concat(relatedUsers)).then(() => {
       console.log(`Stored ${username}, Pre-stored related users`)
 
+      storeStories(user.stories).then(() => {
+        console.log(`Stored ${username}'s stories`)
+      }).catch(() => console.log(`Failed to stored ${username}'s stories`))
+
       Promise.resolve(displayUserProfile(user)).then(() => {
         storeExplorePage(user.events.concat(user.interested, user.going)).
           then(() => console.log(`Pre-stored ${username}'s events`)).
           catch(() => console.log('Failed to pre-store events'))
       })
-    }).catch(() => console.log(`Failed to store ${username}`))
+    }).catch((err) => console.log(`Failed to store ${err}`))
   }).catch(() => {
     console.log(`Failed to load ${username} from server, loading from local`)
 
@@ -79,9 +84,12 @@ export function initUserDatabase (db) {
     store.createIndex('genres', 'genres', {
       multiEntry: true,
     })
-    store.createIndex('followers', 'followers', {
+    store.createIndex('stories', 'stories', {
       multiEntry: true,
-    })
+    }),
+      store.createIndex('followers', 'followers', {
+        multiEntry: true,
+      })
     store.createIndex('following', 'following', {
       multiEntry: true,
     })
@@ -117,7 +125,7 @@ export async function loadAllUserProfilesLocal () {
 /**
  * Load the user profile data from MongoDB
  *
- * @param {string} username The username in the URL
+ * @param {string} username The username of the user
  * @returns {Promise<any>} The Promise
  */
 function loadUserProfile (username) {
@@ -157,6 +165,7 @@ export async function storeUserProfile (users) {
         (async () => {
           const user = Object.assign({}, users[i]) // map will modify object
           user.genres = user.genres.map(genre => genre.name)
+          user.stories = user.stories.map(story => story._id)
           user.followers = user.followers.map(follower => follower.username)
           user.following = user.following.map(following => following.username)
           tx.store.put(user)
@@ -189,14 +198,17 @@ function displayUserProfile (doc) {
   document.getElementById('following-count').textContent = makeFriendly(
     doc.following.length)
 
-  const genre = $(document.getElementById('genre'))
+  const genre = document.getElementById('genre')
 
   if (doc.genres.length) {
     for (let i = 0, n = doc.genres.length; i < n; i++) {
-      genre.append(`<span class="tag">${doc.genres[i].name}</span>`)
+      const node = document.createElement('span')
+      node.classList.add('tag')
+      node.textContent = doc.genres[i].name ? doc.genres[i].name : doc.genres[i]
+      genre.appendChild(node)
     }
   } else {
-    genre.addClass('is-hidden')
+    genre.classList.add('is-hidden')
   }
 
   // Add listener for follow button
@@ -217,7 +229,7 @@ function displayUserProfile (doc) {
 
     editProfileForm.onsubmit = function (e) {
       e.preventDefault()
-      editProfileSubmit(doc.username, convertToJSON($(this).serializeArray()))
+      submitEditProfile(doc.username, convertToJSON($(this).serializeArray()))
     }
   }
 
@@ -239,7 +251,7 @@ function displayUserProfile (doc) {
       break
     case 'going':
       const going = doc.going.filter(
-        event => new Date() < new Date(event.startDate))
+        event => new Date() <= new Date(event.startDate))
       renderEventColumns(going)
       break
     case 'went':
@@ -248,7 +260,8 @@ function displayUserProfile (doc) {
       renderEventColumns(went)
       break
     default:
-      break // undefined for /:username/stories
+      renderStoryColumns(doc.stories)
+      break
   }
 
   // Only show the content when the user details are loaded
@@ -304,7 +317,7 @@ function submitFollow () {
  * @param {string} username The username to update in IndexedDB if success
  * @param {object} formJson THe form data submitted in JSON format
  */
-function editProfileSubmit (username, formJson) {
+function submitEditProfile (username, formJson) {
   const submitForm = Object.assign({}, formJson)
   const displayForm = Object.assign({}, formJson)
 
@@ -433,8 +446,23 @@ function renderEventColumns (events) {
 
   for (let i = 0, n = events.length; i < n; i++) {
     // renderEventCard from event.mjs
-    eventColumns.innerHTML += renderEventCard(events[i])
+    eventColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
   }
 
   addInterestedGoingListener() // Click listener for interested buttons
 }
+
+/**
+ * Render and append the story to the story columns
+ *
+ * @param {Array} stories An array of story documents
+ */
+function renderStoryColumns (stories) {
+  const storyColumns = document.getElementById('stories').firstElementChild
+  for (let i = 0, n = stories.length; i < n; i++) {
+    // renderStoryColumn from story.mjs
+    storyColumns.insertAdjacentHTML('beforeend', renderStoryColumn(stories[i]))
+  }
+}
+
+

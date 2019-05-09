@@ -26,6 +26,7 @@ const FILES = [
   '/javascripts/databases/event.mjs',
   '/javascripts/databases/genre.mjs',
   '/javascripts/databases/user.mjs',
+  '/javascripts/databases/story.mjs',
   '/javascripts/script.js',
   '/offline.html',
 ]

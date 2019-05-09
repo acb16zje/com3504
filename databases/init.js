@@ -16,6 +16,7 @@ const URL = `mongodb://localhost:27017/${DB_NAME}`
 const Event = require('../models/event')
 const Genre = require('../models/genre')
 const Image = require('../models/image')
+const Story = require('../models/story')
 const User = require('../models/user')
 
 // Connect to MongoDB
@@ -124,16 +125,48 @@ mongoose.connect(URL, {
       interested: [gakki.id],
     }).save()
 
-    // Update the users followers and events details
+    // Story data
+    const gakkiStoryImage = await new Image({
+      content: Buffer.from(fs.readFileSync(
+        path.join(__dirname, '../public/images/gakki2.webp'),
+        { encoding: 'base64' }), 'base64'),
+      contentType: 'image/webp',
+    }).save()
+
+    const gakkiStory = await new Story({
+      user: gakki.id,
+      event: gakkiEvent.id,
+      image: `/image/${gakkiStoryImage.id}`,
+      caption: 'Join me at Gakki Event',
+    }).save()
+
+    const marioStory = await new Story({
+      user: mario.id,
+      event: marioEvent.id,
+      image: `/image/${marioImg.id}`,
+      caption: 'Join me at Mario Event'
+    }).save()
+
+    const luigiStory = await new Story({
+      user: luigi.id,
+      event: luigiEvent.id,
+      image: `/image/${luigiImg.id}`,
+      caption: 'Join me at Luigi Event'
+    }).save()
+
+    // Update the users events, followers, and stories details
+    gakki.stories = [gakkiStory.id]
     gakki.followers = [mario.id, luigi.id]
     gakki.events = gakkiEvent.id
     gakki.interested = [marioEvent.id, luigiEvent.id]
     await gakki.save()
 
+    mario.stories = [marioStory.id]
     mario.events = marioEvent.id
     mario.going = [gakkiEvent.id]
     await mario.save()
 
+    luigi.stories = [luigiStory.id]
     luigi.events = luigiEvent.id
     luigi.going = [gakkiEvent.id]
     await luigi.save()

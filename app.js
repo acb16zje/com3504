@@ -23,6 +23,7 @@ const genreRouter = require('./routes/genre')
 const imageRouter = require('./routes/image')
 const indexRouter = require('./routes/index')
 const userRouter = require('./routes/user')
+const storyRouter = require('./routes/story')
 
 const app = express()
 
@@ -65,6 +66,7 @@ app.use(genreRouter)
 app.use(imageRouter)
 app.use(indexRouter)
 app.use(userRouter)
+app.use(storyRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

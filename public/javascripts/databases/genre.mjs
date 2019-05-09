@@ -100,7 +100,7 @@ export async function getGenres () {
 /**
  * Initialise the <select> element with genres options
  *
- * @param input The <select> element to load
+ * @param {Element} input The <select> element to load
  */
 export async function initGenresInput (input) {
   await getGenres().then(genres => {

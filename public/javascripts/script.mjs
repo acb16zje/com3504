@@ -21,19 +21,19 @@ import {
  * Add events data to search
  * Add events to select options in
  *
- * @param {object} events An array of events object
+ * @param {Array} events An array of events object
  */
 function addEvents (events) {
   for (let i = 0, n = events.length; i < n; i++) {
-    if (events[i].genres) {
-      // events[i].genres = events[i].genres.map(genre => genre.name).join(' ')
-    }
-
-    index.add(events[i])
-
     if (eventSelect) {
       appendEventToSelect(events[i].name, events[i]._id)
     }
+
+    if (events[i].genres) {
+      events[i].genres = events[i].genres.map(genre => genre.name).join(' ')
+    }
+
+    index.add(events[i])
   }
 }
 
@@ -56,13 +56,12 @@ function addUsers (users) {
  */
 (async function () {
   await loadExplorePage().then(events => {
-    addEvents(events)
-
+    addEvents(JSON.parse(JSON.stringify(events)))
     return events
   }).then(events => storeExplorePage(events).finally()).catch(err => {
 
     loadExplorePageLocal().then(events => {
-      addEvents(events)
+      addEvents(JSON.parse(JSON.stringify(events)))
     }).catch(err => {
       console.log(err)
       console.log('Failed to load events data for search functon')

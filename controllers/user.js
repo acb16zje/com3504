@@ -10,8 +10,8 @@ const User = require('../models/user')
 /**
  * GET the data of all user profiles
  *
- * @param req The request header
- * @param res The response header
+ * @param {object} req The request header
+ * @param {object} res The response header
  */
 exports.getUsers = function (req, res) {
   const userQuery = User.find({})
@@ -25,6 +25,7 @@ exports.getUsers = function (req, res) {
       { path: 'going', select: '-_id username' },
     ],
   })
+  userQuery.populate('stories')
   userQuery.populate('followers following', '-_id').lean()
 
   userQuery.then(users => {
@@ -55,6 +56,13 @@ exports.getUserData = function (req, res) {
       { path: 'genres', select: '-_id name' },
       { path: 'interested', select: '-_id username' },
       { path: 'going', select: '-_id username' },
+    ],
+  })
+  userQuery.populate({
+    path: 'stories',
+    populate: [
+      { path: 'user', select: '-_id username' },
+      { path: 'event', select: 'id name'}
     ],
   })
   userQuery.populate('followers following', '-_id').lean()

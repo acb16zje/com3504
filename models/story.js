@@ -14,16 +14,13 @@ const Story = mongoose.model('Story', new Schema({
     ref: 'User',
     required: true
   },
+  event: {
+    type: Schema.Types.ObjectId,
+    ref: 'Event',
+    required: true
+  },
   image: {
     type: String,
-  },
-  location: {
-    latitude: Number,
-    longitude: Number,
-    address: {
-      type: String,
-      default: 'No location',
-    }
   },
   caption: String,
   date: {

@@ -270,7 +270,7 @@ function displayExplorePage (events) {
   const exploreColumns = exploreSection.children[0].children[0]
 
   for (let i = 0, n = events.length; i < n; i++) {
-    exploreColumns.innerHTML += renderEventCard(events[i])
+    exploreColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
   }
 
   addInterestedGoingListener() // click listener for interested and going
@@ -335,12 +335,16 @@ function displayEventPage (event) {
   // Genre tags
   if (event.genres.length) {
     genre.classList.remove('is-hidden')
-    genre.innerHTML += '<div id="tags" class="tags"></div>'
 
-    const tags = document.getElementById('tags')
+    const tags = document.createElement('div')
+    tags.classList.add('tags')
+    genre.appendChild(tags)
 
     for (let i = 0, n = event.genres.length; i < n; i++) {
-      tags.innerHTML += `<span class="tag">${event.genres[i].name}</span>`
+      const node = document.createElement('span')
+      node.classList.add('tag')
+      node.textContent = event.genres[i].name
+      tags.appendChild(node)
     }
   }
 
