@@ -11,12 +11,16 @@
         <div class="card-header-title">
           <nav class="level is-mobile is-marginless">
             <div class="level-item">
-              <figure class="image is-48x48">
-                <img id="user-image-modal" class="is-rounded" src="/images/default.webp" alt="User profile image">
-              </figure>
+              <a class="profile-link">
+                <figure class="image is-48x48">
+                  <img id="user-image-modal" class="is-rounded" src="/images/default.webp" alt="User profile image">
+                </figure>
+              </a>
             </div>
             <div class="level-item">
-              <p class="title is-6">gakki le mari mari mari mari m</p>
+              <a class="profile-link">
+                <p class="title is-6 story-username"></p>
+              </a>
             </div>
           </nav>
         </div>
@@ -30,11 +34,13 @@
 
       <div class="card-content">
         <div class="content">
-          <p><strong>gakki</strong> Some caption here, not yet implemented
-          </p>
+          <a class="profile-link">
+            <p class="title is-6 story-username is-inline"></p>
+          </a>
+          <p id="caption" class="is-inline"></p>
           <hr>
         </div>
-        <div class="content">
+        <div id="comments" class="content">
           <p class="subtitle is-6"><strong>lorem ipsum</strong>Lorem Ipsum1</p>
           <p class="subtitle is-6"><strong>lorem ipsumngel1</strong>Lorem Ipsum2</p>
           <p class="subtitle is-6"><strong>glorem ipsumlove1</strong>Lorem Ipsum3</p>

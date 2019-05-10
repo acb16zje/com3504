@@ -24,7 +24,7 @@ if (createStoryForm) {
   })
 }
 
-/************************ Functions below ************************/
+/************************ IndexedDB / AJAX related ************************/
 /**
  * Initialise the story database
  *
@@ -38,33 +38,24 @@ export function initStoryDatabase (db) {
     store.createIndex('_id', '_id', { unique: true })
     store.createIndex('user', 'user')
     store.createIndex('event', 'event')
-    store.createIndex('image', 'image')
-    store.createIndex('caption', 'caption')
-    store.createIndex('date', 'date')
-    store.createIndex('likes', 'likes', {
-      multiEntry: true,
-    })
-    store.createIndex('comments', 'comments', {
-      multiEntry: true,
-    })
   }
 }
 
 /**
- * Load the stories of a user
+ * Load all stories of a user from MongoDB
  *
  * @param {string} username The username of the user
  * @returns {Promise<any>} The Promise
  */
-function loadStories (username) {
+function loadUserStories (username) {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
-    url: `/api/story/${username}`,
+    url: `/api/user_story/${username}`,
   }))
 }
 
-// export function loadStoriesLocal (username) {
+// export function loadUserStoriesLocal (username) {
 //   if (dbPromise) {
 //     return dbPromise.then(async db => {
 //       return await db.getFromIndex(STORY_STORE, 'user')
@@ -84,6 +75,34 @@ function loadFollowingStories (username) {
     dataType: 'json',
     url: `/api/following_story/${username}`,
   }))
+}
+
+/**
+ * Load a story from MongoDB
+ *
+ * @param {string} storyID The ID of the story
+ * @returns {Promise<any>} The Promise
+ */
+function loadStory (storyID) {
+  return Promise.resolve($.ajax({
+    method: 'GET',
+    dataType: 'json',
+    url: `/api/story/${storyID}`
+  }))
+}
+
+/**
+ * Load a story locally from IndexedDB
+ *
+ * @param {string} storyID The ID of the story
+ * @returns {Promise<* | void>} The Promise
+ */
+function loadStoryLocal (storyID) {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      return await db.getFromIndex(STORY_STORE, '_id', storyID)
+    }).catch(err => console.log(err))
+  }
 }
 
 /**
@@ -110,6 +129,25 @@ export async function storeStories (stories) {
   }
 }
 
+export async function loadCaptionComments (storyID) {
+  return loadStory(storyID).then(story => {
+    console.log(`Loaded story ${storyID} from server`)
+    storeStories([story]).
+      then(() => console.log(`Stored story ${storyID}`)).
+      catch(() => console.log(`Failed to store story ${storyID}`))
+
+    return story
+  }).catch(() => {
+    console.log(`Failed to load story ${storyID} from server, loading locally`)
+
+    return loadStoryLocal(storyID).then(story => {
+      console.log(`Loaded story ${storyID} from local`)
+      return story
+    }).catch(() => console.log(`Failed to load story ${storyID} locally`))
+  })
+}
+
+/************************ Rendering related ************************/
 /**
  * Return the HTML fragment for a story document
  *
@@ -118,7 +156,7 @@ export async function storeStories (stories) {
  */
 export function renderStoryColumn (story) {
   return `<div class="column is-4">
-    <figure class="image is-flex modal-button" data-target="story">
+    <figure class="image is-flex story-modal" data-id=${story._id}>
       <img src=${story.image} alt="Story image">
     </figure>
   </div>`

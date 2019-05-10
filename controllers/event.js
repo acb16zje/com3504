@@ -10,7 +10,7 @@ const User = require('../models/user')
 const imageController = require('../controllers/image')
 
 /**
- * Explore page (/explore) with featured and suggested events
+ * GET Explore page (/explore) with featured and suggested events
  *
  * @param {object} req The request header
  * @param {object} res The response header
@@ -110,8 +110,7 @@ exports.createEvent = async (req, res) => {
  * @param {object} res The response header
  */
 exports.setEventInterested = (req, res) => {
-  const json = req.body
-  const eventQuery = Event.findById(json.id, 'interested going')
+  const eventQuery = Event.findById(req.body.id, 'interested going')
 
   eventQuery.then(event => {
     // 404 error if event is not found
@@ -162,8 +161,7 @@ exports.setEventInterested = (req, res) => {
  * @param {object} res The response header
  */
 exports.setEventGoing = (req, res) => {
-  const json = req.body
-  const eventQuery = Event.findById(json.id, 'interested going')
+  const eventQuery = Event.findById(req.body.id, 'interested going')
 
   eventQuery.then(event => {
     // 404 error if event is not found

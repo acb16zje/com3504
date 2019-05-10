@@ -1,7 +1,7 @@
 <form id="create-story" class="box">
   <div class="field is-horizontal">
     <div class="field-label is-normal">
-      <label class="label">Story Photo</label>
+      <label class="label">Photo</label>
     </div>
     <div class="field-body">
       <div class="field is-narrow">
@@ -38,8 +38,19 @@
                 <div class="content">
                   <video id="video" autoplay></video>
                   <canvas id="canvas" class="is-hidden"></canvas>
-                  <img id="snapshot" src="" alt="The image taken">
-
+                  <div id="filter-tabs" class="tabs is-toggle">
+                    <ul class="is-marginless">
+                      <li class="is-active camera-filter" data-value="none"><a>Original</a></li>
+                      <li class="camera-filter" data-value="blur"><a>Blur</a></li>
+                      <li class="camera-filter" data-value="brightness"><a>Brighten</a></li>
+                      <li class="camera-filter" data-value="contrast"><a>Contrast</a></li>
+                      <li class="camera-filter" data-value="grayscale"><a>Grayscale</a></li>
+                      <li class="camera-filter" data-value="huerotate"><a>Hue-rotate</a></li>
+                      <li class="camera-filter" data-value="invert"><a>Invert</a></li>
+                      <li class="camera-filter" data-value="saturate"><a>Saturate</a></li>
+                      <li class="camera-filter" data-value="sepia"><a>Sepia</a></li>
+                    </ul>
+                  </div>
                   <div class="buttons is-centered">
                     <a id="capture" class="button is-danger">Capture</a>
                   </div>

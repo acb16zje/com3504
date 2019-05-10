@@ -265,7 +265,73 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 #camera video {
-  height: 640px;
+  height: 550px;
+}
+
+#camera div.tabs ul {
+  width: inherit;
+}
+
+#camera div.tabs ul li {
+  margin: 0;
+}
+
+#filter-tabs::-webkit-scrollbar {
+  height: 10px;
+}
+
+/* Track */
+#filter-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Handle */
+#filter-tabs::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+#filter-tabs::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Camera filter effects */
+#camera .none {
+  filter: none;
+}
+
+#camera .blur {
+  filter: blur(3px);
+}
+
+#camera .brightness {
+  filter: brightness(2);
+}
+
+#camera .contrast {
+  filter: contrast(2);
+}
+
+#camera .grayscale {
+  filter: grayscale(1);
+}
+
+#camera .huerotate {
+  filter: hue-rotate(90deg);
+}
+
+#camera .invert {
+  filter: invert(1);
+}
+
+#camera .saturate {
+  filter: saturate(5);
+}
+
+#camera .sepia {
+  filter: sepia(1);
 }
 
 /* Create event form adjustment */
@@ -455,7 +521,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   overflow: auto;
 }
 
-#story div.card-content div.content strong {
+#story p.story-username {
   padding-right: 5px;
 }
 

@@ -12,7 +12,11 @@ import {
   storeExplorePage,
 } from './event.mjs'
 import { initGenresInput } from './genre.mjs'
-import { renderStoryColumn, storeStories } from './story.mjs'
+import {
+  loadCaptionComments,
+  renderStoryColumn,
+  storeStories,
+} from './story.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
@@ -54,14 +58,14 @@ if (userSection) {
         if (user) {
           displayUserProfile(user)
         } else {
-          unableToLoadPage(userSection)
+          // unableToLoadPage(userSection)
         }
       }).
       catch(() => console.log(`Failed to load ${username} from local`))
   })
 }
 
-/************************ Functions below ************************/
+/************************ IndexedDB / AJAX related ************************/
 /**
  * Initialise the user IndexedDB
  *
@@ -77,21 +81,6 @@ export function initUserDatabase (db) {
     })
     store.createIndex('email', 'email', {
       unique: true,
-    })
-    store.createIndex('fullname', 'fullname')
-    store.createIndex('description', 'description')
-    store.createIndex('image', 'image')
-    store.createIndex('genres', 'genres', {
-      multiEntry: true,
-    })
-    store.createIndex('stories', 'stories', {
-      multiEntry: true,
-    }),
-      store.createIndex('followers', 'followers', {
-        multiEntry: true,
-      })
-    store.createIndex('following', 'following', {
-      multiEntry: true,
     })
   }
 }
@@ -165,7 +154,6 @@ export async function storeUserProfile (users) {
         (async () => {
           const user = Object.assign({}, users[i]) // map will modify object
           user.genres = user.genres.map(genre => genre.name)
-          user.stories = user.stories.map(story => story._id)
           user.followers = user.followers.map(follower => follower.username)
           user.following = user.following.map(following => following.username)
           tx.store.put(user)
@@ -176,6 +164,66 @@ export async function storeUserProfile (users) {
   }
 }
 
+/**
+ * Submit the follow request
+ *
+ * @returns {Promise<any>}
+ */
+function submitFollow () {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({ username: username }),
+    url: '/api/follow_user',
+  }))
+}
+
+/**
+ * Submit edit profile
+ *
+ * @param {string} username The username to update in IndexedDB if success
+ * @param {object} formJson THe form data submitted in JSON format
+ */
+function submitEditProfile (username, formJson) {
+  const submitForm = Object.assign({}, formJson)
+  const displayForm = Object.assign({}, formJson)
+
+  // Genres field is empty is no option is selected
+  if (formJson.genres) {
+    submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
+    displayForm.genres = JSON.parse(displayForm.genres).
+      map(genre => genre.value)
+  }
+
+  const ajax = Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(submitForm),
+    url: '/api/user/edit',
+  }))
+
+  ajax.then(() => {
+    updateUserProfile(username, displayForm)
+  }).catch(err => {
+    console.log(err)
+    if (err.responseJSON) {
+      err = err.responseJSON
+
+      // Model validation error
+      if (err.name === 'MongoError' && err.code === 11000) {
+        showSnackbar('Username already exist')
+      } else if (err.errors.description) {
+        showSnackbar(err.errors.description.message)
+      } else {
+        showSnackbar('Error occurred, failed to save changes')
+      }
+    } else {
+      showSnackbar('Failed to save changes')
+    }
+  })
+}
+
+/************************ Rendering related ************************/
 /**
  * Display the user data on the page
  *
@@ -266,94 +314,6 @@ function displayUserProfile (doc) {
 
   // Only show the content when the user details are loaded
   userSection.classList.remove('is-hidden')
-}
-
-/**
- * Add click listener for follow button
- */
-function addFollowListener () {
-  followButton.onclick = function () {
-    if (!currentUser) {
-      showSnackbar('Please sign in to continue')
-      return
-    }
-
-    submitFollow().then(() => {
-      const followerCount = document.getElementById('follower-count')
-
-      if (this.textContent === 'Follow') {
-        this.textContent = 'Followed'
-        followerCount.textContent = parseInt(followerCount.textContent) + 1
-      } else {
-        this.textContent = 'Follow'
-        followerCount.textContent = parseInt(followerCount.textContent) - 1
-      }
-
-      this.classList.toggle('is-light')
-      this.classList.toggle('is-info')
-    }).catch(() => {
-      showSnackbar('Failed to process the request')
-    })
-  }
-}
-
-/**
- * Submit the follow request
- *
- * @returns {Promise<any>}
- */
-function submitFollow () {
-  return Promise.resolve($.ajax({
-    method: 'POST',
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify({ username: username }),
-    url: '/api/follow_user',
-  }))
-}
-
-/**
- * Submit edit profile
- *
- * @param {string} username The username to update in IndexedDB if success
- * @param {object} formJson THe form data submitted in JSON format
- */
-function submitEditProfile (username, formJson) {
-  const submitForm = Object.assign({}, formJson)
-  const displayForm = Object.assign({}, formJson)
-
-  // Genres field is empty is no option is selected
-  if (formJson.genres) {
-    submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
-    displayForm.genres = JSON.parse(displayForm.genres).
-      map(genre => genre.value)
-  }
-
-  const ajax = Promise.resolve($.ajax({
-    method: 'POST',
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(submitForm),
-    url: '/api/user/edit',
-  }))
-
-  ajax.then(() => {
-    updateUserProfile(username, displayForm)
-  }).catch(err => {
-    console.log(err)
-    if (err.responseJSON) {
-      err = err.responseJSON
-
-      // Model validation error
-      if (err.name === 'MongoError' && err.code === 11000) {
-        showSnackbar('Username already exist')
-      } else if (err.errors.description) {
-        showSnackbar(err.errors.description.message)
-      } else {
-        showSnackbar('Error occurred, failed to save changes')
-      }
-    } else {
-      showSnackbar('Failed to save changes')
-    }
-  })
 }
 
 /**
@@ -463,6 +423,73 @@ function renderStoryColumns (stories) {
     // renderStoryColumn from story.mjs
     storyColumns.insertAdjacentHTML('beforeend', renderStoryColumn(stories[i]))
   }
+
+  // Story modal profile
+  const profileUsernames = document.getElementsByClassName('story-username')
+  const profileLinks = document.getElementsByClassName('profile-link')
+  for (let i = 0, n = profileLinks.length; i < n; i++) {
+    profileLinks[i].href = `/${username}`
+  }
+  for (let i = 0, n = profileUsernames.length; i < n; i++) {
+    profileUsernames[i].textContent = username
+  }
+
+  addStoryModalListener()
 }
 
+/************************ EventListener below ************************/
+/**
+ * Add click listener for follow button
+ */
+function addFollowListener () {
+  followButton.onclick = function () {
+    if (!currentUser) {
+      showSnackbar('Please sign in to continue')
+      return
+    }
 
+    submitFollow().then(() => {
+      const followerCount = document.getElementById('follower-count')
+
+      if (this.textContent === 'Follow') {
+        this.textContent = 'Followed'
+        followerCount.textContent = parseInt(followerCount.textContent) + 1
+      } else {
+        this.textContent = 'Follow'
+        followerCount.textContent = parseInt(followerCount.textContent) - 1
+      }
+
+      this.classList.toggle('is-light')
+      this.classList.toggle('is-info')
+    }).catch(() => {
+      showSnackbar('Failed to process the request')
+    })
+  }
+}
+
+function addStoryModalListener () {
+  const storyModals = document.getElementsByClassName('story-modal')
+
+  if (storyModals.length) {
+    for (let i = 0, n = storyModals.length; i < n; i++) {
+      storyModals[i].onclick = function () {
+        // Add the image source
+        const profileImgModal = document.getElementById('user-image-modal')
+        profileImgModal.src = document.querySelector('#user-image img').src
+
+        const imgChild = document.getElementById('story-image')
+        imgChild.src = this.children[0].src
+
+        // Reset comments scroll to top
+        // document.querySelector('#story div.card-content').scrollTop = 0
+
+        // AJAX load caption and comments
+        loadCaptionComments(this.dataset.id).then(data => {
+          document.getElementById('caption').textContent = data.caption
+
+          document.getElementById('story').classList.add('is-active')
+        }).catch(() => showSnackbar('Failed to load story'))
+      }
+    }
+  }
+}

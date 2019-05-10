@@ -214,18 +214,7 @@ if (modalButtons.length) {
       const targetID = this.dataset.target
       document.getElementById(`${targetID}`).classList.add('is-active')
 
-      // Story modal
-      if (targetID === 'story') {
-        // Add the image source
-        const profileImgModal = document.getElementById('user-image-modal')
-        profileImgModal.src = document.querySelector('#user-image img').src
-
-        const imgChild = document.getElementById(`${targetID}-image`)
-        imgChild.src = this.children[0].src
-
-        // Reset comments scroll to top
-        document.querySelector('#story div.card-content').scrollTop = 0
-      } else if (targetID === 'camera') {
+      if (targetID === 'camera') {
         startWebRTC()
       }
     }
@@ -418,6 +407,7 @@ if (searchInput) {
 
   // Clicking the dropdown links
   suggestions.onmousedown = (e) => {
+    e.preventDefault()
     if (e.target.tagName === 'SPAN') {
       e.target.parentNode.click()
     } else if (e.target.tagName === 'svg') {
@@ -431,7 +421,7 @@ if (searchInput) {
 
   // Show or hide the dropdown
   searchInput.onfocus = () => suggestions.classList.remove('is-hidden')
-  // searchInput.onblur = () => suggestions.classList.add('is-hidden')
+  searchInput.onblur = () => suggestions.classList.add('is-hidden')
 }
 
 /************************ WebRTC below ************************/
@@ -448,6 +438,28 @@ function startWebRTC () {
     const video = document.getElementById('video')
     const capture = document.getElementById('capture')
     const imageInput = document.getElementsByName('image')[0]
+    const filters = document.getElementsByClassName('camera-filter')
+    let filterValue = 'none'
+
+    // Apply filter effect on click
+    for (let i = 0, n = filters.length; i < n; i++) {
+      filters[i].onclick = function (e) {
+        for (let i = 0, n = filters.length; i < n; i++) {
+          filters[i].classList.remove('is-active')
+        }
+
+        const clickedTarget = e.currentTarget
+        clickedTarget.classList.add('is-active')
+
+        if (video.classList.contains('is-hidden')) {
+          video.className = `is-hidden ${this.dataset.value}`
+        } else {
+          video.className = this.dataset.value
+        }
+
+        filterValue = this.dataset.value
+      }
+    }
 
     video.srcObject = stream
 
@@ -455,12 +467,15 @@ function startWebRTC () {
       const canvas = document.getElementById('canvas')
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
-      canvas.getContext('2d').
-        drawImage(video, 0, 0, canvas.width, canvas.height)
+
+      const ctx = canvas.getContext('2d')
+      applyFilterEffect(ctx, filterValue)
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
       // Switch video to canvas when captured
       video.classList.toggle('is-hidden')
       canvas.classList.toggle('is-hidden')
+      document.getElementById('filter-tabs').classList.toggle('is-hidden')
 
       if (capture.textContent === 'Capture') {
         capture.textContent = 'Capture again'
@@ -478,4 +493,41 @@ function startWebRTC () {
   }).catch(err => {
     showSnackbar('Camera error, try again.')
   })
+}
+
+/**
+ * Apply filter effect to the canvas
+ *
+ * @param {object} ctx Canvas context object
+ * @param {string} filterValue Filter effect
+ */
+function applyFilterEffect(ctx, filterValue) {
+  switch (filterValue) {
+    case 'blur':
+      ctx.filter = 'blur(3px)'
+      break
+    case 'brightness':
+      ctx.filter = 'brightness(2)'
+      break
+    case 'contrast':
+      ctx.filter = 'contrast(2)'
+      break
+    case 'grayscale':
+      ctx.filter = 'grayscale(1)'
+      break
+    case 'huerotate':
+      ctx.filter = 'hue-rotate(90deg)'
+      break
+    case 'invert':
+      ctx.filter = 'invert(1)'
+      break
+    case 'saturate':
+      ctx.filter = 'saturate(5)'
+      break
+    case 'sepia':
+      ctx.filter = 'sepia(1)'
+      break
+    default:
+      break
+  }
 }

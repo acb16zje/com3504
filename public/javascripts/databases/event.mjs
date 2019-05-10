@@ -25,9 +25,7 @@ if (exploreSection) {
         return events
       }).catch(() => console.log('Failed to store /explore'))
     }).
-    then(events => {
-      displayExplorePage(events)
-    }).
+    then(events => displayExplorePage(events)).
     catch(() => {
       console.log('Failed to load /explore from server, loading from local')
 
@@ -126,14 +124,6 @@ export function initEventDatabase (db) {
     })
     store.createIndex('_id', '_id', { unique: true })
     store.createIndex('name', 'name')
-    store.createIndex('description', 'description')
-    store.createIndex('organiser', 'organiser')
-    store.createIndex('startDate', 'startDate')
-    store.createIndex('endDate', 'endDate')
-    store.createIndex('latitude', 'latitude')
-    store.createIndex('longitude', 'longitude')
-    store.createIndex('address', 'address')
-    store.createIndex('image', 'image')
   }
 }
 
