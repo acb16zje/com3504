@@ -76,7 +76,7 @@ if (createEventForm) {
 
       const autocomplete = new google.maps.places.Autocomplete(input)
 
-      $(input).change(function () {
+      autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace()
 
         if (place) {
@@ -106,7 +106,7 @@ if (createEventForm) {
       window.location.href = `/event/${res.eventID}`
     }).catch(err => {
       console.log(err)
-      showSnackbar('Cannot create event')
+      showSnackbar('Failed to create event')
     })
   })
 }
@@ -208,7 +208,7 @@ export async function storeExplorePage (events) {
 /**
  * Create an event
  *
- * @param {object} formJson THe form data submitted in JSON format
+ * @param {object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function createEvent (formJson) {

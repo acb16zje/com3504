@@ -17,7 +17,14 @@ if (createStoryForm) {
     const imageInput = document.getElementsByName('image')[0]
 
     if (imageInput.getAttribute('value')) {
+      const formJson = convertToJSON($(this).serializeArray())
 
+      createStory(formJson).then(res => {
+        window.location.href = '/'
+      }).catch(err => {
+        console.log(err)
+        showSnackbar('Failed to create story')
+      })
     } else {
       showSnackbar('A photo is required')
     }
@@ -87,7 +94,7 @@ function loadStory (storyID) {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
-    url: `/api/story/${storyID}`
+    url: `/api/story/${storyID}`,
   }))
 }
 
@@ -127,6 +134,21 @@ export async function storeStories (stories) {
       }
     }).catch(err => console.log(err))
   }
+}
+
+/**
+ * Create a story
+ *
+ * @param {object} formJson The form data submitted in JSON format
+ * @returns {Promise<any>} The Promise
+ */
+function createStory (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    url: '/api/story/create',
+  }))
 }
 
 export async function loadCaptionComments (storyID) {

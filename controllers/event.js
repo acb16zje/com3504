@@ -76,7 +76,7 @@ exports.createEvent = async (req, res) => {
   userQuery.then(async user => {
     const event = await new Event({
       name: json.name,
-      descrption: json.description,
+      description: json.description,
       organiser: user.id,
       startDate: json.startDate,
       endDate: json.endDate ? json.endDate : undefined,
@@ -93,9 +93,12 @@ exports.createEvent = async (req, res) => {
     })
 
     if (event) {
+      // Add the created event to user
       await user.events.push(event.id)
       await user.save()
       res.status(200).json({ eventID: event.id })
+    } else {
+      res.sendStatus(500)
     }
   }).catch(err => {
     console.log(err)

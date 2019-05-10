@@ -154,7 +154,7 @@ mongoose.connect(URL, {
       caption: 'Join me at Luigi Event'
     }).save()
 
-    // Update the users events, followers, and stories details
+    // User: Update the events, followers, and stories details
     gakki.stories = [gakkiStory.id]
     gakki.followers = [mario.id, luigi.id]
     gakki.events = gakkiEvent.id
@@ -170,6 +170,16 @@ mongoose.connect(URL, {
     luigi.events = luigiEvent.id
     luigi.going = [gakkiEvent.id]
     await luigi.save()
+
+    // Event: update the stories
+    gakkiEvent.stories = [gakkiStory.id]
+    await gakkiEvent.save()
+
+    marioEvent.stories = [marioStory.id]
+    await marioEvent.save()
+
+    luigiEvent.stories = [luigiEvent.id]
+    await luigiEvent.save()
 
     console.log('Finished successfully, closing the connection')
     db.close()

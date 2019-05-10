@@ -9,6 +9,7 @@ const Schema = mongoose.Schema
 // Models required for population
 require('../models/genre')
 require('../models/user')
+require('../models/story')
 
 const Event = mongoose.model('Event', new Schema({
   name: {
@@ -36,7 +37,7 @@ const Event = mongoose.model('Event', new Schema({
     address: {
       type: String,
       default: 'No location',
-    }
+    },
   },
   image: {
     type: String,
@@ -55,13 +56,19 @@ const Event = mongoose.model('Event', new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      default: []
+      default: [],
     }],
   going: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      default: []
+      default: [],
+    }],
+  stories: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Story',
+      default: [],
     }],
 }))
 

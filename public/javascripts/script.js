@@ -347,7 +347,7 @@ const index = new FlexSearch({
     field: [
       // Event field
       'data:name',
-      'data:address',
+      'data:location:address',
       'data:genres',
       // User field
       'data:username',

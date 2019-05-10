@@ -132,7 +132,7 @@ exports.followUser = function (req, res) {
         if (userB) {
           // Unfollow if already followed, otherwise follow
           if (userA.following.indexOf(userB.id) > -1 &&
-            userB.followers.indexOf(userA.id) > 1) {
+            userB.followers.indexOf(userA.id) > -1) {
 
             userA.following.pull({ _id: userB.id })
             userB.followers.pull({ _id: userA.id })
