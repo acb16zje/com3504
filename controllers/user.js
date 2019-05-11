@@ -25,7 +25,7 @@ exports.getUsers = function (req, res) {
       { path: 'going', select: '-_id username' },
     ],
   })
-  userQuery.populate('stories')
+  userQuery.populate({ path: 'stories', options: { sort: { date: -1 } } })
   userQuery.populate('followers following', '-_id').lean()
 
   userQuery.then(users => {
@@ -62,8 +62,9 @@ exports.getUserData = function (req, res) {
     path: 'stories',
     populate: [
       { path: 'user', select: '-_id username' },
-      { path: 'event', select: 'id name'}
+      { path: 'event', select: 'id name' },
     ],
+    options: { sort: { date: -1 } },
   })
   userQuery.populate('followers following', '-_id').lean()
 

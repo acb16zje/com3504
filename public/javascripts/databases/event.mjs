@@ -69,29 +69,7 @@ if (eventSection) {
 
 // Create event
 if (createEventForm) {
-  // Google Maps JavaScript API
-  try {
-    (function () {
-      const input = document.getElementById('autocomplete')
-
-      const autocomplete = new google.maps.places.Autocomplete(input)
-
-      autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace()
-
-        if (place) {
-          document.getElementsByName('latitude')[0].
-            setAttribute('value', place.geometry.location.lat())
-          document.getElementsByName('longitude')[0].
-            setAttribute('value', place.geometry.location.lng())
-        }
-      })
-
-    })()
-  } catch (e) {}
-
-  const genresInput = document.getElementsByName('genres')[0]
-  initGenresInput(genresInput).finally()
+  initEventForm()
 
   $(createEventForm).submit(function (e) {
     e.preventDefault()
@@ -111,7 +89,7 @@ if (createEventForm) {
   })
 }
 
-/************************ Functions below ************************/
+/************************ IndexedDB / AJAX related ************************/
 /**
  * Initialise the event IndexedDB
  *
@@ -222,6 +200,21 @@ function createEvent (formJson) {
 }
 
 /**
+ * Edit an event
+ *
+ * @param {object} formJson The form data submitted in JSON format
+ * @returns {Promise<any>} The Promise
+ */
+function editEvent (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    url: '/api/event/update',
+  }))
+}
+
+/**
  * Record the event as interested for the user
  *
  * @param {string} eventID The ID of the event the user is interested
@@ -251,6 +244,7 @@ function submitGoing (eventID) {
   }))
 }
 
+/************************ Rendering related ************************/
 /**
  * Display all events data on /explore page
  *
@@ -264,6 +258,7 @@ function displayExplorePage (events) {
   }
 
   addInterestedGoingListener() // click listener for interested and going
+  addEditListener() // Click listener for edit event buttons
 }
 
 /**
@@ -289,24 +284,33 @@ function displayEventPage (event) {
   const interested = document.getElementById('interested')
   const going = document.getElementById('going')
 
-  interested.dataset.id = event._id
-  going.dataset.id = event._id
+  // Event host can only edit, but not set interested or going
+  if (organiser === currentUser) {
+    interested.parentElement.classList.add('is-hidden')
 
-  const isUserInterested =
-    event.interested.some(user => user.username === currentUser)
-  const isUserGoing =
-    event.going.some(user => user.username === currentUser)
+    const edit = document.getElementById('edit')
+    edit.dataset.id = event._id
+    edit.parentElement.classList.remove('is-hidden')
+  } else {
+    interested.dataset.id = event._id
+    going.dataset.id = event._id
 
-  /* Assume that the server does not go wrong, a user can only be
-  * interested or going to an event */
-  if (isUserInterested) {
-    interested.classList.add('is-light')
-    interested.children[0].classList.add('is-hidden')
-    interested.children[1].classList.remove('is-hidden')
-  }
+    const isUserInterested =
+      event.interested.some(user => user.username === currentUser)
+    const isUserGoing =
+      event.going.some(user => user.username === currentUser)
 
-  if (isUserGoing) {
-    going.classList.add('is-light')
+    /* Assume that the server does not go wrong, a user can only be
+    * interested or going to an event */
+    if (isUserInterested) {
+      interested.classList.add('is-light')
+      interested.children[0].classList.add('is-hidden')
+      interested.children[1].classList.remove('is-hidden')
+    }
+
+    if (isUserGoing) {
+      going.classList.add('is-light')
+    }
   }
 
   // Time
@@ -343,6 +347,7 @@ function displayEventPage (event) {
 
   eventSection.classList.remove('is-hidden')
   addInterestedGoingListener() // click listener for interested and going
+  addEditListener() // Click listener for edit event buttons
 }
 
 /**
@@ -368,7 +373,7 @@ export function renderEventCard (event) {
 
       <div class="card-image"><a href="/event/${event._id}">
         <figure class="image is-2by1">
-        <img src="${event.image}" alt="Event image">
+          <img src="${event.image}" alt="Event image">
         </figure>
       </a></div>
 
@@ -383,7 +388,7 @@ export function renderEventCard (event) {
             <p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>
             <p class="location subtitle is-6">${address}</p>
             <p class="subtitle is-6">
-                ${prettifyTime(event.startDate, event.endDate)}
+              ${prettifyTime(event.startDate, event.endDate)}
             </p>
           </div>
         </div>
@@ -396,20 +401,27 @@ export function renderEventCard (event) {
           </div>
           <div class="level-right">
             <div class="level-item">
-              <button class=
-              "button interested-button ${isUserInterested ? 'is-light' : ''}"
-              data-id="${event._id}">
-
-                <span class=
-                "border icon iconify ${isUserInterested ? 'is-hidden' : ''}"
-                data-icon="ic:sharp-star-border"></span>
-
-                <span class=
-                "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}"
-                data-icon="ic:sharp-star"></span>
-
-                <span>Interested</span>
-              </button>
+              ${organiser === currentUser ?
+                `<button class="button edit-button" data-id="${event._id}">
+                  <span class="icon iconify"data-icon="ic:baseline-edit"></span>
+                  <span>Edit</span>
+                </button>`
+              :
+                `<button class=
+                "button interested-button ${isUserInterested ? 'is-light' : ''}"
+                data-id="${event._id}">
+  
+                  <span class=
+                  "border icon iconify ${isUserInterested ? 'is-hidden' : ''}"
+                  data-icon="ic:sharp-star-border"></span>
+  
+                  <span class=
+                  "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}"
+                  data-icon="ic:sharp-star"></span>
+  
+                  <span>Interested</span>
+                </button>`
+              }
             </div>
           </div>
         </nav>
@@ -418,62 +430,156 @@ export function renderEventCard (event) {
   </div>`
 }
 
-/************************ Helper Functions below ************************/
 /**
- * Get the month of the start date
+ * Return the HTML for edit event modal
  *
- * @param {Date} startDate A date
- * @returns {string} The month in upper case
+ * @param event
+ * @returns {string} The HTML fragment
  */
-function getStartMonth (startDate) {
-  return startDate.toLocaleString(undefined, { month: 'short' }).toUpperCase()
+function renderEditEventModal (event) {
+  return `
+  <div id="edit-event" class="modal is-active">
+    <div class="modal-background"></div>
+
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Edit Event</p>
+      </header>
+      <section class="modal-card-body">
+        <form id="edit-event-form">
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Event Photo</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="file has-name">
+                  <label class="file-label">
+                    <input id="file-input" class="file-input" type="file" accept="image/*">
+                    <input name="image" type="hidden">
+                    <input name="id" type="hidden" value=${event._id}>
+                    <span class="file-cta">
+                      <span class="file-icon">
+                        <span class="iconify" data-icon="fa-solid:camera"></span>
+                      </span>
+                      <span class="file-label">
+                        Upload photo
+                      </span>
+                    </span>
+                    <span id="file-name" class="file-name">No file chosen</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Event Name</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded">
+                  <input name="name" class="input" type="text" maxlength="64" value=${event.name} required>
+                </p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Location</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control ">
+                  <input name="address" id="autocomplete" class="input" type="search" value="${event.location.address}">
+                  <input name="latitude" type="hidden">
+                  <input name="longitude" type="hidden">
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Description</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <textarea name="description" class="textarea has-fixed-size autosize" rows="3">${event.description}</textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Start Date</label>
+            </div>
+            <div class="field-body is-vcentered">
+              <div class="field">
+                <p class="control">
+                  <input name="startDate" id="startDate" class="input flatpickr flatpickr-input" type="text" required>
+                </p>
+              </div>
+              <div class="field is-narrow is-flex">
+                <a id="add-end-time">+ End Date</a>
+              </div>
+            </div>
+          </div>
+        
+          <div id="end-time-field" class="field is-horizontal is-hidden">
+            <div class="field-label is-normal">
+              <label class="label">End Date</label>
+            </div>
+            <div class="field-body is-vcentered">
+              <div class="field">
+                <p class="control">
+                  <input name="endDate" id="endDate" class="input flatpickr flatpickr-input" type="text">
+                </p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label">
+              <label class="label">Genres</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input name="genres" type="text" class="input" placeholder="Maximum 5 genres">
+                </p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label">
+              <!-- Left empty for spacing -->
+            </div>
+            <div class="field-body">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">Save</button>
+                </div>
+                <div class="control">
+                  <button type="button" class="button is-light button-close">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <button class="modal-close is-large" aria-label="close"></button>
+  </div>`
 }
 
-/**
- * Prettify print the start date to end date
- *
- * @param {string} startDate
- * @param {string} endDate
- * @returns {string} The start date to end date prettified
- */
-function prettifyTime (startDate, endDate) {
-  const start = new Date(startDate)
-  const end = endDate ? new Date(endDate) : undefined
-
-  const localeOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  }
-
-  if (end) {
-    if (isSameDate(start, end)) {
-      // Format: 27 Mar 2019 10:30 - 13:30 GMT
-      return `${start.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      })} – ${end.toLocaleString(undefined, {
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZoneName: 'short',
-      })}`
-    } else {
-      // Format: 27 Mar 2019 10:30 - 28 Mar 2019 13:30 GMT
-      return `
-        ${start.toLocaleString(undefined, localeOptions)} –
-        ${end.toLocaleString(undefined, localeOptions)}`
-    }
-  } else {
-    return start.toLocaleString(undefined, localeOptions)
-  }
-}
-
+/************************ EventListener below ************************/
 /**
  * Add click listener to interested and going buttons after page load
  */
@@ -530,5 +636,158 @@ export function addInterestedGoingListener () {
         showSnackbar('Failed to process the request')
       })
     })
+  }
+}
+
+/**
+ * Add click listener to edit button
+ */
+export function addEditListener () {
+  const editButtons = document.getElementsByClassName('edit-button')
+
+  for (let i = 0, n = editButtons.length; i < n; i++) {
+    editButtons[i].onclick = async function () {
+      if (!document.getElementById('edit-event')) {
+        await loadEventPage(this.dataset.id).then(event => {
+          this.parentElement.insertAdjacentHTML(
+            'beforeend', renderEditEventModal(event))
+
+          initEventForm()
+          initFileInput()
+
+          // Set datepicker with event dates
+          initDatepicker()
+
+          const fp = document.getElementById('startDate')._flatpickr
+          fp.setDate(event.startDate)
+
+          // Show end date if the event has one
+          if (event.endDate) {
+            document.getElementById('add-end-time').click()
+            const fpEnd = document.getElementById('endDate')._flatpickr
+
+            // Do not allow end date to be earlier than start date
+            if (new Date(event.startDate) <= new Date()) {
+              fpEnd.set('minDate', new Date())
+            } else {
+              fpEnd.set('minDate', event.startDate)
+            }
+            fpEnd.setDate(event.endDate)
+          }
+
+          // Set genres input with event genres
+          const genresInput = document.getElementsByName('genres')[0]
+          genresInput.setAttribute(
+            'value', event.genres.map(genre => genre.name).join(','))
+
+          // Edit form submit
+          const editEventForm = document.getElementById('edit-event-form')
+          $(editEventForm).submit(function (e) {
+            e.preventDefault()
+
+            const formJson = convertToJSON($(this).serializeArray())
+
+            if (formJson.genres) {
+              formJson.genres = JSON.parse(formJson.genres).map(genre => genre.id)
+            }
+
+            editEvent(formJson).then(() => {
+              showSnackbar('Event updated')
+              document.getElementById('edit-event').remove()
+            }).catch(err => {
+              console.log(err)
+              showSnackbar('Failed to edit event')
+            })
+          })
+        }).catch(err => console.log(err))
+
+        closeModalListener()
+      }
+    }
+  }
+}
+
+/************************ Helper Functions below ************************/
+/**
+ * Initialise create, edit event form
+ */
+function initEventForm () {
+  // Google Maps JavaScript API
+  try {
+    (function () {
+      const input = document.getElementById('autocomplete')
+
+      const autocomplete = new google.maps.places.Autocomplete(input)
+
+      autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace()
+
+        if (place) {
+          document.getElementsByName('latitude')[0].
+            setAttribute('value', place.geometry.location.lat())
+          document.getElementsByName('longitude')[0].
+            setAttribute('value', place.geometry.location.lng())
+        }
+      })
+
+    })()
+  } catch (e) {}
+
+  const genresInput = document.getElementsByName('genres')[0]
+  initGenresInput(genresInput).finally()
+}
+
+/**
+ * Get the month of the start date
+ *
+ * @param {Date} startDate A date
+ * @returns {string} The month in upper case
+ */
+function getStartMonth (startDate) {
+  return startDate.toLocaleString(undefined, { month: 'short' }).toUpperCase()
+}
+
+/**
+ * Prettify print the start date to end date
+ *
+ * @param {string} startDate
+ * @param {string} endDate
+ * @returns {string} The start date to end date prettified
+ */
+function prettifyTime (startDate, endDate) {
+  const start = new Date(startDate)
+  const end = endDate ? new Date(endDate) : undefined
+
+  const localeOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }
+
+  if (end) {
+    if (isSameDate(start, end)) {
+      // Format: 27 Mar 2019 10:30 - 13:30 GMT
+      return `${start.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })} – ${end.toLocaleString(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      })}`
+    } else {
+      // Format: 27 Mar 2019 10:30 - 28 Mar 2019 13:30 GMT
+      return `
+        ${start.toLocaleString(undefined, localeOptions)} –
+        ${end.toLocaleString(undefined, localeOptions)}`
+    }
+  } else {
+    return start.toLocaleString(undefined, localeOptions)
   }
 }

@@ -36,6 +36,9 @@ router.get('/api/event/:id', eventController.getEventData)
 /* AJAX POST create an event */
 router.post('/api/event/create', auth.checkAuth, eventController.createEvent)
 
+/* AJAX POST update an event */
+router.post('/api/event/update', auth.checkAuth, eventController.updateEvent)
+
 /* AJAX POST set the event as interested for the user */
 router.post('/api/interested', auth.checkAuth, eventController.setEventInterested)
 

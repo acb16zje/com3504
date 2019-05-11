@@ -25,6 +25,7 @@ Iconify.preloadImages([
   'ic:round-access-time',
   'ic:round-location-on',
   'ic:baseline-event',
+  'ic:baseline-edit',
   'dashicons:tag',
   'flat-color-icons:google',
 ])
@@ -107,20 +108,27 @@ $(document).on('keypress', 'form', function (event) {
 autosize(document.getElementsByClassName('autosize'))
 
 // File upload
-const fileInput = document.getElementById('file-input')
-if (fileInput) {
-  fileInput.onchange = function () {
-    if (this.files.length > 0) {
-      const file = this.files[0]
-      document.getElementById('file-name').textContent = file.name
+/**
+ * Initialise file input button
+ */
+function initFileInput () {
+  const fileInput = document.getElementById('file-input')
+  if (fileInput) {
+    fileInput.onchange = function () {
+      if (this.files.length > 0) {
+        const file = this.files[0]
+        document.getElementById('file-name').textContent = file.name
 
-      getBase64(file).then(data => {
-        document.getElementsByName('image')[0].
-          setAttribute('value', data)
-      })
+        getBase64(file).then(data => {
+          document.getElementsByName('image')[0].
+            setAttribute('value', data)
+        })
+      }
     }
   }
 }
+
+initFileInput()
 
 /**
  * Convert the image file to base64 format
@@ -202,10 +210,7 @@ if (dropdowns.length > 0) {
 
 /************************ Modals below ************************/
 // Launch and close the user story modal
-const modals = document.getElementsByClassName('modal')
 const modalButtons = document.getElementsByClassName('modal-button')
-const modalCloses = document.querySelectorAll(
-  '.modal-close, .modal-background, .button-close')
 
 // Open the modal
 if (modalButtons.length) {
@@ -221,28 +226,41 @@ if (modalButtons.length) {
   }
 }
 
-// Close modal when click outside of story or Esc pressed
-if (modalCloses.length) {
-  for (let i = 0, n = modalCloses.length; i < n; i++) {
-    modalCloses[i].onclick = () => closeModal()
-  }
+/**
+ * Close modal when click outside of story or Esc pressed
+ */
+function closeModalListener () {
+  const modalCloses = document.querySelectorAll(
+    '.modal-close, .modal-background, .button-close')
 
-  document.onkeydown = e => {
-    if (e.key === 'Escape') {
-      closeModal()
+  if (modalCloses.length) {
+    for (let i = 0, n = modalCloses.length; i < n; i++) {
+      modalCloses[i].onclick = () => closeModal()
+    }
+
+    document.onkeydown = e => {
+      if (e.key === 'Escape') {
+        closeModal()
+      }
     }
   }
-}
 
-/**
- * Close the user story modal
- */
-const closeModal = () => {
-  for (let i = 0, n = modals.length; i < n; i++) {
-    modals[i].classList.remove('is-active')
+  /**
+   * Close the modal
+   */
+  const closeModal = () => {
+    const modals = document.getElementsByClassName('modal')
+
+    for (let i = 0, n = modals.length; i < n; i++) {
+      modals[i].classList.remove('is-active')
+    }
+
+    // Specific case for edit event modal
+    document.getElementById('edit-event').remove()
   }
 }
 
+closeModalListener()
 /************************ Offline notification below ************************/
 const offlineNotification = document.getElementById('offline')
 
@@ -259,66 +277,71 @@ window.addEventListener('offline', () => {
 })
 
 /************************ Plugins below ************************/
+
 /*------------------ DatePicker -----------------*/
-const startDate = document.getElementById('startDate')
-const endDate = document.getElementById('endDate')
+function initDatepicker () {
+  const startDate = document.getElementById('startDate')
+  const endDate = document.getElementById('endDate')
 
-if (startDate && endDate) {
-  const today = new Date()
+  if (startDate && endDate) {
+    const today = new Date()
 
-  const options = {
-    altInput: true,
-    altFormat: 'j F Y, h:i K',
-    enableTime: true,
-    time_24hr: true,
-    defaultDate: today,
-    minDate: 'today',
-    minTime: today,
-  }
-
-  const fp = $(startDate).flatpickr(options)
-  const fpEnd = $(endDate).flatpickr(options)
-  fpEnd.clear()
-
-  document.getElementById('add-end-time').onclick = function () {
-    const endTimeField = document.getElementById('end-time-field')
-
-    if (endTimeField.classList.contains('is-hidden')) {
-      this.textContent = '– End Date'
-      fpEnd.setDate(new Date().setHours(today.getHours() + 3))
-    } else {
-      this.textContent = '+ End Date'
-      fpEnd.setDate(undefined)
+    const options = {
+      altInput: true,
+      altFormat: 'j F Y, h:i K',
+      enableTime: true,
+      time_24hr: true,
+      defaultDate: today,
+      minDate: 'today',
+      minTime: today,
     }
 
-    endTimeField.classList.toggle('is-hidden')
+    const fp = $(startDate).flatpickr(options)
+    const fpEnd = $(endDate).flatpickr(options)
+    fpEnd.clear()
+
+    document.getElementById('add-end-time').onclick = function () {
+      const endTimeField = document.getElementById('end-time-field')
+
+      if (endTimeField.classList.contains('is-hidden')) {
+        this.textContent = '– End Date'
+        fpEnd.setDate(new Date().setHours(today.getHours() + 3))
+      } else {
+        this.textContent = '+ End Date'
+        fpEnd.setDate(undefined)
+      }
+
+      endTimeField.classList.toggle('is-hidden')
+    }
+
+    fp.config.onValueUpdate = [
+      function (selectedDates) {
+        // Start time cannot be in the past
+        if (isSameDate(selectedDates[0], today)) {
+          fp.set('minTime', Date.now())
+        } else {
+          fp.set('minTime', undefined)
+        }
+
+        // End date cannot be earlier than start date
+        fpEnd.set('minDate', new Date(selectedDates))
+        fpEnd.changeMonth(fp.currentMonth - fpEnd.currentMonth)
+      }]
+
+    // End time cannot be earlier than start time on the same date
+    fpEnd.config.onValueUpdate = [
+      function (selectedDates) {
+        if (isSameDate(selectedDates[0], fp.selectedDates[0])) {
+          fpEnd.set('minTime', new Date(fp.selectedDates[0]))
+        } else {
+          fpEnd.set('minTime', undefined)
+        }
+      },
+    ]
   }
-
-  fp.config.onValueUpdate = [
-    function (selectedDates) {
-      // Start time cannot be in the past
-      if (isSameDate(selectedDates[0], today)) {
-        fp.set('minTime', Date.now())
-      } else {
-        fp.set('minTime', undefined)
-      }
-
-      // End date cannot be earlier than start date
-      fpEnd.set('minDate', new Date(selectedDates))
-      fpEnd.changeMonth(fp.currentMonth - fpEnd.currentMonth)
-    }]
-
-  // End time cannot be earlier than start time on the same date
-  fpEnd.config.onValueUpdate = [
-    function (selectedDates) {
-      if (isSameDate(selectedDates[0], fp.selectedDates[0])) {
-        fpEnd.set('minTime', new Date(fp.selectedDates[0]))
-      } else {
-        fpEnd.set('minTime', undefined)
-      }
-    },
-  ]
 }
+
+initDatepicker()
 
 /*------------------ polonel/Snackbar -----------------*/
 /**
@@ -501,7 +524,7 @@ function startWebRTC () {
  * @param {object} ctx Canvas context object
  * @param {string} filterValue Filter effect
  */
-function applyFilterEffect(ctx, filterValue) {
+function applyFilterEffect (ctx, filterValue) {
   switch (filterValue) {
     case 'blur':
       ctx.filter = 'blur(3px)'

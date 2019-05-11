@@ -49,7 +49,7 @@ svg.solid {
   --primary-color-hover: #4240d4;
 }
 
-form ::placeholder {
+::placeholder {
   color: #81858c !important;
 }
 
@@ -196,7 +196,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 }
 
 .event-columns img, #event img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .month-date {
@@ -274,27 +274,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 #camera div.tabs ul li {
   margin: 0;
-}
-
-#filter-tabs::-webkit-scrollbar {
-  height: 10px;
-}
-
-/* Track */
-#filter-tabs::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-/* Handle */
-#filter-tabs::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-#filter-tabs::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
 
 /* Camera filter effects */
@@ -482,14 +461,22 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 /* User profile page stories */
 #stories div.columns {
-  min-height: 37.5vw;
+  min-height: 32.7vw;
   max-width: 935px;
   margin: 0 auto;
 }
 
+#stories div.columns .column {
+  min-height: 32.7vw;
+}
+
 @media screen and (min-width: 983px) {
   #stories div.columns {
-    min-height: 369px;
+    min-height: 300px;
+  }
+
+  #stories div.columns .column {
+    min-height: 300px;
   }
 }
 
@@ -507,6 +494,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 /* User profile story image modal */
 #story div.modal-content {
   overflow: hidden;
+  max-height: initial;
 }
 
 #story header p.title {
@@ -514,11 +502,6 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
-}
-
-#story div.card-content {
-  height: 450px;
-  overflow: auto;
 }
 
 #story p.story-username {
@@ -530,6 +513,37 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   margin: 0 auto;
 }
 
+#story div.card-content {
+  height: 450px;
+  overflow: auto;
+}
+
+#story footer {
+  flex-direction: column;
+}
+
+#story footer #like {
+  align-items: center;
+}
+
+#story footer .iconify {
+  width: 24px;
+  height: 24px;
+}
+
+#story #reply {
+  padding: 0 16px 10px;
+  align-items: center;
+}
+
+#story #reply textarea {
+  min-width: initial;
+  min-height: 18px;
+  box-shadow: none;
+  padding: 0.3rem;
+  border: none;
+}
+
 /* User profile event card */
 #user div.event-columns {
   max-width: 935px;
@@ -538,6 +552,29 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
 /* Desktop viewport adjustments */
 @media screen and (min-width: 1088px) {
+  /* Scrollbar beautification */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
   /* Desktop navbar */
   nav.navbar .navbar-brand a.navbar-item {
     margin-right: 10px;
@@ -580,7 +617,7 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
   #story div.card {
     display: grid;
-    grid-template-areas: "image header" "image content";
+    grid-template-areas: "image header" "image content" "image footer";
   }
 
   #story header.card-header {
@@ -605,6 +642,10 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   #story div.card-content {
     grid-area: content;
     max-width: 350px;
+  }
+
+  #story footer {
+    grid-area: footer;
   }
 
   @media screen and (max-width: 1088px) {
@@ -645,6 +686,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
 
   #stories div.column {
     padding: 5px 3px;
+  }
+
+  /* User profile story image modal */
+  #story div.card-content {
+    height: 380px;
+    overflow: auto;
   }
 
   @media screen and (min-width: 440px) {

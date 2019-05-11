@@ -45,3 +45,27 @@ exports.createImage = async function (data) {
     }).save()
   } catch (e) {}
 }
+
+/**
+ * Update the image
+ *
+ * @param {string} id The ID of the image
+ * @param {string} data The data URI of the image in base64
+ * @returns {Promise<void>} An Image object if promise resolves
+ */
+exports.updateImage = async function (id, data) {
+  const imageQuery = Image.findById(id)
+
+  imageQuery.then(async image => {
+    // These will be empty if no image is submitted, hence error
+    const content = data.replace(/^data:image\/.*;base64,/, '')
+    const contentType = data.match(/image\/.*;/)[0].slice(0, -1)
+
+    image.content = Buffer.from(content, 'base64')
+    image.contentType = contentType
+
+    await image.save()
+  }).catch(err => {
+    console.log(err)
+  })
+}

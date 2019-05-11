@@ -7,6 +7,7 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import {
+  addEditListener,
   addInterestedGoingListener,
   renderEventCard,
   storeExplorePage,
@@ -53,12 +54,11 @@ if (userSection) {
 
     loadUserProfileLocal(username).
       then(user => {
-        console.log(`Loaded ${username} from local`)
-
         if (user) {
+          console.log(`Loaded ${username} from local`)
           displayUserProfile(user)
         } else {
-          // unableToLoadPage(userSection)
+          unableToLoadPage(userSection)
         }
       }).
       catch(() => console.log(`Failed to load ${username} from local`))
@@ -409,7 +409,8 @@ function renderEventColumns (events) {
     eventColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
   }
 
-  addInterestedGoingListener() // Click listener for interested buttons
+  addInterestedGoingListener() // click listener for interested and going
+  addEditListener() // Click listener for edit event buttons
 }
 
 /**
@@ -485,7 +486,12 @@ function addStoryModalListener () {
 
         // AJAX load caption and comments
         loadCaptionComments(this.dataset.id).then(data => {
-          document.getElementById('caption').textContent = data.caption
+          const caption = document.getElementById('caption')
+          if (data.caption) {
+            caption.textContent = data.caption
+          } else {
+            caption.parentElement.classList.add('is-hidden')
+          }
 
           document.getElementById('story').classList.add('is-active')
         }).catch(() => showSnackbar('Failed to load story'))

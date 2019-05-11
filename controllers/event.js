@@ -87,7 +87,9 @@ exports.createEvent = async (req, res) => {
       },
       image: eventImage ? `/image/${eventImage._id}` : undefined,
       genres: genres,
+      going: [user.id],
     }).save().catch(err => {
+      // Bad request
       console.log(err)
       res.status(400).send(err)
     })
@@ -95,6 +97,7 @@ exports.createEvent = async (req, res) => {
     if (event) {
       // Add the created event to user
       await user.events.push(event.id)
+      await user.going.push(event.id)
       await user.save()
       res.status(200).json({ eventID: event.id })
     } else {
@@ -103,6 +106,79 @@ exports.createEvent = async (req, res) => {
   }).catch(err => {
     console.log(err)
     res.sendStatus(500)
+  })
+}
+
+/**
+ * POST update an event
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.updateEvent = async (req, res) => {
+  const json = req.body
+  const genres = json.genres && json.genres.length ? json.genres : []
+
+  const eventQuery = Event.findById(json.id)
+
+  eventQuery.then(async event => {
+    if (event) {
+      event.name = event.name === json.name ? event.name : json.name
+      event.description = event.description === json.description
+        ? event.description
+        : json.description
+
+      if (json.image) {
+        const imageId = event.image.split('/')[2] // /image/:id
+
+        if (imageId === 'placeholder.webp') {
+          const eventImage = await imageController.createImage(json.image)
+          event.image = eventImage ? `/image/${eventImage._id}` : undefined
+        } else {
+          await imageController.updateImage(imageId, json.image)
+        }
+      }
+
+      // Update the event dates
+      if (json.startDate) {
+        const startDate = new Date(event.startDate)
+        const newStartDate = new Date(json.startDate)
+
+        if (startDate !== newStartDate && newStartDate >= startDate) {
+          event.startDate = newStartDate
+        }
+
+        if (json.endDate) {
+          const endDate = new Date(event.endDate)
+          const newEndDate = new Date(json.endDate)
+
+          if (newEndDate !== endDate && newEndDate > newStartDate) {
+            event.endDate = newEndDate
+          }
+        } else {
+          // User removed the end date
+          event.endDate = undefined
+        }
+      }
+
+      // Update location
+      if (event.location.address !== json.address) {
+        event.location.latitude = json.latitude ? json.latitude : undefined
+        event.location.longitude = json.longitude ? json.longitude : undefined
+        event.location.address = json.address ? json.address : 'No location'
+      }
+
+      event.genres = genres
+
+      await event.save()
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    // Bad request
+    console.log(err)
+    res.status(400).send(err)
   })
 }
 
