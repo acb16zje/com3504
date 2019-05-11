@@ -480,7 +480,7 @@ function renderEditEventModal (event) {
             <div class="field-body">
               <div class="field">
                 <p class="control is-expanded">
-                  <input name="name" class="input" type="text" maxlength="64" value=${event.name} required>
+                  <input name="name" class="input" type="text" maxlength="64" value="${event.name}" required>
                 </p>
               </div>
             </div>
@@ -550,7 +550,7 @@ function renderEditEventModal (event) {
             <div class="field-body">
               <div class="field">
                 <p class="control">
-                  <input id="${event._id}-genre" class="event-genre" name="genres" type="text" class="input" placeholder="Maximum 5 genres">
+                  <input id="${event._id}-genre" name="genres" type="text" class="input event-genre" placeholder="Maximum 5 genres">
                 </p>
               </div>
             </div>
