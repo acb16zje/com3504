@@ -256,7 +256,10 @@ function closeModalListener () {
     }
 
     // Specific case for edit event modal
-    document.getElementById('edit-event').remove()
+    const editEventDiv = document.getElementById('edit-event')
+    if (editEventDiv) {
+      editEventDiv.remove()
+    }
   }
 }
 

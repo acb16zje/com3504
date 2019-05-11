@@ -550,7 +550,7 @@ function renderEditEventModal (event) {
             <div class="field-body">
               <div class="field">
                 <p class="control">
-                  <input name="genres" type="text" class="input" placeholder="Maximum 5 genres">
+                  <input id="${event._id}-genre" class="event-genre" name="genres" type="text" class="input" placeholder="Maximum 5 genres">
                 </p>
               </div>
             </div>
@@ -653,7 +653,6 @@ export function addEditListener () {
             'beforeend', renderEditEventModal(event))
 
           initEventForm()
-          initFileInput()
 
           // Set datepicker with event dates
           initDatepicker()
@@ -676,7 +675,7 @@ export function addEditListener () {
           }
 
           // Set genres input with event genres
-          const genresInput = document.getElementsByName('genres')[0]
+          const genresInput = document.getElementById(`${event._id}-genre`)
           genresInput.setAttribute(
             'value', event.genres.map(genre => genre.name).join(','))
 
@@ -712,6 +711,8 @@ export function addEditListener () {
  * Initialise create, edit event form
  */
 function initEventForm () {
+  initFileInput()
+
   // Google Maps JavaScript API
   try {
     (function () {
@@ -733,8 +734,10 @@ function initEventForm () {
     })()
   } catch (e) {}
 
-  const genresInput = document.getElementsByName('genres')[0]
-  initGenresInput(genresInput).finally()
+  const genresInput = document.getElementsByClassName('event-genre')
+  for (let i = 0, n = genresInput.length; i < n; i++) {
+    initGenresInput(genresInput[i]).finally()
+  }
 }
 
 /**
