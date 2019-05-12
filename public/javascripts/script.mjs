@@ -17,6 +17,8 @@ import {
   storeUserProfile,
 } from './databases/user.mjs'
 
+export const currentUser = $(document.getElementById('my-account')).data('user')
+
 /**
  * Add events data to search
  * Add events to select options in

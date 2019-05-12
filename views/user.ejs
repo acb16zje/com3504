@@ -15,7 +15,7 @@
         <!--User name and follow / edit profile button-->
         <div id="user-name-follow">
           <p id="user-name" class="subtitle is-4"></p>
-          <% if (username_path === username) { %>
+          <% if (authenticated && username_path === username) { %>
             <a id="user-edit" class="button is-fullwidth modal-button" data-target="edit-profile">Edit Profile</a>
           <% } else { %>
             <a id="user-follow" class="button is-info is-fullwidth">Follow</a>

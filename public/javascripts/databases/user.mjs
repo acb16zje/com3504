@@ -7,22 +7,21 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import {
-  addEditListener,
+  addEditEventListener,
   addInterestedGoingListener,
   renderEventCard,
   storeExplorePage,
 } from './event.mjs'
 import { initGenresInput } from './genre.mjs'
 import {
-  likeStory,
-  loadStoryData,
+  addStoryModalListener,
   renderStoryColumn,
   storeStories,
 } from './story.mjs'
+import { currentUser } from '../script.mjs'
 
 const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
-const currentUser = $(document.getElementById('my-account')).data('user')
 const followButton = document.getElementById('user-follow')
 const editProfileForm = document.getElementById('edit-profile-form')
 
@@ -411,7 +410,7 @@ function renderEventColumns (events) {
   }
 
   addInterestedGoingListener() // click listener for interested and going
-  addEditListener() // Click listener for edit event buttons
+  addEditEventListener() // Click listener for edit event buttons
 }
 
 /**
@@ -426,7 +425,7 @@ function renderStoryColumns (stories) {
     storyColumns.insertAdjacentHTML('beforeend', renderStoryColumn(stories[i]))
   }
 
-  // Story modal profile
+  // Pre-set data that will be same for all stories
   const profileUsernames = document.getElementsByClassName('story-username')
   const profileLinks = document.getElementsByClassName('profile-link')
   for (let i = 0, n = profileLinks.length; i < n; i++) {
@@ -436,7 +435,7 @@ function renderStoryColumns (stories) {
     profileUsernames[i].textContent = username
   }
 
-  addStoryModalListener()
+  addStoryModalListener() // Set data that will be different for each story
 }
 
 /************************ EventListener below ************************/
@@ -445,94 +444,25 @@ function renderStoryColumns (stories) {
  */
 function addFollowListener () {
   followButton.onclick = function () {
-    if (!currentUser) {
-      showSnackbar('Please sign in to continue')
-      return
-    }
-
     submitFollow().then(() => {
       const followerCount = document.getElementById('follower-count')
 
       if (this.textContent === 'Follow') {
         this.textContent = 'Followed'
-        followerCount.textContent = parseInt(followerCount.textContent) + 1
+        followerCount.textContent = makeFriendly(parseInt(followerCount.textContent) + 1)
       } else {
         this.textContent = 'Follow'
-        followerCount.textContent = parseInt(followerCount.textContent) - 1
+        followerCount.textContent = makeFriendly(parseInt(followerCount.textContent) - 1)
       }
 
       this.classList.toggle('is-light')
       this.classList.toggle('is-info')
-    }).catch(() => {
-      showSnackbar('Failed to process the request')
-    })
-  }
-}
-
-function addStoryModalListener () {
-  const storyModals = document.getElementsByClassName('story-modal')
-
-  if (storyModals.length) {
-    for (let i = 0, n = storyModals.length; i < n; i++) {
-      storyModals[i].onclick = function () {
-        const storyID = this.dataset.id
-
-        // Add the image source
-        const profileImgModal = document.getElementById('user-image-modal')
-        profileImgModal.src = document.querySelector('#user-image img').src
-
-        const imgChild = document.getElementById('story-image')
-        imgChild.src = this.children[0].src
-
-        // Reset comments scroll to top
-        // document.querySelector('#story div.card-content').scrollTop = 0
-
-        // AJAX load caption, comments, and like count
-        loadStoryData(storyID).then(data => {
-          const caption = document.getElementById('caption')
-          if (data.caption) {
-            caption.textContent = data.caption
-          } else {
-            caption.parentElement.classList.add('is-hidden')
-          }
-
-          // Like count
-          const likeCount = document.getElementById('like-count')
-          likeCount.textContent = data.likes.length
-
-          // Like button
-          const likeButton = document.getElementById('like-button')
-          const borderHeart = document.getElementById('border-heart')
-          const redHeart = document.getElementById('red-heart')
-
-          const isUserLiked = data.likes.some(user => user.username === currentUser)
-          if (isUserLiked) {
-            borderHeart.classList.add('is-hidden')
-            redHeart.classList.remove('is-hidden')
-          }
-
-          likeButton.onclick = function () {
-            likeStory(storyID).then(() => {
-              borderHeart.classList.toggle('is-hidden')
-              redHeart.classList.toggle('is-hidden')
-
-              if (redHeart.classList.contains('is-hidden')) {
-                likeCount.textContent = parseInt(likeCount.textContent) - 1
-              } else {
-                likeCount.textContent = parseInt(likeCount.textContent) + 1
-              }
-            }).catch(err => {
-              if (err.status === 401) {
-                showSnackbar('Please sign in to continue')
-              } else {
-                showSnackbar('Failed to like story')
-              }
-            })
-          }
-
-          document.getElementById('story').classList.add('is-active')
-        }).catch(() => showSnackbar('Failed to load story'))
+    }).catch(err => {
+      if (err.status === 401) {
+        showSnackbar('Please sign in to continue')
+      } else {
+        showSnackbar('Failed to process the request')
       }
-    }
+    })
   }
 }

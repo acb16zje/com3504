@@ -7,11 +7,11 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import { initGenresInput } from './genre.mjs'
+import { currentUser } from '../script.mjs'
 
 const EVENT_STORE = 'event_store'
 const exploreSection = document.getElementById('explore')
 const eventSection = document.getElementById('event')
-const currentUser = $(document.getElementById('my-account')).data('user')
 const createEventForm = document.getElementById('create-event')
 
 // Loading, storing, and displaying events at /explore
@@ -258,7 +258,7 @@ function displayExplorePage (events) {
   }
 
   addInterestedGoingListener() // click listener for interested and going
-  addEditListener() // Click listener for edit event buttons
+  addEditEventListener() // Click listener for edit event buttons
 }
 
 /**
@@ -347,7 +347,7 @@ function displayEventPage (event) {
 
   eventSection.classList.remove('is-hidden')
   addInterestedGoingListener() // click listener for interested and going
-  addEditListener() // Click listener for edit event buttons
+  addEditEventListener() // Click listener for edit event buttons
 }
 
 /**
@@ -431,9 +431,9 @@ export function renderEventCard (event) {
 }
 
 /**
- * Return the HTML for edit event modal
+ * Return the HTML fragment for edit event modal
  *
- * @param event
+ * @param {object} event The event document object
  * @returns {string} The HTML fragment
  */
 function renderEditEventModal (event) {
@@ -457,7 +457,7 @@ function renderEditEventModal (event) {
                   <label class="file-label">
                     <input id="file-input" class="file-input" type="file" accept="image/*">
                     <input name="image" type="hidden">
-                    <input name="id" type="hidden" value=${event._id}>
+                    <input name="id" type="hidden" value="${event._id}">
                     <span class="file-cta">
                       <span class="file-icon">
                         <span class="iconify" data-icon="fa-solid:camera"></span>
@@ -637,17 +637,20 @@ export function addInterestedGoingListener () {
 }
 
 /**
- * Add click listener to edit button
+ * Add click listener to edit event button
  */
-export function addEditListener () {
+export function addEditEventListener () {
   const editButtons = document.getElementsByClassName('edit-button')
 
   for (let i = 0, n = editButtons.length; i < n; i++) {
     editButtons[i].onclick = async function () {
+      // Do not render the modal more than once
       if (!document.getElementById('edit-event')) {
         await loadEventPage(this.dataset.id).then(event => {
           this.parentElement.insertAdjacentHTML(
-            'beforeend', renderEditEventModal(event))
+            'beforeend',
+            renderEditEventModal(event)
+          )
 
           initEventForm()
 
@@ -676,7 +679,7 @@ export function addEditListener () {
           genresInput.setAttribute(
             'value', event.genres.map(genre => genre.name).join(','))
 
-          // Edit form submit
+          // Edit event form submit
           const editEventForm = document.getElementById('edit-event-form')
           $(editEventForm).submit(function (e) {
             e.preventDefault()
@@ -690,12 +693,9 @@ export function addEditListener () {
             editEvent(formJson).then(() => {
               showSnackbar('Event updated')
               document.getElementById('edit-event').remove()
-            }).catch(err => {
-              console.log(err)
-              showSnackbar('Failed to edit event')
-            })
+            }).catch(() => showSnackbar('Failed to edit event'))
           })
-        }).catch(err => console.log(err))
+        }).catch(() => showSnackbar('Failed to load event data'))
 
         closeModalListener()
       }

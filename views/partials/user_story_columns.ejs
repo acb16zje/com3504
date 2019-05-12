@@ -17,14 +17,19 @@
                 </figure>
               </a>
             </div>
-            <div class="level-item">
+            <div id="profile-event-link" class="level-item">
               <a class="profile-link">
                 <p class="title is-6 story-username"></p>
+              </a>
+              <a id="event-link">
+                <small id="event-name" class="is-size-7"></small>
               </a>
             </div>
           </nav>
 
-          <button class="button is-light">Edit</button>
+          <% if (authenticated && username_path === username) { %>
+            <button id="edit-button" class="button is-light">Edit</button>
+          <% } %>
         </div>
       </header>
 
@@ -64,14 +69,17 @@
       </div>
 
       <footer class="card-footer">
-        <div id="like" class="is-flex">
-          <a id="like-button" class="has-text-black">
-            <span class="icon is-large">
-              <span id="border-heart" class="iconify" data-icon="bytesize:heart"></span>
-              <span id="red-heart" class="iconify has-text-danger is-hidden" data-icon="maki:heart-15"></span>
-            </span>
-          </a>
-          <p class="subtitle is-6 has-text-weight-bold"><span id="like-count"></span> likes</p>
+        <div id="like-and-time" class="is-flex">
+          <div id="like" class="is-flex">
+            <a id="like-button" class="has-text-black">
+              <span class="icon is-large">
+                <span id="border-heart" class="iconify" data-icon="bytesize:heart"></span>
+                <span id="red-heart" class="iconify has-text-danger is-hidden" data-icon="maki:heart-15"></span>
+              </span>
+            </a>
+            <p class="subtitle is-6 has-text-weight-bold"><span id="like-count"></span> likes</p>
+          </div>
+          <small id="story-date"></small>
         </div>
         <div id="reply" class="is-flex">
           <textarea name="reply" class="textarea has-fixed-size" placeholder="Add a comment"></textarea>

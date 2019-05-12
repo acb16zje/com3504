@@ -20,6 +20,12 @@ router.get('/api/story/:id', storyController.getStoryData)
 /* AJAX POST create a story */
 router.post('/api/story/create', auth.checkAuthAPI, storyController.createStory)
 
+/* AJAX POST update a story */
+router.post('/api/story/update', auth.checkAuthAPI, storyController.updateStory)
+
+/* AJAX POST delete a story */
+router.post('/api/story/delete', auth.checkAuthAPI, storyController.deleteStory)
+
 /* AJAX POST like a story */
 router.post('/api/story/like', auth.checkAuthAPI, storyController.likeStory)
 

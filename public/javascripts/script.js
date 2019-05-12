@@ -251,19 +251,26 @@ function closeModalListener () {
   const closeModal = () => {
     const modals = document.getElementsByClassName('modal')
 
-    for (let i = 0, n = modals.length; i < n; i++) {
-      modals[i].classList.remove('is-active')
-    }
+    // Specific case: closing edit story modal does not close story modal
+    const editStoryDiv = document.getElementById('edit-story')
 
     // Specific case for edit event modal
     const editEventDiv = document.getElementById('edit-event')
-    if (editEventDiv) {
+
+    if (editStoryDiv) {
+      editStoryDiv.remove()
+    } else if (editEventDiv) {
       editEventDiv.remove()
+    } else {
+      for (let i = 0, n = modals.length; i < n; i++) {
+        modals[i].classList.remove('is-active')
+      }
     }
   }
 }
 
 closeModalListener()
+
 /************************ Offline notification below ************************/
 const offlineNotification = document.getElementById('offline')
 
@@ -308,7 +315,7 @@ function initDatepicker () {
 
       if (endTimeField.classList.contains('is-hidden')) {
         this.textContent = '– End Date'
-        fpEnd.setDate(new Date().setHours(today.getHours() + 3))
+        fpEnd.setDate(today.setHours(today.getHours() + 3))
       } else {
         this.textContent = '+ End Date'
         fpEnd.setDate(undefined)

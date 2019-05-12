@@ -80,6 +80,48 @@ exports.createStory = async (req, res) => {
 }
 
 /**
+ * POST update a story
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.updateStory = function (req, res) {
+  const json = req.body
+  const storyQuery = Story.findById(json.id)
+
+  storyQuery.then(async story => {
+    if (story) {
+      story.caption = json.caption
+      await story.save()
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    // Bad request
+    console.log(err)
+    res.status(400).send(err)
+  })
+}
+
+/**
+ * POST delete a story
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.deleteStory = function (req, res) {
+  const storyQuery = Story.deleteOne({ _id: req.body.id })
+
+  storyQuery.
+    then(() => res.sendStatus(200)).
+    catch(err => {
+      console.log(err)
+      res.sendStatus(500)
+    })
+}
+
+/**
  * POST like a story
  *
  * @param {object} req The request header

@@ -508,6 +508,12 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-width: 220px;
 }
 
+#story #profile-event-link {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
 #story p.story-username {
   padding-right: 5px;
 }
@@ -526,8 +532,16 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   flex-direction: column;
 }
 
-#story footer #like {
+#story footer #like-and-time {
+  justify-content: space-between;
+}
+
+#story footer #like, #like-and-time {
   align-items: center;
+}
+
+#story footer #story-date {
+  padding-right: 16px;
 }
 
 #story footer .iconify {
@@ -546,6 +560,11 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   box-shadow: none;
   padding: 0.3rem;
   border: none;
+}
+
+/* Edit story modal */
+#edit-story #edit-story-buttons {
+  justify-content: space-between;
 }
 
 /* User profile event card */
