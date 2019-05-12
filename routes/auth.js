@@ -56,7 +56,7 @@ passport.serializeUser((user, cb) => cb(null, user))
 // Determines which data to be returned in req.user
 passport.deserializeUser((user, cb) => {
   // Reflect the changes immediately after username changes
-  User.findOne({email: user.email}, function (err, user) {
+  User.findOne({ email: user.email }, function (err, user) {
     cb(null, user)
   })
 })
@@ -93,7 +93,23 @@ function checkAuth (req, res, next) {
   }
 }
 
+/**
+ * If the user is not logged in, response 401 Unauthorized
+ *
+ * @param {object} req The request object
+ * @param {object} res The response object
+ * @param {function} next The next middleware function
+ */
+function checkAuthAPI (req, res, next) {
+  if (req.isAuthenticated()) {
+    next()
+  } else {
+    res.sendStatus(401)
+  }
+}
+
 module.exports = {
   router: router,
   checkAuth: checkAuth,
+  checkAuthAPI: checkAuthAPI,
 }

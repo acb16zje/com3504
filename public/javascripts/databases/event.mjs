@@ -589,11 +589,6 @@ export function addInterestedGoingListener () {
 
   if (interestedButtons.length) {
     interestedButtons.click(function () {
-      if (!currentUser) {
-        showSnackbar('Please sign in to continue')
-        return
-      }
-
       // Set the event as interested, will replace going status
       submitInterested(this.dataset.id).then(() => {
         this.classList.toggle('is-light')
@@ -606,19 +601,18 @@ export function addInterestedGoingListener () {
           going.classList.remove('is-light')
         }
 
-      }).catch(() => {
-        showSnackbar('Failed to process the request')
+      }).catch(err => {
+        if (err.status === 401) {
+          showSnackbar('Please sign in to continue')
+        } else {
+          showSnackbar('Failed to process the request')
+        }
       })
     })
   }
 
   if (goingButtons.length) {
     goingButtons.click(function () {
-      if (!currentUser) {
-        showSnackbar('Please sign in to continue')
-        return
-      }
-
       // Set the event as going, will replace interested status
       submitGoing(this.dataset.id).then(() => {
         this.classList.toggle('is-light')
@@ -631,9 +625,12 @@ export function addInterestedGoingListener () {
           interested.querySelector('svg.border').classList.remove('is-hidden')
         }
 
-      }).catch((err) => {
-        console.log(err)
-        showSnackbar('Failed to process the request')
+      }).catch(err => {
+        if (err.status === 401) {
+          showSnackbar('Please sign in to continue')
+        } else {
+          showSnackbar('Failed to process the request')
+        }
       })
     })
   }

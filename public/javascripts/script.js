@@ -37,7 +37,7 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js').
       then(() => {
         console.log('SW registration successful')
-      }, (err) => {
+      }, err => {
         console.log('SW registration failed: ', err)
       })
   })
@@ -195,7 +195,7 @@ if (dropdowns.length > 0) {
   const dropDownsArray = Array.from(dropdowns)
 
   for (let i = 0, n = dropDownsArray.length; i < n; i++) {
-    dropDownsArray[i].addEventListener('click', (e) => {
+    dropDownsArray[i].addEventListener('click', e => {
       e.stopPropagation()
       dropDownsArray[i].classList.toggle('is-active')
     })

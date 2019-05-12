@@ -497,6 +497,10 @@ nav.navbar.is-fixed-bottom.is-hidden-desktop div.navbar-brand a.is-active {
   max-height: initial;
 }
 
+#story header div.card-header-title {
+  justify-content: space-between;
+}
+
 #story header p.title {
   white-space: nowrap;
   overflow: hidden;

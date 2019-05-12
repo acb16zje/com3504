@@ -151,7 +151,37 @@ function createStory (formJson) {
   }))
 }
 
-export async function loadCaptionComments (storyID) {
+function editStory (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    url: '/api/story/update',
+  }))
+}
+
+/**
+ * Like a story
+ *
+ * @param {string} storyID The ID of the story to be liked
+ * @returns {Promise<any>} The Promise
+ */
+export function likeStory (storyID) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({ id: storyID }),
+    url: '/api/story/like',
+  }))
+}
+
+/**
+ * Load the story data from Mongo, or IndexedDB
+ *
+ * @param {story} storyID The ID of the story to load
+ * @returns {Promise<any | * | void>} The Promise
+ */
+export async function loadStoryData (storyID) {
   return loadStory(storyID).then(story => {
     console.log(`Loaded story ${storyID} from server`)
     storeStories([story]).

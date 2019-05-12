@@ -23,6 +23,8 @@
               </a>
             </div>
           </nav>
+
+          <button class="button is-light">Edit</button>
         </div>
       </header>
 
@@ -63,13 +65,13 @@
 
       <footer class="card-footer">
         <div id="like" class="is-flex">
-          <a class="has-text-black">
+          <a id="like-button" class="has-text-black">
             <span class="icon is-large">
-              <span class="iconify" data-icon="bytesize:heart"></span>
-              <!--            <span class="iconify" data-icon="flat-color-icons:like"></span>-->
+              <span id="border-heart" class="iconify" data-icon="bytesize:heart"></span>
+              <span id="red-heart" class="iconify has-text-danger is-hidden" data-icon="maki:heart-15"></span>
             </span>
           </a>
-          <p class="subtitle is-6 has-text-weight-bold">0 likes</p>
+          <p class="subtitle is-6 has-text-weight-bold"><span id="like-count"></span> likes</p>
         </div>
         <div id="reply" class="is-flex">
           <textarea name="reply" class="textarea has-fixed-size" placeholder="Add a comment"></textarea>

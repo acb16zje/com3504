@@ -19,7 +19,8 @@ const imageController = require('../controllers/image')
 exports.getStoryData = function (req, res) {
   const storyQuery = Story.findById(req.params.id, '-__v')
   storyQuery.populate('user', '-_id username')
-  storyQuery.populate('event', '_id name').lean()
+  storyQuery.populate('event', '_id name')
+  storyQuery.populate('likes', '-_id username').lean()
 
   storyQuery.then(story => {
     // 404 error if story is not found
@@ -46,13 +47,13 @@ exports.createStory = async (req, res) => {
   const eventQuery = Event.findById(json.event)
   const storyImage = await imageController.createImage(json.image)
 
-  userQuery.then( user => {
+  userQuery.then(user => {
     eventQuery.then(async event => {
       const story = await new Story({
         user: user.id,
         event: json.event,
         image: storyImage ? `/image/${storyImage.id}` : undefined,
-        caption: json.caption
+        caption: json.caption,
       }).save().catch(err => {
         console.log(err)
         res.status(400).send(err)
@@ -72,6 +73,50 @@ exports.createStory = async (req, res) => {
       console.log(err)
       res.sendStatus(500)
     })
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
+ * POST like a story
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.likeStory = function (req, res) {
+  const userQuery = User.findById(req.user.id)
+
+  userQuery.then(user => {
+    if (user) {
+      const storyQuery = Story.findById(req.body.id)
+
+      storyQuery.then(async story => {
+        if (story) {
+          if (user.likes.indexOf(story.id) > -1 &&
+            story.likes.indexOf(user.id) > -1) {
+
+            user.likes.pull({ _id: story.id })
+            story.likes.pull({ _id: user.id })
+          } else {
+            user.likes.push(story.id)
+            story.likes.push(user.id)
+          }
+
+          await user.save()
+          await story.save()
+          res.sendStatus(200)
+        } else {
+          res.sendStatus(404)
+        }
+      }).catch(err => {
+        console.log(err)
+        res.sendStatus(500)
+      })
+    } else {
+      res.sendStatus(404)
+    }
   }).catch(err => {
     console.log(err)
     res.sendStatus(500)

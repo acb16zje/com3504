@@ -138,6 +138,7 @@ mongoose.connect(URL, {
       event: gakkiEvent.id,
       image: `/image/${gakkiStoryImage.id}`,
       caption: 'Join me at Gakki Event',
+      likes : [mario.id, luigi.id]
     }).save()
 
     const marioStory = await new Story({
@@ -162,11 +163,13 @@ mongoose.connect(URL, {
     await gakki.save()
 
     mario.stories = [marioStory.id]
+    mario.likes = [gakkiStory.id]
     mario.events = marioEvent.id
     mario.going = [gakkiEvent.id]
     await mario.save()
 
     luigi.stories = [luigiStory.id]
+    luigi.likes = [gakkiStory.id]
     luigi.events = luigiEvent.id
     luigi.going = [gakkiEvent.id]
     await luigi.save()

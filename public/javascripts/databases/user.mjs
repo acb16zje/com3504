@@ -14,7 +14,8 @@ import {
 } from './event.mjs'
 import { initGenresInput } from './genre.mjs'
 import {
-  loadCaptionComments,
+  likeStory,
+  loadStoryData,
   renderStoryColumn,
   storeStories,
 } from './story.mjs'
@@ -48,7 +49,7 @@ if (userSection) {
           then(() => console.log(`Pre-stored ${username}'s events`)).
           catch(() => console.log('Failed to pre-store events'))
       })
-    }).catch((err) => console.log(`Failed to store ${err}`))
+    }).catch(err => console.log(`Failed to store ${err}`))
   }).catch(() => {
     console.log(`Failed to load ${username} from server, loading from local`)
 
@@ -474,6 +475,8 @@ function addStoryModalListener () {
   if (storyModals.length) {
     for (let i = 0, n = storyModals.length; i < n; i++) {
       storyModals[i].onclick = function () {
+        const storyID = this.dataset.id
+
         // Add the image source
         const profileImgModal = document.getElementById('user-image-modal')
         profileImgModal.src = document.querySelector('#user-image img').src
@@ -484,13 +487,47 @@ function addStoryModalListener () {
         // Reset comments scroll to top
         // document.querySelector('#story div.card-content').scrollTop = 0
 
-        // AJAX load caption and comments
-        loadCaptionComments(this.dataset.id).then(data => {
+        // AJAX load caption, comments, and like count
+        loadStoryData(storyID).then(data => {
           const caption = document.getElementById('caption')
           if (data.caption) {
             caption.textContent = data.caption
           } else {
             caption.parentElement.classList.add('is-hidden')
+          }
+
+          // Like count
+          const likeCount = document.getElementById('like-count')
+          likeCount.textContent = data.likes.length
+
+          // Like button
+          const likeButton = document.getElementById('like-button')
+          const borderHeart = document.getElementById('border-heart')
+          const redHeart = document.getElementById('red-heart')
+
+          const isUserLiked = data.likes.some(user => user.username === currentUser)
+          if (isUserLiked) {
+            borderHeart.classList.add('is-hidden')
+            redHeart.classList.remove('is-hidden')
+          }
+
+          likeButton.onclick = function () {
+            likeStory(storyID).then(() => {
+              borderHeart.classList.toggle('is-hidden')
+              redHeart.classList.toggle('is-hidden')
+
+              if (redHeart.classList.contains('is-hidden')) {
+                likeCount.textContent = parseInt(likeCount.textContent) - 1
+              } else {
+                likeCount.textContent = parseInt(likeCount.textContent) + 1
+              }
+            }).catch(err => {
+              if (err.status === 401) {
+                showSnackbar('Please sign in to continue')
+              } else {
+                showSnackbar('Failed to like story')
+              }
+            })
           }
 
           document.getElementById('story').classList.add('is-active')

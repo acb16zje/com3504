@@ -27,9 +27,9 @@ router.get('/api/users/', userController.getUsers)
 router.get('/api/user/:username/?:type(|events|going|interested|went)', userController.getUserData)
 
 /* AJAX POST for editing user profile */
-router.post('/api/user/edit', auth.checkAuth, userController.editUserProfile)
+router.post('/api/user/edit', auth.checkAuthAPI, userController.editUserProfile)
 
 /* AAJX POST follow the given username */
-router.post('/api/follow_user', auth.checkAuth, userController.followUser)
+router.post('/api/follow_user', auth.checkAuthAPI, userController.followUser)
 
 module.exports = router

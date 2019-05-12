@@ -17,7 +17,10 @@ const storyController = require('../controllers/story')
 /* AJAX GET story data */
 router.get('/api/story/:id', storyController.getStoryData)
 
-/* AJAX POST create an event */
-router.post('/api/story/create', auth.checkAuth, storyController.createStory)
+/* AJAX POST create a story */
+router.post('/api/story/create', auth.checkAuthAPI, storyController.createStory)
+
+/* AJAX POST like a story */
+router.post('/api/story/like', auth.checkAuthAPI, storyController.likeStory)
 
 module.exports = router

@@ -58,6 +58,12 @@ const user = new Schema({
       ref: 'Story',
       default: [],
     }],
+  likes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Story',
+      default: [],
+    }],
   followers: [
     {
       type: Schema.Types.ObjectId,
