@@ -55,10 +55,9 @@
       <hr>
       <div class="columns is-centered is-marginless">
         <div class="column is-narrow has-text-centered">
-          <button id="maps-button" class="button is-light">Open Maps</button>
+          <button id="map-button" class="button is-light" data-target="map-modal">Open Maps</button>
         </div>
       </div>
-      <div id="maps" class="columns is-hidden"></div>
     </div>
 
     <!-- Upcoming events columns-->
@@ -67,5 +66,11 @@
     <!--Past events columns-->
     <h1 id="past-text" class="title has-text-centered">Past Events</h1>
     <div id="past" class="columns is-multiline event-columns"></div>
+  </div>
+
+  <div id="map-modal" class="modal">
+    <div class="modal-background"></div>
+    <div id="map" class="modal-content"></div>
+    <button class="modal-close is-large" aria-label="close"></button>
   </div>
 </section>

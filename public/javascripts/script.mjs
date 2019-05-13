@@ -9,6 +9,7 @@
 import {
   displayExplorePage,
   EVENT_STORE,
+  isPastEvent,
   loadExplorePage,
   loadExplorePageLocal,
   storeExplorePage,
@@ -96,6 +97,7 @@ function addUsers (users) {
 
 /************************ Explore page search ************************/
 const exploreSearchForm = document.getElementById('explore-search-form')
+const mapButton = document.getElementById('map-button')
 
 if (exploreSearchForm) {
   const searchButton = document.getElementById('search-button')
@@ -191,14 +193,67 @@ function searchEventLocal (formJson) {
            * Case 3: Has end date, selected date between start and end date
            */
 
-          return (startDate >= date && startDate < dateTomorrow && event.endDate === undefined) ||
-            (startDate >= date && startDate < dateTomorrow && endDate >= date) ||
+          return (startDate >= date && startDate < dateTomorrow &&
+            event.endDate === undefined) ||
+            (startDate >= date && startDate < dateTomorrow && endDate >=
+              date) ||
             (startDate <= date && endDate >= date)
         })
       }
 
       return events
     }).catch(err => console.log(err))
+  }
+}
+
+if (mapButton) {
+  mapButton.onclick = function () {
+    document.getElementById(this.dataset.target).classList.add('is-active')
+
+    const map = L.map('map').setView([53.381197, -1.472573], 15)
+
+    const southWest = L.latLng(-89.98155760646617, -180)
+    const northEast = L.latLng(89.99346179538875, 180)
+    const bounds = L.latLngBounds(southWest, northEast)
+
+    map.setMaxBounds(bounds)
+    map.on('drag', function () {
+      map.panInsideBounds(bounds, { animate: false })
+    })
+
+    new L.Control.Geocoder({
+      defaultMarkGeocode: false,
+    }).on('markgeocode', function (e) {
+      const bbox = e.geocode.bbox
+      const poly = L.polygon([
+        bbox.getSouthEast(),
+        bbox.getNorthEast(),
+        bbox.getNorthWest(),
+        bbox.getSouthWest(),
+      ]).addTo(map)
+      map.fitBounds(poly.getBounds())
+    }).addTo(map)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      minZoom: 2
+    }).addTo(map)
+
+    loadExplorePage().then(events => {
+      console.log('Loaded events from server [map]')
+
+      storeExplorePage(events).
+        then(() => console.log('Stored events [map]')).
+        catch(() => console.log('Failed to store events [map]'))
+
+      addEventsToMap(map, events)
+    }).catch(() => {
+      console.log('Failed to load events from server, loading from local [map]')
+
+      loadExplorePageLocal().then(events => {
+        console.log('Loaded events from local [map]')
+        addEventsToMap(map, events)
+      }).catch(() => console.log('Failed to plot events'))
+    })
   }
 }
 
@@ -218,6 +273,31 @@ function refreshExplorePage (events) {
     past.removeChild(past.firstChild)
 
   displayExplorePage(events)
+}
+
+function addEventsToMap (map, events) {
+  for (let i = events.length; i--;) {
+    if (!isPastEvent(events[i])) {
+      const marker = L.marker(
+        [events[i].location.latitude, events[i].location.longitude])
+
+      const popupHTML = `
+        <div class="columns">
+          <div class="column">
+            <figure class="image">
+              <img src="${events[i].image}"  alt="Event image"> 
+            </figure>
+          </div>
+          <div class="column">
+            <a href="/event/${events[i]._id}">${events[i].name}</a>
+          </div>
+        </div>
+      `
+
+      marker.bindPopup(popupHTML)
+      marker.addTo(map)
+    }
+  }
 }
 
 /************************ Helper functions below ************************/
