@@ -271,6 +271,8 @@ export function displayExplorePage (events) {
 
   if (pastColumns.children.length < 1) {
     document.getElementById('past-text').classList.add('is-hidden')
+  } else {
+    document.getElementById('past-text').classList.remove('is-hidden')
   }
 
   addInterestedGoingListener() // click listener for interested and going

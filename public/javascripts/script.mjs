@@ -128,8 +128,9 @@ if (exploreSearchForm) {
 
       refreshExplorePage(events)
     }).catch(() => {
-
-      showSnackbar('Failed to search events from server')
+      searchEventLocal(formJson).then(events => {
+        refreshExplorePage(events)
+      }).catch(() => showSnackbar('Failed to search events from server'))
     })
   })
 }
@@ -159,14 +160,51 @@ function searchEvent (formJson) {
 function searchEventLocal (formJson) {
   if (dbPromise) {
     return dbPromise.then(async db => {
-      const events = await db.getAll(EVENT_STORE)
+      let events = await db.getAll(EVENT_STORE)
+
+      if (formJson.event) {
+        events = events.filter(event => {
+          return event.name.match(new RegExp(`^.*${formJson.event.replace(
+            /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'))
+        })
+      }
+
+      if (formJson.address) {
+        events = events.filter(event => {
+          return event.location.address.match(
+            new RegExp(`^.*${formJson.address.replace(
+              /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'))
+        })
+      }
+
+      if (formJson.date) {
+        const date = new Date(formJson.date)
+        const dateTomorrow = new Date(date).setDate(date.getDate() + 1)
+
+        events = events.filter(event => {
+          const startDate = new Date(event.startDate)
+          const endDate = new Date(event.endDate)
+
+          /**
+           * Case 1: Only has start date
+           * Case 2: Has end date, selected date is start date
+           * Case 3: Has end date, selected date between start and end date
+           */
+
+          return (startDate >= date && startDate < dateTomorrow && event.endDate === undefined) ||
+            (startDate >= date && startDate < dateTomorrow && endDate >= date) ||
+            (startDate <= date && endDate >= date)
+        })
+      }
+
+      return events
     }).catch(err => console.log(err))
   }
 }
 
 /**
  * Re-display the explore page with search resutls
- * 
+ *
  * @param {Array} events An array of searched events
  */
 function refreshExplorePage (events) {
