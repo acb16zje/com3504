@@ -35,8 +35,8 @@ const FILES = [
 /**
  * installation event: it adds all the files to be cached
  */
-self.addEventListener('install', function (event) {
-  event.waitUntil(caches.open(CACHENAME).then(function (cache) {
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHENAME).then(cache => {
     return cache.addAll(FILES)
   }))
 })

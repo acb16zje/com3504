@@ -13,7 +13,7 @@ const User = require('../models/user')
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.getUsers = function (req, res) {
+exports.getUsers = (req, res) => {
   const userQuery = User.find()
   userQuery.populate('genres', 'id name')
   userQuery.populate({
@@ -46,7 +46,7 @@ exports.getUsers = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.getUserData = function (req, res) {
+exports.getUserData = (req, res) => {
   const userQuery = User.findOne({ 'username': req.params.username }, '-_id')
   userQuery.populate('genres', 'id name')
   userQuery.populate({
@@ -62,7 +62,7 @@ exports.getUserData = function (req, res) {
     path: 'stories',
     populate: [
       { path: 'user', select: '-_id username' },
-      { path: 'event', select: 'id name' },
+      { path: 'event', select: '_id name' },
       { path: 'likes', select: '-_id username'}
     ],
     options: { sort: { date: -1 } },
@@ -88,7 +88,7 @@ exports.getUserData = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.editUserProfile = function (req, res) {
+exports.editUserProfile = (req, res) => {
   const formJson = req.body
   const userQuery = User.findById(req.user.id)
 
@@ -120,7 +120,7 @@ exports.editUserProfile = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.followUser = function (req, res) {
+exports.followUser = (req, res) => {
   // userQueryA: The logged in user
   // userQueryB: The user to be followed
 

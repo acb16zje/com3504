@@ -66,7 +66,7 @@ router.get('/login',
   passport.authenticate('google', { scope: ['profile', 'email'] }))
 
 /* Clears the user session to logout */
-router.get('/logout', function (req, res) {
+router.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'))
 })
 

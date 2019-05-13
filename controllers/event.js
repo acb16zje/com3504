@@ -61,6 +61,41 @@ exports.getEventData = (req, res) => {
 }
 
 /**
+ * GET all events related to the user (follow, created)
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.getEventFeed = (req, res) => {
+  const userQuery = User.findById(req.user.id)
+
+  userQuery.then(user => {
+    if (user) {
+      const eventQuery = Event.find()
+      eventQuery.populate({
+        path: 'organiser',
+        match: { $or: [{ followers: req.user.id }, { _id: req.user.id }] },
+        select: '-_id username',
+      })
+      eventQuery.populate('genres', '-_id name')
+      eventQuery.populate('interested going', '-_id username image').lean()
+
+      eventQuery.
+        then(events => res.json(events.filter(event => event.organiser))).
+        catch(err => {
+          console.log(err)
+          res.sendStatus(500)
+        })
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * POST create an event
  *
  * @param {object} req The request header
@@ -119,7 +154,8 @@ exports.updateEvent = async (req, res) => {
   const json = req.body
   const genres = json.genres && json.genres.length ? json.genres : []
 
-  const eventQuery = Event.findById(json.id)
+  const eventQuery = Event.findById(json.id).
+    populate('organiser', '-_id username')
 
   eventQuery.then(async event => {
     if (event) {
@@ -171,7 +207,7 @@ exports.updateEvent = async (req, res) => {
       event.genres = genres
 
       await event.save()
-      res.sendStatus(200)
+      res.json(event)
     } else {
       res.sendStatus(404)
     }

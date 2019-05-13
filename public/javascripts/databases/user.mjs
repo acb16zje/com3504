@@ -351,6 +351,7 @@ function updateUserProfile (username, formJson) {
 
   const genre = $(document.getElementById('genre'))
 
+  // Update the favourite genres
   if (formJson.genres) {
     genre.find('span').remove()
 

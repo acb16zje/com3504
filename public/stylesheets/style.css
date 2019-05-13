@@ -178,6 +178,24 @@ div.story-feed figure.story-modal {
   cursor: pointer;
 }
 
+/* Home page event feed */
+#event-feed div.column {
+  width: 50%;
+  margin: 0 auto
+}
+
+#event-feed .media-content .title a {
+  color: initial;
+}
+
+#event-feed .media-content .title a:hover {
+  text-decoration: underline;
+}
+
+#event-feed .host.subtitle, #event-feed .location.subtitle {
+  margin-bottom: 0.3em;
+}
+
 /* Explore page events card column */
 .event-columns div.card {
   display: flex;
@@ -208,7 +226,7 @@ div.story-feed figure.story-modal {
   margin-top: auto;
 }
 
-.event-columns img, #event img {
+.event-columns img, #event img, #event-feed img {
   object-fit: contain;
 }
 

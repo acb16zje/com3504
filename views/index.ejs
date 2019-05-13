@@ -21,7 +21,12 @@
     <% if (path === 'home_stories') { %>
       <div id="story-feed"></div>
     <% } else if (path === 'home_events') { %>
-      <div id="event-feed"></div>
+      <div id="event-feed" class="is-hidden">
+        <div id="upcoming"></div>
+
+        <h1 id="past-text" class="title has-text-centered">Past</h1>
+        <div id="past"></div>
+      </div>
     <% } %>
   </div>
 </section>

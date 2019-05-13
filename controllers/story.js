@@ -16,7 +16,7 @@ const imageController = require('../controllers/image')
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.getStoryData = function (req, res) {
+exports.getStoryData = (req, res) => {
   const storyQuery = Story.findById(req.params.id, '-__v')
   storyQuery.populate('user', '-_id username')
   storyQuery.populate('event', '_id name')
@@ -41,7 +41,7 @@ exports.getStoryData = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.getStoryFeed = function (req, res) {
+exports.getStoryFeed = (req, res) => {
   const userQuery = User.findById(req.user.id)
 
   userQuery.then(user => {
@@ -55,12 +55,12 @@ exports.getStoryFeed = function (req, res) {
         select: '_id username image',
       }).sort({ date: -1 }).lean()
 
-      storyQuery.then(stories => {
-        res.json(stories.filter(story => story.user))
-      }).catch(err => {
-        console.log(err)
-        res.sendStatus(500)
-      })
+      storyQuery.
+        then(stories => res.json(stories.filter(story => story.user))).
+        catch(err => {
+          console.log(err)
+          res.sendStatus(500)
+        })
     } else {
       res.sendStatus(404)
     }
@@ -130,7 +130,7 @@ exports.createStory = async (req, res) => {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.updateStory = function (req, res) {
+exports.updateStory = (req, res) => {
   const json = req.body
   const storyQuery = Story.findById(json.id)
 
@@ -155,7 +155,7 @@ exports.updateStory = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.deleteStory = function (req, res) {
+exports.deleteStory = (req, res) => {
   const storyQuery = Story.deleteOne({ _id: req.body.id })
 
   storyQuery.
@@ -172,7 +172,7 @@ exports.deleteStory = function (req, res) {
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.likeStory = function (req, res) {
+exports.likeStory = (req, res) => {
   const userQuery = User.findById(req.user.id)
 
   userQuery.then(user => {

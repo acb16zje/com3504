@@ -91,7 +91,6 @@ export async function storeStories (stories) {
         (async () => {
           const story = Object.assign({}, stories[i])
           story.user = story.user.username
-          story.event = story.event.name
           tx.store.put(story)
           await tx.done
         })()

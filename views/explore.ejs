@@ -1,10 +1,12 @@
 <%- contentFor('body') %>
 
-<section id="explore" class="section">
+<section id="explore" class="section is-hidden">
   <div class="container">
+    <!-- Upcoming events columns-->
+    <div id="upcoming" class="columns is-multiline event-columns"></div>
 
-    <!--Events columns-->
-    <div class="columns is-multiline event-columns"></div>
-
+    <!--Past events columns-->
+    <h1 class="title has-text-centered">Past</h1>
+    <div id="past" class="columns is-multiline event-columns"></div>
   </div>
 </section>

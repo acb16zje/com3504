@@ -13,7 +13,7 @@ const Image = require('../models/image')
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.getImage = function (req, res) {
+exports.getImage = (req, res) => {
   Image.findById(req.params.id).lean().exec(function (err, doc) {
     if (err) {
       res.setHeader('content-type', 'image/webp')
@@ -33,7 +33,7 @@ exports.getImage = function (req, res) {
  * @param {string} data The data URI of the image in base64
  * @returns {Promise<*>} An Image object if promise resolves
  */
-exports.createImage = async function (data) {
+exports.createImage = async data => {
   try {
     // These will be empty if no image is submitted, hence error
     const content = data.replace(/^data:image\/.*;base64,/, '')
@@ -53,7 +53,7 @@ exports.createImage = async function (data) {
  * @param {string} data The data URI of the image in base64
  * @returns {Promise<void>} An Image object if promise resolves
  */
-exports.updateImage = async function (id, data) {
+exports.updateImage = async (id, data) => {
   const imageQuery = Image.findById(id)
 
   imageQuery.then(async image => {

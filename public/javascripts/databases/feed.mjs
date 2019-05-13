@@ -17,9 +17,16 @@ import {
   storeStories,
   STORY_STORE,
 } from './story.mjs'
+import {
+  addInterestedGoingListener,
+  addEditEventListener,
+  EVENT_STORE,
+  isPastEvent,
+  renderEventCard,
+} from './event.mjs'
 
 const storyFeedDiv = document.getElementById('story-feed')
-const eventFeedDiv = document.getElementById('event-feed')
+export const eventFeedDiv = document.getElementById('event-feed')
 
 if (storyFeedDiv) {
   (async function () {
@@ -45,6 +52,8 @@ if (storyFeedDiv) {
       console.log('Failed to load story feed from server, loading from local')
 
       loadStoryFeedLocal().then(feed => {
+        console.log('Loaded story feed from local')
+
         if (feed && feed.length) {
           const stories = feed.sort(function (a, b) {
             // Latest date first
@@ -62,7 +71,7 @@ if (storyFeedDiv) {
         console.log('Failed to load story feed from local')
         storyFeedDiv.insertAdjacentHTML('beforeend', `
         <p class="title has-text-centered">Failed to load story feed</p>
-      `)
+        `)
       })
     })
 
@@ -73,7 +82,24 @@ if (storyFeedDiv) {
 }
 
 if (eventFeedDiv) {
+  (async function () {
+    await loadEventFeed().then(feed => {
+      console.log('Loaded event feed from server ')
+      displayEventFeed(feed)
+    }).catch(() => {
+      console.log('Failed to load event feed from server, loading from local')
 
+      loadEventFeedLocal().then(feed => {
+        console.log('Loaded event feed from local')
+        displayEventFeed(feed)
+      }).catch(() => {
+        console.log('Failed to load event feed from local')
+        eventFeedDiv.insertAdjacentHTML('beforeend', `
+        <p class="title has-text-centered">Failed to load event feed</p>
+        `)
+      })
+    })
+  })()
 }
 
 /************************ IndexedDB / AJAX related ************************/
@@ -129,11 +155,66 @@ function loadEventFeed () {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
-    url: '/api/event/feed',
+    url: '/api/event_feed',
   }))
 }
 
+/**
+ * Load all event feed related to the logged in user from IndexedDB
+ *
+ * @returns {Promise<void>} The Promise
+ */
+function loadEventFeedLocal () {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      const loggedInUser = await db.getFromIndex(USER_STORE, 'username',
+        currentUser)
+      const events = await db.getAll(EVENT_STORE)
+
+      if (events && events.length) {
+        return events.filter(event => event.organiser === currentUser ||
+          loggedInUser.following.includes(event.organiser))
+      } else {
+        return []
+      }
+    }).catch(err => console.log(err))
+  }
+}
+
 /************************ Rendering related ************************/
+/**
+ * Given an array of event feed, display them
+ *
+ * @param {Array} feed An array of event feed
+ */
+function displayEventFeed (feed) {
+  const upcomingDiv = document.getElementById('upcoming')
+  const pastDiv = document.getElementById('past')
+
+  if (feed && feed.length) {
+    for (let i = 0, n = feed.length; i < n; i++) {
+      if (isPastEvent(feed[i])) {
+        pastDiv.insertAdjacentHTML('afterbegin',
+          renderEventCard(feed[i]))
+      } else {
+        upcomingDiv.insertAdjacentHTML('beforeend',
+          renderEventCard(feed[i]))
+      }
+    }
+  } else {
+    noEventFeed(eventFeedDiv)
+  }
+
+  addInterestedGoingListener()
+  addEditEventListener()
+
+  if (pastDiv.children.length < 1) {
+    document.getElementById('past-text').classList.add('is-hidden')
+  }
+
+  eventFeedDiv.classList.remove('is-hidden')
+}
+
 /**
  * Return the HTML fragment for a story feed card
  *
@@ -248,11 +329,27 @@ function addStoryFeedLikeListener (likeButton) {
  *
  * @param {Element} section A DOM element object
  */
-export function noStoryFeed (section) {
+function noStoryFeed (section) {
   section.insertAdjacentHTML('beforeend', `
     <p class="title has-text-centered">No stories to display</p>
     <p class="subtitle has-text-centered">
         Follow some users, or post some stories
-    </p>\
+    </p>
   `)
+}
+
+/**
+ * Display no event feed
+ *
+ * @param {Element} section A DOM element object
+ */
+function noEventFeed (section) {
+  section.insertAdjacentHTML('beforeend', `
+    <p class="title has-text-centered">No events to display</p>
+    <p class="subtitle has-text-centered">
+        Follow some users, or create some events
+    </p>
+  `)
+
+  document.getElementById('past-text').classList.add('is-hidden')
 }

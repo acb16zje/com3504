@@ -8,8 +8,9 @@
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import { initGenresInput } from './genre.mjs'
 import { currentUser } from '../script.mjs'
+import { eventFeedDiv } from './feed.mjs'
 
-const EVENT_STORE = 'event_store'
+export const EVENT_STORE = 'event_store'
 const exploreSection = document.getElementById('explore')
 const eventSection = document.getElementById('event')
 const createEventForm = document.getElementById('create-event')
@@ -213,6 +214,7 @@ function editEvent (formJson) {
     method: 'POST',
     contentType: 'application/json; charset=utf-8',
     data: JSON.stringify(formJson),
+    dataType: 'json',
     url: '/api/event/update',
   }))
 }
@@ -254,14 +256,22 @@ function submitGoing (eventID) {
  * @param {object} events The events documents retrieved
  */
 function displayExplorePage (events) {
-  const exploreColumns = exploreSection.children[0].children[0]
+  const upcomingColumns = document.getElementById('upcoming')
+  const pastColumns = document.getElementById('past')
 
   for (let i = 0, n = events.length; i < n; i++) {
-    exploreColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
+    if (isPastEvent(events[i])) {
+      // Past events
+      pastColumns.insertAdjacentHTML('afterbegin', renderEventCard(events[i]))
+    } else {
+      // Upcoming events
+      upcomingColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
+    }
   }
 
   addInterestedGoingListener() // click listener for interested and going
   addEditEventListener() // Click listener for edit event buttons
+  exploreSection.classList.remove('is-hidden')
 }
 
 /**
@@ -333,6 +343,10 @@ function displayEventPage (event) {
   if (event.genres.length) {
     genre.classList.remove('is-hidden')
 
+    if (document.getElementsByClassName('tags')[0]) {
+      document.getElementsByClassName('tags')[0].remove()
+    }
+
     const tags = document.createElement('div')
     tags.classList.add('tags')
     genre.appendChild(tags)
@@ -343,6 +357,8 @@ function displayEventPage (event) {
       node.textContent = event.genres[i].name
       tags.appendChild(node)
     }
+  } else {
+    genre.classList.add('is-hidden')
   }
 
   // Description
@@ -360,6 +376,7 @@ function displayEventPage (event) {
  * @return {string} The HTML fragment
  */
 export function renderEventCard (event) {
+  const eventID = event._id
   const organiser = event.organiser.username || event.organiser
   const address = event.location.address
   const people = event.interested.length + event.going.length
@@ -371,28 +388,26 @@ export function renderEventCard (event) {
   const isUserInterested =
     event.interested.some(user => user.username === currentUser)
 
-  return `<div class="column">
+  return `<div id="${eventID}" class="column">
     <div class="card">
 
-      <div class="card-image"><a href="/event/${event._id}">
+      <div class="card-image"><a href="/event/${eventID}">
         <figure class="image is-2by1">
-          <img src="${event.image}" alt="Event image">
+          <img id="event-image-${eventID}" src="${event.image}" alt="Event image">
         </figure>
       </a></div>
 
       <div class="card-content">
         <div class="media month-date">
           <div class="media-left">
-            <p class="subtitle is-6 has-text-danger">${startMonth}</p>
-            <p class="title is-4 has-text-centered">${startDay}</p>
+            <p id="event-month-${eventID}" class="subtitle is-6 has-text-danger">${startMonth}</p>
+            <p id="event-day-${eventID}" class="title is-4 has-text-centered">${startDay}</p>
           </div>
           <div class="media-content">
-            <p class="title is-4"><a href="/event/${event._id}">${event.name}</a></p>
+            <p class="title is-4"><a id="event-name-${eventID}" href="/event/${eventID}">${event.name}</a></p>
             <p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>
-            <p class="location subtitle is-6">${address}</p>
-            <p class="subtitle is-6">
-              ${prettifyTime(event.startDate, event.endDate)}
-            </p>
+            <p id="event-location-${eventID}" class="location subtitle is-6">${address}</p>
+            <p id="event-time-${eventID}" class="subtitle is-6">${prettifyTime(event.startDate, event.endDate)}</p>
           </div>
         </div>
 
@@ -405,14 +420,14 @@ export function renderEventCard (event) {
           <div class="level-right">
             <div class="level-item">
               ${organiser === currentUser ?
-                `<button class="button edit-button" data-id="${event._id}">
+                `<button class="button edit-button" data-id="${eventID}">
                   <span class="icon iconify"data-icon="ic:baseline-edit"></span>
                   <span>Edit</span>
                 </button>`
               :
                 `<button class=
                 "button interested-button ${isUserInterested ? 'is-light' : ''}"
-                data-id="${event._id}">
+                data-id="${eventID}">
   
                   <span class=
                   "border icon iconify ${isUserInterested ? 'is-hidden' : ''}"
@@ -650,6 +665,8 @@ export function addEditEventListener () {
       // Do not render the modal more than once
       if (!document.getElementById('edit-event')) {
         await loadEventPage(this.dataset.id).then(event => {
+          const eventID = event._id
+
           this.parentElement.insertAdjacentHTML(
             'beforeend',
             renderEditEventModal(event)
@@ -678,7 +695,7 @@ export function addEditEventListener () {
           }
 
           // Set genres input with event genres
-          const genresInput = document.getElementById(`${event._id}-genre`)
+          const genresInput = document.getElementById(`${eventID}-genre`)
           genresInput.setAttribute(
             'value', event.genres.map(genre => genre.name).join(','))
 
@@ -688,13 +705,32 @@ export function addEditEventListener () {
             e.preventDefault()
 
             const formJson = convertToJSON($(this).serializeArray())
+            const submitForm = Object.assign({}, formJson)
+            const displayForm = Object.assign({}, formJson)
 
+            // Genres field is empty is no option is selected
             if (formJson.genres) {
-              formJson.genres = JSON.parse(formJson.genres).map(genre => genre.id)
+              submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
+              displayForm.genres = JSON.parse(displayForm.genres).
+                map(genre => {return {name: genre.value}})
             }
 
-            editEvent(formJson).then(() => {
+            editEvent(submitForm).then(event => {
               showSnackbar('Event updated')
+              if (eventSection) {
+                event.genres = displayForm.genres
+                displayEventPage(event)
+              } else if (exploreSection || eventFeedDiv) {
+                const startDate = new Date(event.startDate)
+                const startDay = startDate.getDate()
+                const startMonth = getStartMonth(startDate)
+
+                document.getElementById(`event-name-${eventID}`).textContent = event.name
+                document.getElementById(`event-month-${eventID}`).textContent = startMonth
+                document.getElementById(`event-day-${eventID}`).textContent = startDay
+                document.getElementById(`event-location-${eventID}`).textContent = event.location.address
+                document.getElementById(`event-time-${eventID}`).textContent = prettifyTime(event.startDate, event.endDate)
+              }
               document.getElementById('edit-event').remove()
             }).catch(() => showSnackbar('Failed to edit event'))
           })
@@ -793,4 +829,17 @@ function prettifyTime (startDate, endDate) {
   } else {
     return start.toLocaleString(undefined, localeOptions)
   }
+}
+
+/**
+ * Check if the event is already finished
+ *
+ * @param {object} event An event document
+ * @returns {boolean} True if the event has already finished
+ */
+export function isPastEvent (event) {
+  const today = new Date()
+
+ return new Date(event.startDate) < today &&
+   (!event.endDate || new Date(event.endDate) < today)
 }

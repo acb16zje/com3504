@@ -13,7 +13,7 @@ const Genre = require('../models/genre')
  * @param {object} req The request header
  * @param {object} res The response header
  */
-exports.index = function (req, res) {
+exports.index = (req, res) => {
   const genreQuery = Genre.find().lean()
 
   genreQuery.then(genres => {

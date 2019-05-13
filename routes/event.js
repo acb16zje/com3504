@@ -33,6 +33,9 @@ router.get('/event/:id?', (req, res) => {
 /* AJAX GET the details of a specific event */
 router.get('/api/event/:id', eventController.getEventData)
 
+/* AJAX GET all events related to the username */
+router.get('/api/event_feed', auth.checkAuthAPI, eventController.getEventFeed)
+
 /* AJAX POST create an event */
 router.post('/api/event/create', auth.checkAuthAPI, eventController.createEvent)
 
