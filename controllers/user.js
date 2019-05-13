@@ -14,7 +14,7 @@ const User = require('../models/user')
  * @param {object} res The response header
  */
 exports.getUsers = function (req, res) {
-  const userQuery = User.find({})
+  const userQuery = User.find()
   userQuery.populate('genres', 'id name')
   userQuery.populate({
     path: 'events going interested',
@@ -63,6 +63,7 @@ exports.getUserData = function (req, res) {
     populate: [
       { path: 'user', select: '-_id username' },
       { path: 'event', select: 'id name' },
+      { path: 'likes', select: '-_id username'}
     ],
     options: { sort: { date: -1 } },
   })

@@ -5,11 +5,10 @@
  */
 
 'use strict'
-
 import { dbPromise } from './database.mjs'
 import { currentUser } from '../script.mjs'
 
-const STORY_STORE = 'story_store'
+export const STORY_STORE = 'story_store'
 const createStoryForm = document.getElementById('create-story')
 
 if (createStoryForm) {
@@ -47,42 +46,6 @@ export function initStoryDatabase (db) {
     store.createIndex('user', 'user')
     store.createIndex('event', 'event')
   }
-}
-
-/**
- * Load all stories of a user from MongoDB
- *
- * @param {string} username The username of the user
- * @returns {Promise<any>} The Promise
- */
-function loadUserStories (username) {
-  return Promise.resolve($.ajax({
-    method: 'GET',
-    dataType: 'json',
-    url: `/api/user_story/${username}`,
-  }))
-}
-
-// export function loadUserStoriesLocal (username) {
-//   if (dbPromise) {
-//     return dbPromise.then(async db => {
-//       return await db.getFromIndex(STORY_STORE, 'user')
-//     }).catch(err => console.log(err))
-//   }
-// }
-
-/**
- * Load the stories of all followed users
- *
- * @param {string} username The username of logged in user
- * @returns {Promise<any>} The Promise
- */
-function loadFollowingStories (username) {
-  return Promise.resolve($.ajax({
-    method: 'GET',
-    dataType: 'json',
-    url: `/api/following_story/${username}`,
-  }))
 }
 
 /**
@@ -231,16 +194,115 @@ export async function loadStoryData (storyID) {
 
 /************************ Rendering related ************************/
 /**
- * Return the HTML fragment for a story document
+ * Return the HTML fragment for a story column (image card only)
  *
  * @param {object} story A story document
  * @returns {string} The HTML fragment
  */
 export function renderStoryColumn (story) {
   return `<div id="${story._id}" class="column is-4">
-    <figure class="image is-flex story-modal" data-id=${story._id}>
-      <img src=${story.image} alt="Story image">
+    <figure class="image is-flex story-modal" data-id="${story._id}">
+      <img src="${story.image}" alt="Story image">
     </figure>
+  </div>`
+}
+
+/**
+ * Return the HTM fragment for a story modal
+ *
+ * @param {string} username The username of the story creator
+ * @returns {string} The HTML fragment of story modal
+ */
+export function renderStoryModal (username = undefined) {
+  return `
+  <div id="story" class="modal">
+    <div class="modal-background"></div>
+  
+    <div class="modal-content">
+      <div class="card">
+        <header class="card-header">
+          <div class="card-header-title">
+            <nav class="level is-mobile is-marginless">
+              <div class="level-item">
+                <a class="profile-link">
+                  <figure class="image is-48x48">
+                    <img id="user-image-modal" class="is-rounded" src="/images/default.webp" alt="User profile image">
+                  </figure>
+                </a>
+              </div>
+              <div id="profile-event-link" class="level-item">
+                <a class="profile-link">
+                  <p class="title is-6 story-username"></p>
+                </a>
+                <a id="event-link">
+                  <small id="event-name" class="is-size-7"></small>
+                </a>
+              </div>
+            </nav>
+            
+            ${currentUser === username ? `
+              <button class="button edit-button is-light">Edit</button>
+            ` : ''}
+          </div>
+        </header>
+  
+        <div class="card-image">
+          <figure class="image">
+            <img id="story-image" src="/images/placeholder.webp" alt="Story image">
+          </figure>
+        </div>
+  
+        <div class="card-content">
+          <div class="content">
+            <a class="profile-link">
+              <p class="title is-6 story-username is-inline"></p>
+            </a>
+            <p id="caption" class="is-inline"></p>
+            <hr>
+          </div>
+          <div id="comments" class="content">
+            <p class="subtitle is-6"><strong>lorem ipsum</strong>Lorem Ipsum1</p>
+            <p class="subtitle is-6"><strong>lorem ipsumngel1</strong>Lorem Ipsum2</p>
+            <p class="subtitle is-6"><strong>glorem ipsumlove1</strong>Lorem Ipsum3</p>
+            <p class="subtitle is-6"><strong>lorem ipsumwaii1</strong>Lorem Ipsum4</p>
+            <p class="subtitle is-6"><strong>glorem ipsui</strong>Lorem Ipsum5</p>
+            <p class="subtitle is-6"><strong>glorem ipsum1</strong>Lorem Ipsum6</p>
+            <p class="subtitle is-6"><strong>galorem ipsumfan1</strong>Lorem Ipsum7</p>
+            <p class="subtitle is-6"><strong>gi_fan1</strong>Lorem Ipsum8</p>
+            <p class="subtitle is-6"><strong>gklorem ipsuman1</strong>Lorem Ipsum9</p>
+            <p class="subtitle is-6"><strong>gakki_fan1</strong>Lorem Ipsum11</p>
+            <p class="subtitle is-6"><strong>gakki_fan2</strong>Lorem Ipsum12</p>
+            <p class="subtitle is-6"><strong>dogeshiba</strong>Lorem Ipsum13</p>
+            <p class="subtitle is-6"><strong>animal</strong>Lorem Ipsum15</p>
+            <p class="subtitle is-6"><strong>testueser</strong>Lorem Ipsum17</p>
+            <p class="subtitle is-6"><strong>goku</strong>Lorem Ipsum16</p>
+            <p class="subtitle is-6"><strong>dragon</strong>Lorem Ipsum18</p>
+            <p class="subtitle is-6"><strong>unicorn</strong>Lorem Ipsum19</p>
+          </div>
+        </div>
+  
+        <footer class="story-footer card-footer">
+          <div class="like-and-time is-flex">
+            <div class="like is-flex">
+              <a id="like-button" class="has-text-black">
+                <span class="icon is-large">
+                  <span id="border-heart" class="iconify" data-icon="bytesize:heart"></span>
+                  <span id="red-heart" class="iconify has-text-danger is-hidden" data-icon="maki:heart-15"></span>
+                </span>
+              </a>
+              <p class="subtitle is-6 has-text-weight-bold"><span id="like-count"></span> likes</p>
+            </div>
+            <small id="story-date"></small>
+          </div>
+          <div id="reply" class="is-flex">
+            <textarea name="reply" class="textarea has-fixed-size" placeholder="Add a comment"></textarea>
+            <a id="post-reply">Post</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  
+    <button class="modal-close is-large" aria-label="close"></button>
   </div>`
 }
 
@@ -307,6 +369,7 @@ function renderEditStoryModal (id, caption) {
 /************************ EventListener below ************************/
 export function addStoryModalListener () {
   const storyModals = document.getElementsByClassName('story-modal')
+  const fromStoryFeed = document.querySelector('#user-image img') === null
 
   if (storyModals.length) {
     for (let i = 0, n = storyModals.length; i < n; i++) {
@@ -314,7 +377,7 @@ export function addStoryModalListener () {
         const storyID = this.dataset.id
 
         // Edit button
-        const editButton = document.getElementById('edit-button')
+        const editButton = document.getElementsByClassName('edit-button')[0]
         if (editButton) {
           editButton.dataset.id = storyID
           addEditStoryListener() // Click listener for edit story button
@@ -322,16 +385,32 @@ export function addStoryModalListener () {
 
         // Add the image source
         const profileImgModal = document.getElementById('user-image-modal')
-        profileImgModal.src = document.querySelector('#user-image img').src
+        profileImgModal.src =
+          fromStoryFeed ?
+            document.querySelector(`#user-image-${storyID} img`).src
+            : document.querySelector('#user-image img').src
 
         const imgChild = document.getElementById('story-image')
-        imgChild.src = this.children[0].src
+        imgChild.src = fromStoryFeed ?
+          document.getElementById(`story-image-${storyID}`).src
+          : this.children[0].src
 
         // Reset comments scroll to top
         // document.querySelector('#story div.card-content').scrollTop = 0
 
         // AJAX load caption, comments, and like count
         loadStoryData(storyID).then(story => {
+          if (fromStoryFeed) {
+            const profileUsernames = document.getElementsByClassName('story-username')
+            const profileLinks = document.getElementsByClassName('profile-link')
+            for (let i = 0, n = profileLinks.length; i < n; i++) {
+              profileLinks[i].href = `/${story.user.username}`
+            }
+            for (let i = 0, n = profileUsernames.length; i < n; i++) {
+              profileUsernames[i].textContent = story.user.username
+            }
+          }
+
           document.getElementById('event-link').href = `/event/${story.event._id}`
           document.getElementById('event-name').textContent = story.event.name
 
@@ -353,21 +432,44 @@ export function addStoryModalListener () {
 
           const isUserLiked = story.likes.some(
             user => user.username === currentUser)
+
           if (isUserLiked) {
             borderHeart.classList.add('is-hidden')
             redHeart.classList.remove('is-hidden')
+          } else {
+            borderHeart.classList.remove('is-hidden')
+            redHeart.classList.add('is-hidden')
           }
 
           likeButton.onclick = function () {
             likeStory(storyID).then(() => {
+              // Toggle border / red heart
               borderHeart.classList.toggle('is-hidden')
               redHeart.classList.toggle('is-hidden')
 
+              // Increase like count
               if (redHeart.classList.contains('is-hidden')) {
                 likeCount.textContent = parseInt(likeCount.textContent) - 1
               } else {
                 likeCount.textContent = parseInt(likeCount.textContent) + 1
               }
+
+              // If liked in story feed page, change that as well
+              if (document.getElementById(`story-feed-${storyID}`)) {
+                const borderHeart = document.getElementById(`border-heart-${storyID}`)
+                const redHeart = document.getElementById(`red-heart-${storyID}`)
+                const likeCount = document.getElementById(`like-count-${storyID}`)
+
+                borderHeart.classList.toggle('is-hidden')
+                redHeart.classList.toggle('is-hidden')
+
+                if (redHeart.classList.contains('is-hidden')) {
+                  likeCount.textContent = parseInt(likeCount.textContent) - 1
+                } else {
+                  likeCount.textContent = parseInt(likeCount.textContent) + 1
+                }
+              }
+
             }).catch(err => {
               if (err.status === 401) {
                 showSnackbar('Please sign in to continue')
@@ -378,13 +480,10 @@ export function addStoryModalListener () {
           }
 
           // Story date
-          const storyDate = new Date(story.date)
-          const month = storyDate.toLocaleString(undefined, { month: 'short' })
-          document.getElementById('story-date').textContent =
-            `${storyDate.getDate()} ${month} ${storyDate.getFullYear()}`
+          document.getElementById('story-date').textContent = formatStoryDate(story.date)
 
           document.getElementById('story').classList.add('is-active')
-        }).catch((err) => showSnackbar('Failed to load story'))
+        }).catch((err) => console.log(err))
       }
     }
   }
@@ -393,54 +492,96 @@ export function addStoryModalListener () {
 /**
  * Add click listener to edit story button
  */
-function addEditStoryListener () {
+export function addEditStoryListener () {
   // Edit story
-  const editButton = document.getElementById('edit-button')
+  const editButton = document.getElementsByClassName('edit-button')
 
-  editButton.onclick = async function () {
-    // Do not render the modal more than once
-    if (!document.getElementById('edit-story')) {
-      const caption = document.getElementById('caption')
-      const storyID = this.dataset.id
-      this.parentElement.insertAdjacentHTML(
-        'beforeend',
-        renderEditStoryModal(storyID, caption.textContent)
-      )
+  for (let i = editButton.length; i--;) {
+    editButton[i].onclick = async function () {
+      // Do not render the modal more than once
+      if (!document.getElementById('edit-story')) {
+        const storyID = this.dataset.id
+        const captionModal = document.getElementById('caption')
+        const captionFeed = document.getElementById(`story-caption-${storyID}`)
 
-      closeModalListener()
+        if (captionFeed) {
+          this.parentElement.insertAdjacentHTML(
+            'beforeend',
+            renderEditStoryModal(storyID, captionFeed.textContent)
+          )
+        } else {
+          this.parentElement.insertAdjacentHTML(
+            'beforeend',
+            renderEditStoryModal(storyID, captionModal.textContent)
+          )
+        }
 
-      // Edit story form submit
-      const editStoryForm = document.getElementById('edit-story-form')
-      $(editStoryForm).submit(function (e) {
-        e.preventDefault()
+        closeModalListener()
 
-        const formJson = convertToJSON($(this).serializeArray())
+        // Edit story form submit
+        const editStoryForm = document.getElementById('edit-story-form')
+        $(editStoryForm).submit(function (e) {
+          e.preventDefault()
 
-        editStory(formJson).then(() => {
-          showSnackbar('Story updated')
-          caption.textContent = formJson.caption
-          document.getElementById('edit-story').remove()
-        }).catch(() => showSnackbar('Failed to edit story'))
-      })
+          const formJson = convertToJSON($(this).serializeArray())
 
-      // Delete story
-      const deleteButton = document.getElementById('delete-button')
+          editStory(formJson).then(() => {
+            showSnackbar('Story updated')
 
-      deleteButton.onclick = function () {
-        if (confirm('Delete confirmation')) {
-          deleteStory(storyID).then(() => {
-            deleteStoryLocal(storyID)
-            showSnackbar('Story deleted')
+            if (captionFeed) {
+              captionFeed.textContent = formJson.caption
+            } else {
+              captionModal.textContent = formJson.caption
+            }
+
             document.getElementById('edit-story').remove()
-            document.getElementById(storyID).remove()
-            document.getElementById('story').classList.remove('is-active')
+          }).catch(() => showSnackbar('Failed to edit story'))
+        })
 
-            const storyCount = document.getElementById('story-count')
-            storyCount.textContent = parseInt(storyCount.textContent) - 1
+        // Delete story
+        const deleteButton = document.getElementById('delete-button')
 
-          }).catch(() => showSnackbar('Failed to delete story'))
+        deleteButton.onclick = function () {
+          if (confirm('Delete confirmation')) {
+            deleteStory(storyID).then(() => {
+              deleteStoryLocal(storyID)
+              showSnackbar('Story deleted')
+              document.getElementById('edit-story').remove()
+
+              /**
+               * If delete action is in story feed, then remove from story feed
+               * Else remove from user profile
+               */
+              if (captionFeed) {
+                document.getElementById(`story-feed-${storyID}`).remove()
+              } else {
+                document.getElementById(storyID).remove()
+              }
+
+              document.getElementById('story').classList.remove('is-active')
+
+              const storyCount = document.getElementById('story-count')
+              if (storyCount) {
+                storyCount.textContent = parseInt(storyCount.textContent) - 1
+              }
+            }).catch(() => showSnackbar('Failed to delete story'))
+          }
         }
       }
     }
   }
+}
+
+/************************ Helper functions below ************************/
+/**
+ * Format the story date to DD MMM YYYY
+ *
+ * @param {string} date The story date in string format
+ * @returns {string} The story date in format DD MMM YYYY
+ */
+export function formatStoryDate (date) {
+  const storyDate = new Date(date)
+  const month = storyDate.toLocaleString(undefined, { month: 'short' })
+
+  return `${storyDate.getDate()} ${month} ${storyDate.getFullYear()}`
 }

@@ -14,7 +14,7 @@ const Genre = require('../models/genre')
  * @param {object} res The response header
  */
 exports.index = function (req, res) {
-  const genreQuery = Genre.find({}).lean()
+  const genreQuery = Genre.find().lean()
 
   genreQuery.then(genres => {
     // 404 error if no genres if found (extreme case)

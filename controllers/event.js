@@ -16,7 +16,7 @@ const imageController = require('../controllers/image')
  * @param {object} res The response header
  */
 exports.index = (req, res) => {
-  const eventQuery = Event.find({})
+  const eventQuery = Event.find()
   eventQuery.populate('organiser', '-_id')
   eventQuery.populate('genres', '-_id name')
   eventQuery.populate('interested going', '-_id username image').lean()

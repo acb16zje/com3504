@@ -17,5 +17,11 @@
         </div>
       </div>
     </div>
+
+    <% if (path === 'home_stories') { %>
+      <div id="story-feed"></div>
+    <% } else if (path === 'home_events') { %>
+      <div id="event-feed"></div>
+    <% } %>
   </div>
 </section>

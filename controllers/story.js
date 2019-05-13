@@ -11,7 +11,7 @@ const Story = require('../models/story')
 const imageController = require('../controllers/image')
 
 /**
- * GET all the data of the user
+ * GET all the data of a story
  *
  * @param {object} req The request header
  * @param {object} res The response header
@@ -36,6 +36,42 @@ exports.getStoryData = function (req, res) {
 }
 
 /**
+ * GET all stories related to the user (follow, created)
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.getStoryFeed = function (req, res) {
+  const userQuery = User.findById(req.user.id)
+
+  userQuery.then(user => {
+    if (user) {
+      const storyQuery = Story.find()
+      storyQuery.populate('event', '_id name')
+      storyQuery.populate('likes', '-_id username')
+      storyQuery.populate({
+        path: 'user',
+        match: { $or: [{ followers: req.user.id }, { _id: req.user.id }] },
+        select: '_id username image',
+      }).sort({ date: -1 }).lean()
+
+      storyQuery.then(stories => {
+        res.json(stories.filter(story => story.user))
+      }).catch(err => {
+        console.log(err)
+        res.sendStatus(500)
+      })
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+
+}
+
+/**
  * POST create a story
  *
  * @param {object} req The request header
@@ -48,31 +84,40 @@ exports.createStory = async (req, res) => {
   const storyImage = await imageController.createImage(json.image)
 
   userQuery.then(user => {
-    eventQuery.then(async event => {
-      const story = await new Story({
-        user: user.id,
-        event: json.event,
-        image: storyImage ? `/image/${storyImage.id}` : undefined,
-        caption: json.caption,
-      }).save().catch(err => {
-        console.log(err)
-        res.status(400).send(err)
-      })
+    if (user) {
+      eventQuery.then(async event => {
+        if (event) {
+          const story = await new Story({
+            user: user.id,
+            event: json.event,
+            image: storyImage ? `/image/${storyImage.id}` : undefined,
+            caption: json.caption,
+          }).save().catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+          })
 
-      if (story) {
-        // Add the created story to user and event
-        await user.stories.push(story.id)
-        await event.stories.push(story.id)
-        await user.save()
-        await event.save()
-        res.sendStatus(200)
-      } else {
+          if (story) {
+            // Add the created story to user and event
+            await user.stories.push(story.id)
+            await event.stories.push(story.id)
+            await user.save()
+            await event.save()
+            res.sendStatus(200)
+          } else {
+            res.sendStatus(500)
+          }
+        } else {
+          // Bad request
+          res.sendStatus(400)
+        }
+      }).catch(err => {
+        console.log(err)
         res.sendStatus(500)
-      }
-    }).catch(err => {
-      console.log(err)
-      res.sendStatus(500)
-    })
+      })
+    } else {
+      res.sendStatus(401)
+    }
   }).catch(err => {
     console.log(err)
     res.sendStatus(500)

@@ -10,6 +10,7 @@ import { initGenreDatabase } from './genre.mjs'
 import { initUserDatabase } from './user.mjs'
 import { initEventDatabase } from './event.mjs'
 import { initStoryDatabase } from './story.mjs'
+import './feed.mjs'
 
 const DB_NAME = 'musicbee'
 const VERSION = 1

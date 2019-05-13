@@ -37,7 +37,10 @@ if (exploreSection) {
         } else {
           unableToLoadPage(exploreSection)
         }
-      }).catch(() => console.log('Failed to load /explore page from local'))
+      }).catch(() => {
+        console.log('Failed to load /explore page from local')
+        unableToLoadPage(exploreSection)
+      })
     })
 }
 

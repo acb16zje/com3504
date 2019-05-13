@@ -102,6 +102,11 @@ mongoose.connect(URL, {
       description: 'Your daily heavenly days by gakki cute cute cute cute cute cute',
       organiser: gakki.id,
       image: `/image/${gakkiImg.id}`,
+      location: {
+        address: 'Regent Court, Sheffield, UK',
+        latitude: 53.3808188,
+        longitude: -1.4803254999999353,
+      },
       genres: pop.id,
       going: [mario.id, luigi.id],
     }).save()
@@ -112,6 +117,11 @@ mongoose.connect(URL, {
       startDate: new Date().setHours(new Date().getHours() + 3),
       endDate: new Date().setHours(new Date().getHours() + 7),
       image: `/image/${marioImg.id}`,
+      location: {
+        address: 'Sheffield Students\' Union, Western Bank, Sheffield, UK',
+        latitude: 53.38072,
+        longitude: -1.4871329999999716,
+      },
       genres: [classical.id, electronic.id],
       interested: [gakki.id],
     }).save()
@@ -121,6 +131,11 @@ mongoose.connect(URL, {
       organiser: luigi.id,
       endDate: new Date().setHours(new Date().getHours() + 25),
       image: `/image/${luigiImg.id}`,
+      location: {
+        address: 'Kroto Research Institute, Red Hill, Sheffield, UK',
+        latitude: 53.3835591,
+        longitude: -1.4789316999999755,
+      },
       genres: [classical.id, electronic.id, pop.id],
       interested: [gakki.id],
     }).save()

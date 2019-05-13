@@ -16,11 +16,12 @@ import { initGenresInput } from './genre.mjs'
 import {
   addStoryModalListener,
   renderStoryColumn,
+  renderStoryModal,
   storeStories,
 } from './story.mjs'
 import { currentUser } from '../script.mjs'
 
-const USER_STORE = 'user_store'
+export const USER_STORE = 'user_store'
 const userSection = document.getElementById('user')
 const followButton = document.getElementById('user-follow')
 const editProfileForm = document.getElementById('edit-profile-form')
@@ -61,7 +62,10 @@ if (userSection) {
           unableToLoadPage(userSection)
         }
       }).
-      catch(() => console.log(`Failed to load ${username} from local`))
+      catch(() => {
+        console.log(`Failed to load ${username} from local`)
+        unableToLoadPage(userSection)
+      })
   })
 }
 
@@ -425,6 +429,9 @@ function renderStoryColumns (stories) {
     storyColumns.insertAdjacentHTML('beforeend', renderStoryColumn(stories[i]))
   }
 
+  storyColumns.insertAdjacentHTML('beforeend', renderStoryModal(username))
+  closeModalListener()
+
   // Pre-set data that will be same for all stories
   const profileUsernames = document.getElementsByClassName('story-username')
   const profileLinks = document.getElementsByClassName('profile-link')
@@ -449,10 +456,12 @@ function addFollowListener () {
 
       if (this.textContent === 'Follow') {
         this.textContent = 'Followed'
-        followerCount.textContent = makeFriendly(parseInt(followerCount.textContent) + 1)
+        followerCount.textContent = makeFriendly(
+          parseInt(followerCount.textContent) + 1)
       } else {
         this.textContent = 'Follow'
-        followerCount.textContent = makeFriendly(parseInt(followerCount.textContent) - 1)
+        followerCount.textContent = makeFriendly(
+          parseInt(followerCount.textContent) - 1)
       }
 
       this.classList.toggle('is-light')

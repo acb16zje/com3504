@@ -27,6 +27,7 @@ const FILES = [
   '/javascripts/databases/genre.mjs',
   '/javascripts/databases/user.mjs',
   '/javascripts/databases/story.mjs',
+  '/javascripts/databases/feed.mjs',
   '/javascripts/script.js',
   '/offline.html',
 ]

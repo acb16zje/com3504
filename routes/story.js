@@ -11,11 +11,11 @@ const router = express.Router()
 
 const storyController = require('../controllers/story')
 
-/* AJAX GET all stories of the username */
-// router.get('/api/story/:username', storyController)
-
 /* AJAX GET story data */
 router.get('/api/story/:id', storyController.getStoryData)
+
+/* AJAX GET all stories related to the username */
+router.get('/api/story_feed', auth.checkAuthAPI, storyController.getStoryFeed)
 
 /* AJAX POST create a story */
 router.post('/api/story/create', auth.checkAuthAPI, storyController.createStory)
