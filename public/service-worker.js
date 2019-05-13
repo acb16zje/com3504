@@ -13,7 +13,6 @@ const FILES = [
   '/explore',
   '/create',
   '/create/event',
-  '/notifications',
   '/favicon/favicon-32x32.png',
   '/favicon/android-chrome-192x192.png',
   '/favicon/android-chrome-256x256.png',
@@ -29,6 +28,7 @@ const FILES = [
   '/javascripts/databases/story.mjs',
   '/javascripts/databases/feed.mjs',
   '/javascripts/script.js',
+  '/javascripts/script.mjs',
   '/offline.html',
 ]
 

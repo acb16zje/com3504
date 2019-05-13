@@ -7,6 +7,8 @@
 
 'use strict'
 import {
+  displayExplorePage,
+  EVENT_STORE,
   loadExplorePage,
   loadExplorePageLocal,
   storeExplorePage,
@@ -16,9 +18,11 @@ import {
   loadAllUserProfilesLocal,
   storeUserProfile,
 } from './databases/user.mjs'
+import { dbPromise } from './databases/database.mjs'
 
 export const currentUser = $(document.getElementById('my-account')).data('user')
 
+/************************ Navbar search ************************/
 /**
  * Add events data to search
  * Add events to select options in
@@ -89,3 +93,117 @@ function addUsers (users) {
     })
   })
 })()
+
+/************************ Explore page search ************************/
+const exploreSearchForm = document.getElementById('explore-search-form')
+
+if (exploreSearchForm) {
+  const searchButton = document.getElementById('search-button')
+
+  // Location search input
+  initLocationInput()
+
+  // Date search input
+  const dateInput = document.getElementById('searchDate')
+  if (dateInput) {
+    const fp = flatpickr(dateInput, {
+      altInput: true,
+      altFormat: 'j F Y',
+    })
+
+    document.getElementById('date-clear').onclick = () => {
+      fp.clear()
+    }
+  }
+
+  $(exploreSearchForm).submit(function (e) {
+    e.preventDefault()
+
+    const formJson = convertToJSON($(this).serializeArray())
+
+    searchEvent(formJson).then(events => {
+      storeExplorePage(events).then(() => {
+        console.log('Stored searched events')
+      }).catch(() => console.log('Failed to store searched events'))
+
+      refreshExplorePage(events)
+    }).catch(() => {
+
+      showSnackbar('Failed to search events from server')
+    })
+  })
+}
+
+/**
+ * Search for events from MongoDB
+ *
+ * @param {object} formJson The form data submitted in JSON format
+ * @returns {Promise<any>} The Promise
+ */
+function searchEvent (formJson) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(formJson),
+    dataType: 'json',
+    url: '/api/event_search',
+  }))
+}
+
+/**
+ * Search for events from IndexedDB
+ *
+ * @param {object} formJson The form data submitted in JSON format
+ * @returns {Promise<* | void>} The Promise
+ */
+function searchEventLocal (formJson) {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      const events = await db.getAll(EVENT_STORE)
+    }).catch(err => console.log(err))
+  }
+}
+
+/**
+ * Re-display the explore page with search resutls
+ * 
+ * @param {Array} events An array of searched events
+ */
+function refreshExplorePage (events) {
+  const upcoming = document.getElementById('upcoming')
+  const past = document.getElementById('past')
+
+  while (upcoming.firstChild)
+    upcoming.removeChild(upcoming.firstChild)
+
+  while (past.firstChild)
+    past.removeChild(past.firstChild)
+
+  displayExplorePage(events)
+}
+
+/************************ Helper functions below ************************/
+/**
+ * Initialise Google location autocomplete search
+ */
+export function initLocationInput () {
+  try {
+    (function () {
+      const input = document.getElementById('autocomplete')
+
+      const autocomplete = new google.maps.places.Autocomplete(input)
+
+      autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace()
+
+        if (place) {
+          document.getElementsByName('latitude')[0].
+            setAttribute('value', place.geometry.location.lat())
+          document.getElementsByName('longitude')[0].
+            setAttribute('value', place.geometry.location.lng())
+        }
+      })
+
+    })()
+  } catch (e) {}
+}

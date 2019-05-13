@@ -24,7 +24,23 @@
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css">
   <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.min.css">
+  <link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.min.css">
   <link rel="stylesheet" href='/stylesheets/style.css'>
+
+  <!--JavaScripts-->
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/@iconify/iconify/dist/iconify.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/flexsearch/dist/flexsearch.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.min.js"></script>
+  <script defer crossorigin src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.min.js"></script>
+
+  <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADJ3makQvB2HU3yBydhdiYUgTsnit5QBA&libraries=places"></script>
+  <script defer src="/javascripts/script.js"></script>
+  <script defer type="module" src="/javascripts/databases/database.mjs"></script>
+  <script defer type="module" src="/javascripts/script.mjs"></script>
 
   <title><%= title %></title>
 </head>
@@ -39,20 +55,5 @@
   <div id="snackbar"></div>
 
   <%- body %>
-
-  <!--JavaScripts-->
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/@iconify/iconify/dist/iconify.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/flexsearch/dist/flexsearch.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/autosize/dist/autosize.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.min.js"></script>
-
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADJ3makQvB2HU3yBydhdiYUgTsnit5QBA&libraries=places"></script>
-  <script src="/javascripts/script.js"></script>
-  <script type="module" src="/javascripts/databases/database.mjs"></script>
-  <script type="module" src="/javascripts/script.mjs"></script>
 </body>
 </html>

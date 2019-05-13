@@ -331,7 +331,7 @@ function renderEditStoryModal (id, caption) {
               <div class="field">
                 <div class="control">
                   <input name="id" type="hidden" value="${id}">
-                  <textarea name="caption" class="textarea has-fixed-size autosize" rows="3">${caption}</textarea>
+                  <textarea name="caption" class="textarea has-fixed-size" rows="3">${caption}</textarea>
                 </div>
               </div>
             </div>

@@ -7,7 +7,7 @@
 'use strict'
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import { initGenresInput } from './genre.mjs'
-import { currentUser } from '../script.mjs'
+import { currentUser, initLocationInput } from '../script.mjs'
 import { eventFeedDiv } from './feed.mjs'
 
 export const EVENT_STORE = 'event_store'
@@ -86,8 +86,7 @@ if (createEventForm) {
 
     createEvent(formJson).then(res => {
       window.location.href = `/event/${res.eventID}`
-    }).catch(err => {
-      console.log(err)
+    }).catch(() => {
       showSnackbar('Failed to create event')
     })
   })
@@ -255,7 +254,7 @@ function submitGoing (eventID) {
  *
  * @param {object} events The events documents retrieved
  */
-function displayExplorePage (events) {
+export function displayExplorePage (events) {
   const upcomingColumns = document.getElementById('upcoming')
   const pastColumns = document.getElementById('past')
 
@@ -265,8 +264,13 @@ function displayExplorePage (events) {
       pastColumns.insertAdjacentHTML('afterbegin', renderEventCard(events[i]))
     } else {
       // Upcoming events
-      upcomingColumns.insertAdjacentHTML('beforeend', renderEventCard(events[i]))
+      upcomingColumns.insertAdjacentHTML('beforeend',
+        renderEventCard(events[i]))
     }
+  }
+
+  if (pastColumns.children.length < 1) {
+    document.getElementById('past-text').classList.add('is-hidden')
   }
 
   addInterestedGoingListener() // click listener for interested and going
@@ -407,7 +411,8 @@ export function renderEventCard (event) {
             <p class="title is-4"><a id="event-name-${eventID}" href="/event/${eventID}">${event.name}</a></p>
             <p class="host subtitle is-6"><a href="/${organiser}">@${organiser}</a></p>
             <p id="event-location-${eventID}" class="location subtitle is-6">${address}</p>
-            <p id="event-time-${eventID}" class="subtitle is-6">${prettifyTime(event.startDate, event.endDate)}</p>
+            <p id="event-time-${eventID}" class="subtitle is-6">${prettifyTime(
+    event.startDate, event.endDate)}</p>
           </div>
         </div>
 
@@ -420,12 +425,12 @@ export function renderEventCard (event) {
           <div class="level-right">
             <div class="level-item">
               ${organiser === currentUser ?
-                `<button class="button edit-button" data-id="${eventID}">
+    `<button class="button edit-button" data-id="${eventID}">
                   <span class="icon iconify"data-icon="ic:baseline-edit"></span>
                   <span>Edit</span>
                 </button>`
-              :
-                `<button class=
+    :
+    `<button class=
                 "button interested-button ${isUserInterested ? 'is-light' : ''}"
                 data-id="${eventID}">
   
@@ -439,7 +444,7 @@ export function renderEventCard (event) {
   
                   <span>Interested</span>
                 </button>`
-              }
+    }
             </div>
           </div>
         </nav>
@@ -526,7 +531,7 @@ function renderEditEventModal (event) {
             <div class="field-body">
               <div class="field">
                 <div class="control">
-                  <textarea name="description" class="textarea has-fixed-size autosize" rows="3">${event.description}</textarea>
+                  <textarea name="description" class="textarea has-fixed-size" rows="3">${event.description}</textarea>
                 </div>
               </div>
             </div>
@@ -669,7 +674,7 @@ export function addEditEventListener () {
 
           this.parentElement.insertAdjacentHTML(
             'beforeend',
-            renderEditEventModal(event)
+            renderEditEventModal(event),
           )
 
           initEventForm()
@@ -710,9 +715,10 @@ export function addEditEventListener () {
 
             // Genres field is empty is no option is selected
             if (formJson.genres) {
-              submitForm.genres = JSON.parse(submitForm.genres).map(genre => genre.id)
+              submitForm.genres = JSON.parse(submitForm.genres).
+                map(genre => genre.id)
               displayForm.genres = JSON.parse(displayForm.genres).
-                map(genre => {return {name: genre.value}})
+                map(genre => {return { name: genre.value }})
             }
 
             editEvent(submitForm).then(event => {
@@ -725,11 +731,17 @@ export function addEditEventListener () {
                 const startDay = startDate.getDate()
                 const startMonth = getStartMonth(startDate)
 
-                document.getElementById(`event-name-${eventID}`).textContent = event.name
-                document.getElementById(`event-month-${eventID}`).textContent = startMonth
-                document.getElementById(`event-day-${eventID}`).textContent = startDay
-                document.getElementById(`event-location-${eventID}`).textContent = event.location.address
-                document.getElementById(`event-time-${eventID}`).textContent = prettifyTime(event.startDate, event.endDate)
+                document.getElementById(
+                  `event-name-${eventID}`).textContent = event.name
+                document.getElementById(
+                  `event-month-${eventID}`).textContent = startMonth
+                document.getElementById(
+                  `event-day-${eventID}`).textContent = startDay
+                document.getElementById(
+                  `event-location-${eventID}`).textContent = event.location.address
+                document.getElementById(
+                  `event-time-${eventID}`).textContent = prettifyTime(
+                  event.startDate, event.endDate)
               }
               document.getElementById('edit-event').remove()
             }).catch(() => showSnackbar('Failed to edit event'))
@@ -750,25 +762,7 @@ function initEventForm () {
   initFileInput()
 
   // Google Maps JavaScript API
-  try {
-    (function () {
-      const input = document.getElementById('autocomplete')
-
-      const autocomplete = new google.maps.places.Autocomplete(input)
-
-      autocomplete.addListener('place_changed', function () {
-        const place = autocomplete.getPlace()
-
-        if (place) {
-          document.getElementsByName('latitude')[0].
-            setAttribute('value', place.geometry.location.lat())
-          document.getElementsByName('longitude')[0].
-            setAttribute('value', place.geometry.location.lng())
-        }
-      })
-
-    })()
-  } catch (e) {}
+  initLocationInput()
 
   const genresInput = document.getElementsByClassName('event-genre')
   for (let i = 0, n = genresInput.length; i < n; i++) {
@@ -840,6 +834,6 @@ function prettifyTime (startDate, endDate) {
 export function isPastEvent (event) {
   const today = new Date()
 
- return new Date(event.startDate) < today &&
-   (!event.endDate || new Date(event.endDate) < today)
+  return new Date(event.startDate) < today &&
+    (!event.endDate || new Date(event.endDate) < today)
 }

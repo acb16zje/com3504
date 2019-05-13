@@ -197,6 +197,20 @@ div.story-feed figure.story-modal {
 }
 
 /* Explore page events card column */
+#explore-search-box {
+  background-image: linear-gradient(141deg,var(--primary-color) 0, #895bd9 71%, #9852d9 100%);
+}
+
+#explore-search-box .label {
+  color: white;
+}
+
+#explore-search {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
 .event-columns div.card {
   display: flex;
   flex-direction: column;
@@ -605,25 +619,25 @@ div.story-feed figure.story-modal {
 /* Desktop viewport adjustments */
 @media screen and (min-width: 1088px) {
   /* Scrollbar beautification */
-  ::-webkit-scrollbar {
+  #filter-tabs::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
   /* Track */
-  ::-webkit-scrollbar-track {
+  #filter-tabs::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
   }
 
   /* Handle */
-  ::-webkit-scrollbar-thumb {
+  #filter-tabs::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
   }
 
   /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+  #filter-tabs::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
 
@@ -720,6 +734,17 @@ div.story-feed figure.story-modal {
     padding-top: 10px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  /* Home page story feed */
+  div.story-feed {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Home page event feed */
+  #event-feed div.column {
+    width: 100%;
   }
 
   /* Event page */

@@ -2,11 +2,70 @@
 
 <section id="explore" class="section is-hidden">
   <div class="container">
+    <div id="explore-search-box" class="box">
+      <form id="explore-search-form">
+        <div class="columns">
+          <div class="column">
+            <div class="field">
+              <label class="label">Looking for</label>
+              <div class="control">
+                <input name="event" class="input" type="text" placeholder="Event">
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="field">
+              <label class="label">In</label>
+              <div class="control">
+                <input name="address" id="autocomplete" class="input" type="search" placeholder="Location">
+                <input name="latitude" type="hidden">
+                <input name="longitude" type="hidden">
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+              <label class="label">On</label>
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input id="searchDate" name="date" class="input flatpickr flatpickr-input" type="text" placeholder="Date">
+              </div>
+              <div class="control">
+                <a id="date-clear" class="button">
+                  <span class="icon is-small">
+                    <span class="iconify" data-icon="emojione-v1:cross-mark"></span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div id="explore-search" class="column is-narrow">
+            <div class="field">
+              <label class="label"></label>
+              <div class="control">
+                <button id="search-button" type="submit" class="button is-light">Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <hr>
+      <div class="columns is-centered is-marginless">
+        <div class="column is-narrow has-text-centered">
+          <button id="maps-button" class="button is-light">Open Maps</button>
+        </div>
+      </div>
+      <div id="maps" class="columns is-hidden"></div>
+    </div>
+
     <!-- Upcoming events columns-->
     <div id="upcoming" class="columns is-multiline event-columns"></div>
 
     <!--Past events columns-->
-    <h1 class="title has-text-centered">Past</h1>
+    <h1 id="past-text" class="title has-text-centered">Past Events</h1>
     <div id="past" class="columns is-multiline event-columns"></div>
   </div>
 </section>

@@ -95,14 +95,6 @@
         </a>
       </div>
       <div class="column">
-        <a <%= path === 'notifications' ? "class=is-active" : '' %> href="/notifications">
-          <span class="icon is-large">
-            <span class="iconify" data-icon="zmdi:notifications<%= path !== 'notifications' ? '-none' : '' %>">
-            </span>
-          </span>
-        </a>
-      </div>
-      <div class="column">
         <a id="navbar-user" <%= /user_/.test(path) ? "class=is-active" : '' %> href="<%= authenticated ? `/${username}` : '/login' %>">
           <span class="icon is-large">
             <span class="iconify" data-icon="fa-<%= /user_/.test(path) ? 'solid' : 'regular' %>:user"></span>

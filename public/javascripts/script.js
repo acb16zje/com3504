@@ -11,8 +11,6 @@ Iconify.preloadImages([
   'ant-design:home-outline',
   'ion:ios-search',
   'entypo:squared-plus',
-  'zmdi:notifications',
-  'zmdi:notifications-none',
   'fa-solid:search',
   'fa-solid:user',
   'fa-solid:camera',
@@ -28,6 +26,9 @@ Iconify.preloadImages([
   'ic:baseline-edit',
   'dashicons:tag',
   'flat-color-icons:google',
+  'bytesize:heart',
+  'maki:heart-15',
+  'emojione-v1:cross-mark'
 ])
 Iconify.setConfig('localStorage', true)
 
@@ -103,9 +104,6 @@ $(document).on('keypress', 'form', function (event) {
     return event.key !== 'Enter'
   }
 })
-
-// Text area auto expand
-autosize(document.getElementsByClassName('autosize'))
 
 // File upload
 /**
@@ -306,8 +304,8 @@ function initDatepicker () {
       minTime: today,
     }
 
-    const fp = $(startDate).flatpickr(options)
-    const fpEnd = $(endDate).flatpickr(options)
+    const fp = flatpickr(startDate, options)
+    const fpEnd = flatpickr(endDate, options)
     fpEnd.clear()
 
     document.getElementById('add-end-time').onclick = function () {

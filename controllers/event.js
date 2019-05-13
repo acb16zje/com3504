@@ -96,6 +96,62 @@ exports.getEventFeed = (req, res) => {
 }
 
 /**
+ * GET all events matching the search request
+ *
+ * @param {object} req The request header
+ * @param {object} res The response header
+ */
+exports.searchEvent = (req, res) => {
+  const json = req.body
+
+  const eventQuery =
+    Event.find({
+      name: new RegExp(`^.*${json.event.replace(
+        /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'),
+    })
+
+  if (json.address) {
+    eventQuery.find({
+      'location.address': new RegExp(`^.*${json.address.replace(
+        /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'),
+    })
+  }
+
+  if (json.date) {
+    const date = new Date(json.date)
+    const startDateQuery = {
+      $gte: date,
+      $lt: new Date(date).setDate(date.getDate() + 1),
+    }
+
+    eventQuery.find({
+      $or: [
+        // Only has start date
+        { $and: [{ startDate: startDateQuery }, { endDate: undefined }] },
+
+        // Has end date, selected date is start date
+        { $and: [{ startDate: startDateQuery }, { endDate: { $gte: date } }] },
+
+        // Has end date, selected date between start and end date
+        { $and: [{ startDate: { $lte: date } }, { endDate: { $gte: date } }] },
+      ],
+    })
+  }
+
+  eventQuery.populate('organiser', '-_id')
+  eventQuery.populate('genres', '-_id name')
+  eventQuery.populate('interested going', '-_id username image').lean()
+  eventQuery.lean()
+
+  eventQuery.then(events => {
+    res.json(events)
+  }).catch((err) => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * POST create an event
  *
  * @param {object} req The request header

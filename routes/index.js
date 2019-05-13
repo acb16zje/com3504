@@ -25,11 +25,4 @@ router.get('/events', auth.checkAuth, (req, res) => {
   })
 })
 
-router.get('/notifications', auth.checkAuth, (req, res) => {
-  res.render('notifications', {
-    title: 'Musicbee - notifications',
-    path: 'notifications',
-  })
-})
-
 module.exports = router
