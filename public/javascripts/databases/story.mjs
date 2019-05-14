@@ -35,7 +35,7 @@ if (createStoryForm) {
 /**
  * Initialise the story database
  *
- * @param {object} db The DB object
+ * @param {Object} db The DB object
  */
 export function initStoryDatabase (db) {
   if (!db.objectStoreNames.contains(STORY_STORE)) {
@@ -102,7 +102,7 @@ export async function storeStories (stories) {
 /**
  * Create a story
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function createStory (formJson) {
@@ -117,7 +117,7 @@ function createStory (formJson) {
 /**
  * Edit a story
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function editStory (formJson) {
@@ -195,7 +195,7 @@ export async function loadStoryData (storyID) {
 /**
  * Return the HTML fragment for a story column (image card only)
  *
- * @param {object} story A story document
+ * @param {Object} story A story document
  * @returns {string} The HTML fragment
  */
 export function renderStoryColumn (story) {
@@ -216,7 +216,7 @@ export function renderStoryModal (username = undefined) {
   return `
   <div id="story" class="modal">
     <div class="modal-background"></div>
-  
+
     <div class="modal-content">
       <div class="card">
         <header class="card-header">
@@ -238,19 +238,19 @@ export function renderStoryModal (username = undefined) {
                 </a>
               </div>
             </nav>
-            
+
             ${currentUser === username ? `
               <button class="button edit-button is-light">Edit</button>
             ` : ''}
           </div>
         </header>
-  
+
         <div class="card-image">
           <figure class="image">
             <img id="story-image" src="/images/placeholder.webp" alt="Story image">
           </figure>
         </div>
-  
+
         <div class="card-content">
           <div class="content">
             <a class="profile-link">
@@ -259,27 +259,9 @@ export function renderStoryModal (username = undefined) {
             <p id="caption" class="is-inline"></p>
             <hr>
           </div>
-          <div id="comments" class="content">
-            <p class="subtitle is-6"><strong>lorem ipsum</strong>Lorem Ipsum1</p>
-            <p class="subtitle is-6"><strong>lorem ipsumngel1</strong>Lorem Ipsum2</p>
-            <p class="subtitle is-6"><strong>glorem ipsumlove1</strong>Lorem Ipsum3</p>
-            <p class="subtitle is-6"><strong>lorem ipsumwaii1</strong>Lorem Ipsum4</p>
-            <p class="subtitle is-6"><strong>glorem ipsui</strong>Lorem Ipsum5</p>
-            <p class="subtitle is-6"><strong>glorem ipsum1</strong>Lorem Ipsum6</p>
-            <p class="subtitle is-6"><strong>galorem ipsumfan1</strong>Lorem Ipsum7</p>
-            <p class="subtitle is-6"><strong>gi_fan1</strong>Lorem Ipsum8</p>
-            <p class="subtitle is-6"><strong>gklorem ipsuman1</strong>Lorem Ipsum9</p>
-            <p class="subtitle is-6"><strong>gakki_fan1</strong>Lorem Ipsum11</p>
-            <p class="subtitle is-6"><strong>gakki_fan2</strong>Lorem Ipsum12</p>
-            <p class="subtitle is-6"><strong>dogeshiba</strong>Lorem Ipsum13</p>
-            <p class="subtitle is-6"><strong>animal</strong>Lorem Ipsum15</p>
-            <p class="subtitle is-6"><strong>testueser</strong>Lorem Ipsum17</p>
-            <p class="subtitle is-6"><strong>goku</strong>Lorem Ipsum16</p>
-            <p class="subtitle is-6"><strong>dragon</strong>Lorem Ipsum18</p>
-            <p class="subtitle is-6"><strong>unicorn</strong>Lorem Ipsum19</p>
-          </div>
+          <div id="comments" class="content"></div>
         </div>
-  
+
         <footer class="story-footer card-footer">
           <div class="like-and-time is-flex">
             <div class="like is-flex">
@@ -300,7 +282,7 @@ export function renderStoryModal (username = undefined) {
         </footer>
       </div>
     </div>
-  
+
     <button class="modal-close is-large" aria-label="close"></button>
   </div>`
 }
@@ -322,7 +304,7 @@ function renderEditStoryModal (id, caption) {
         <p class="modal-card-title">Edit Story</p>
       </header>
       <section class="modal-card-body">
-        <form id="edit-story-form"> 
+        <form id="edit-story-form">
           <div class="field is-horizontal">
             <div class="field-label is-normal">
               <label class="label">Caption</label>
@@ -336,14 +318,14 @@ function renderEditStoryModal (id, caption) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label">
               <!-- Left empty for spacing -->
             </div>
             <div class="field-body">
               <div id="edit-story-buttons" class="field is-grouped">
-                <div class="field is-grouped">           
+                <div class="field is-grouped">
                   <div class="control">
                     <button type="submit" class="button is-primary">Save</button>
                   </div>
@@ -400,7 +382,8 @@ export function addStoryModalListener () {
         // AJAX load caption, comments, and like count
         loadStoryData(storyID).then(story => {
           if (fromStoryFeed) {
-            const profileUsernames = document.getElementsByClassName('story-username')
+            const profileUsernames = document.getElementsByClassName(
+              'story-username')
             const profileLinks = document.getElementsByClassName('profile-link')
             for (let i = 0, n = profileLinks.length; i < n; i++) {
               profileLinks[i].href = `/${story.user.username}`
@@ -410,14 +393,33 @@ export function addStoryModalListener () {
             }
           }
 
-          document.getElementById('event-link').href = `/event/${story.event._id}`
+          document.getElementById(
+            'event-link').href = `/event/${story.event._id}`
           document.getElementById('event-name').textContent = story.event.name
 
+          // Caption
           const caption = document.getElementById('caption')
           if (story.caption) {
             caption.textContent = story.caption
           } else {
             caption.parentElement.classList.add('is-hidden')
+          }
+
+          // Comments
+          const comments = document.getElementById('comments')
+          while (comments.firstChild)
+            comments.removeChild(comments.firstChild)
+
+          for (let i = story.comments.length; i--;) {
+            const comment = story.comments[i]
+            comments.insertAdjacentHTML('afterbegin', `
+            <p class="subtitle is-6">
+              <a class="title is-6" href="/${comment.user.username}">
+                ${comment.user.username}
+              </a>
+              ${comment.content}
+            </p>
+            `)
           }
 
           // Like count
@@ -455,9 +457,11 @@ export function addStoryModalListener () {
 
               // If liked in story feed page, change that as well
               if (document.getElementById(`story-feed-${storyID}`)) {
-                const borderHeart = document.getElementById(`border-heart-${storyID}`)
+                const borderHeart = document.getElementById(
+                  `border-heart-${storyID}`)
                 const redHeart = document.getElementById(`red-heart-${storyID}`)
-                const likeCount = document.getElementById(`like-count-${storyID}`)
+                const likeCount = document.getElementById(
+                  `like-count-${storyID}`)
 
                 borderHeart.classList.toggle('is-hidden')
                 redHeart.classList.toggle('is-hidden')
@@ -479,7 +483,8 @@ export function addStoryModalListener () {
           }
 
           // Story date
-          document.getElementById('story-date').textContent = formatStoryDate(story.date)
+          document.getElementById('story-date').textContent = formatStoryDate(
+            story.date)
 
           document.getElementById('story').classList.add('is-active')
         }).catch((err) => console.log(err))
@@ -506,12 +511,12 @@ export function addEditStoryListener () {
         if (captionFeed) {
           this.parentElement.insertAdjacentHTML(
             'beforeend',
-            renderEditStoryModal(storyID, captionFeed.textContent)
+            renderEditStoryModal(storyID, captionFeed.textContent),
           )
         } else {
           this.parentElement.insertAdjacentHTML(
             'beforeend',
-            renderEditStoryModal(storyID, captionModal.textContent)
+            renderEditStoryModal(storyID, captionModal.textContent),
           )
         }
 

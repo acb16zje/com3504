@@ -10,8 +10,8 @@ const Image = require('../models/image')
 /**
  * Return the image if valid, otherwise load a placeholder image
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getImage = (req, res) => {
   Image.findById(req.params.id).lean().exec(function (err, doc) {

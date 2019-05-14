@@ -8,6 +8,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+// Models required for population
+require('../models/comment')
+require('../models/event')
+require('../models/user')
+
 const Story = mongoose.model('Story', new Schema({
   user: {
     type: Schema.Types.ObjectId,

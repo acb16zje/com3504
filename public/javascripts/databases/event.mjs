@@ -86,8 +86,12 @@ if (createEventForm) {
 
     createEvent(formJson).then(res => {
       window.location.href = `/event/${res.eventID}`
-    }).catch(() => {
-      showSnackbar('Failed to create event')
+    }).catch(err => {
+      if (err.status === 413) {
+        showSnackbar('Image size too large')
+      } else {
+        showSnackbar('Failed to create event')
+      }
     })
   })
 }
@@ -96,7 +100,7 @@ if (createEventForm) {
 /**
  * Initialise the event IndexedDB
  *
- * @param {object} db The DB object
+ * @param {Object} db The DB object
  */
 export function initEventDatabase (db) {
   if (!db.objectStoreNames.contains(EVENT_STORE)) {
@@ -189,7 +193,7 @@ export async function storeExplorePage (events) {
 /**
  * Create an event
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function createEvent (formJson) {
@@ -205,7 +209,7 @@ function createEvent (formJson) {
 /**
  * Edit an event
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function editEvent (formJson) {
@@ -252,7 +256,7 @@ function submitGoing (eventID) {
 /**
  * Display all events data on /explore page
  *
- * @param {object} events The events documents retrieved
+ * @param {Object} events The events documents retrieved
  */
 export function displayExplorePage (events) {
   const upcomingColumns = document.getElementById('upcoming')
@@ -283,7 +287,7 @@ export function displayExplorePage (events) {
 /**
  * Display the page of an event
  *
- * @param {object} event The event document to display
+ * @param {Object} event The event document to display
  */
 function displayEventPage (event) {
   const host = document.getElementById('host')
@@ -378,7 +382,7 @@ function displayEventPage (event) {
 /**
  * Return the HTML fragments for an event document
  *
- * @param {object} event An event document
+ * @param {Object} event An event document
  * @return {string} The HTML fragment
  */
 export function renderEventCard (event) {
@@ -435,15 +439,15 @@ export function renderEventCard (event) {
     `<button class=
                 "button interested-button ${isUserInterested ? 'is-light' : ''}"
                 data-id="${eventID}">
-  
+
                   <span class=
                   "border icon iconify ${isUserInterested ? 'is-hidden' : ''}"
                   data-icon="ic:sharp-star-border"></span>
-  
+
                   <span class=
                   "solid icon iconify ${isUserInterested ? '' : 'is-hidden'}"
                   data-icon="ic:sharp-star"></span>
-  
+
                   <span>Interested</span>
                 </button>`
     }
@@ -458,7 +462,7 @@ export function renderEventCard (event) {
 /**
  * Return the HTML fragment for edit event modal
  *
- * @param {object} event The event document object
+ * @param {Object} event The event document object
  * @returns {string} The HTML fragment
  */
 function renderEditEventModal (event) {
@@ -497,7 +501,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label is-normal">
               <label class="label">Event Name</label>
@@ -510,7 +514,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label is-normal">
               <label class="label">Location</label>
@@ -525,7 +529,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label is-normal">
               <label class="label">Description</label>
@@ -538,7 +542,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label is-normal">
               <label class="label">Start Date</label>
@@ -554,7 +558,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div id="end-time-field" class="field is-horizontal is-hidden">
             <div class="field-label is-normal">
               <label class="label">End Date</label>
@@ -567,7 +571,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label">
               <label class="label">Genres</label>
@@ -580,7 +584,7 @@ function renderEditEventModal (event) {
               </div>
             </div>
           </div>
-        
+
           <div class="field is-horizontal">
             <div class="field-label">
               <!-- Left empty for spacing -->
@@ -830,7 +834,7 @@ function prettifyTime (startDate, endDate) {
 /**
  * Check if the event is already finished
  *
- * @param {object} event An event document
+ * @param {Object} event An event document
  * @returns {boolean} True if the event has already finished
  */
 export function isPastEvent (event) {

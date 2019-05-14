@@ -1,8 +1,18 @@
-// grab the things we need
+/**
+ * Comment model
+ *
+ * @author Zer Jun Eng
+ */
+
+'use strict'
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const comment = new Schema({
+// Models required for population
+require('../models/user')
+require('../models/story')
+
+const Comment = mongoose.model('Comment', new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -17,8 +27,11 @@ const comment = new Schema({
     type: String,
     required: true,
   },
-})
-
-const Comment = mongoose.model('Comment', comment)
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+}))
 
 module.exports = Comment

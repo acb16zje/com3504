@@ -73,7 +73,7 @@ if (userSection) {
 /**
  * Initialise the user IndexedDB
  *
- * @param {object} db The DB object
+ * @param {Object} db The DB object
  */
 export function initUserDatabase (db) {
   if (!db.objectStoreNames.contains(USER_STORE)) {
@@ -186,7 +186,7 @@ function submitFollow () {
  * Submit edit profile
  *
  * @param {string} username The username to update in IndexedDB if success
- * @param {object} formJson THe form data submitted in JSON format
+ * @param {Object} formJson THe form data submitted in JSON format
  */
 function submitEditProfile (username, formJson) {
   const submitForm = Object.assign({}, formJson)
@@ -231,7 +231,7 @@ function submitEditProfile (username, formJson) {
 /**
  * Display the user data on the page
  *
- * @param {object} doc The user document retrieved
+ * @param {Object} doc The user document retrieved
  */
 function displayUserProfile (doc) {
   document.title = `${doc.fullname} (${username}) - Musicbee`
@@ -383,7 +383,7 @@ function updateUserProfile (username, formJson) {
 /**
  * Render the edit profile modal, with the user's values set
  *
- * @param {object} user The user document retrieved
+ * @param {Object} user The user document retrieved
  */
 function renderEditProfileModal (user) {
   const usernameInput = document.getElementsByName('username')[0]

@@ -12,8 +12,8 @@ const imageController = require('../controllers/image')
 /**
  * GET Explore page (/explore) with featured and suggested events
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.index = (req, res) => {
   const eventQuery = Event.find()
@@ -37,8 +37,8 @@ exports.index = (req, res) => {
 /**
  * GET the event data of a given event ID
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getEventData = (req, res) => {
   const eventQuery = Event.findById(req.params.id)
@@ -63,8 +63,8 @@ exports.getEventData = (req, res) => {
 /**
  * GET all events related to the user (follow, created)
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getEventFeed = (req, res) => {
   const userQuery = User.findById(req.user.id)
@@ -98,8 +98,8 @@ exports.getEventFeed = (req, res) => {
 /**
  * GET all events matching the search request
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.searchEvent = (req, res) => {
   const json = req.body
@@ -154,8 +154,8 @@ exports.searchEvent = (req, res) => {
 /**
  * POST create an event
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.createEvent = async (req, res) => {
   const json = req.body
@@ -203,8 +203,8 @@ exports.createEvent = async (req, res) => {
 /**
  * POST update an event
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.updateEvent = async (req, res) => {
   const json = req.body
@@ -277,8 +277,8 @@ exports.updateEvent = async (req, res) => {
 /**
  * POST set the event as interested for the user
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.setEventInterested = (req, res) => {
   const eventQuery = Event.findById(req.body.id, 'interested going')
@@ -328,8 +328,8 @@ exports.setEventInterested = (req, res) => {
 /**
  * POST set the event as going for the user
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.setEventGoing = (req, res) => {
   const eventQuery = Event.findById(req.body.id, 'interested going')

@@ -131,7 +131,7 @@ initFileInput()
 /**
  * Convert the image file to base64 format
  *
- * @param {object} file The image file
+ * @param {Object} file The image file
  * @returns {Promise<any>} Base64 of the image if resolved
  */
 function getBase64 (file) {
@@ -255,11 +255,19 @@ function closeModalListener () {
     // Specific case for edit event modal
     const editEventDiv = document.getElementById('edit-event')
 
+    // Specific case for map modal
+    const mapDiv = document.getElementById('map')
+
     if (editStoryDiv) {
       editStoryDiv.remove()
     } else if (editEventDiv) {
       editEventDiv.remove()
     } else {
+      // Remove the map, so it can reload when modal is shown again
+      if (mapDiv) {
+        mapDiv.remove()
+      }
+
       for (let i = 0, n = modals.length; i < n; i++) {
         modals[i].classList.remove('is-active')
       }
@@ -529,7 +537,7 @@ function startWebRTC () {
 /**
  * Apply filter effect to the canvas
  *
- * @param {object} ctx Canvas context object
+ * @param {Object} ctx Canvas context object
  * @param {string} filterValue Filter effect
  */
 function applyFilterEffect (ctx, filterValue) {
@@ -561,4 +569,10 @@ function applyFilterEffect (ctx, filterValue) {
     default:
       break
   }
+}
+
+/************************ Socket.io below ************************/
+// Prevent socket.io from transport polling things when offline
+if (navigator.onLine) {
+  const socket = io();
 }

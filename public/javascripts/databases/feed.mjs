@@ -18,11 +18,12 @@ import {
   STORY_STORE,
 } from './story.mjs'
 import {
-  addInterestedGoingListener,
   addEditEventListener,
+  addInterestedGoingListener,
   EVENT_STORE,
   isPastEvent,
   renderEventCard,
+  storeExplorePage,
 } from './event.mjs'
 
 const storyFeedDiv = document.getElementById('story-feed')
@@ -43,15 +44,13 @@ if (storyFeedDiv) {
           addStoryFeedLikeListener(
             document.getElementById(`like-button-${feed[i]._id}`))
         }
-
-        storyFeedDiv.insertAdjacentHTML('beforeend', renderStoryModal())
       } else {
         noStoryFeed(storyFeedDiv)
       }
-    }).catch(() => {
+    }).catch(async () => {
       console.log('Failed to load story feed from server, loading from local')
 
-      loadStoryFeedLocal().then(feed => {
+      await loadStoryFeedLocal().then(feed => {
         console.log('Loaded story feed from local')
 
         if (feed && feed.length) {
@@ -75,6 +74,7 @@ if (storyFeedDiv) {
       })
     })
 
+    storyFeedDiv.insertAdjacentHTML('beforeend', renderStoryModal())
     addStoryModalListener()
     addEditStoryListener()
     closeModalListener()
@@ -85,6 +85,11 @@ if (eventFeedDiv) {
   (async function () {
     await loadEventFeed().then(feed => {
       console.log('Loaded event feed from server ')
+
+      storeExplorePage(feed).
+        then(() => console.log('Stored event feed')).
+        catch(() => console.log('Failed to store event feed'))
+
       displayEventFeed(feed)
     }).catch(() => {
       console.log('Failed to load event feed from server, loading from local')
@@ -104,7 +109,7 @@ if (eventFeedDiv) {
 
 /************************ IndexedDB / AJAX related ************************/
 /**
- * Load all story feed related to the logged in user from MongoDB
+   * Load all story feed related to the logged in user from MongoDB
  *
  * @returns {Promise<any>} The Promise
  */

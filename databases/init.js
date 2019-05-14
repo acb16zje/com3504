@@ -13,6 +13,7 @@ const DB_NAME = 'musicbee'
 const URL = `mongodb://localhost:27017/${DB_NAME}`
 
 // Models
+const Comment = require('../models/comment')
 const Event = require('../models/event')
 const Genre = require('../models/genre')
 const Image = require('../models/image')
@@ -153,21 +154,46 @@ mongoose.connect(URL, {
       event: gakkiEvent.id,
       image: `/image/${gakkiStoryImage.id}`,
       caption: 'Join me at Gakki Event',
-      likes : [mario.id, luigi.id]
+      likes: [mario.id, luigi.id],
     }).save()
 
     const marioStory = await new Story({
       user: mario.id,
       event: marioEvent.id,
       image: `/image/${marioImg.id}`,
-      caption: 'Join me at Mario Event'
+      caption: 'Join me at Mario Event',
     }).save()
 
     const luigiStory = await new Story({
       user: luigi.id,
       event: luigiEvent.id,
       image: `/image/${luigiImg.id}`,
-      caption: 'Join me at Luigi Event'
+      caption: 'Join me at Luigi Event',
+    }).save()
+
+    // Comment data
+    const gakkiCommentMario = await new Comment({
+      user: gakki.id,
+      story: marioStory.id,
+      content: 'Mario, thank you for coming to my event!',
+    }).save()
+
+    const gakkiCommentLuigi = await new Comment({
+      user: gakki.id,
+      story: luigiStory.id,
+      content: 'Luigi, thank you for coming to my event!',
+    }).save()
+
+    const marioCommentGakki = await new Comment({
+      user: mario.id,
+      story: gakkiStory.id,
+      content: 'Hi Gakki, I am Mario!',
+    }).save()
+
+    const luigiCommentGakki = await new Comment({
+      user: luigi.id,
+      story: gakkiStory.id,
+      content: 'Hi Gakki, I am Luigi!',
     }).save()
 
     // User: Update the events, followers, and stories details
@@ -198,6 +224,16 @@ mongoose.connect(URL, {
 
     luigiEvent.stories = [luigiEvent.id]
     await luigiEvent.save()
+
+    // Stories: update the comments
+    gakkiStory.comments = [marioCommentGakki.id, luigiCommentGakki.id]
+    await gakkiStory.save()
+
+    marioStory.comments = [gakkiCommentMario.id]
+    await marioStory.save()
+
+    luigiStory.comments = [gakkiCommentLuigi.id]
+    await luigiStory.save()
 
     console.log('Finished successfully, closing the connection')
     db.close()

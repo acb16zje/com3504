@@ -10,8 +10,8 @@ const User = require('../models/user')
 /**
  * GET the data of all user profiles
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getUsers = (req, res) => {
   const userQuery = User.find()
@@ -25,7 +25,23 @@ exports.getUsers = (req, res) => {
       { path: 'going', select: '-_id username' },
     ],
   })
-  userQuery.populate({ path: 'stories', options: { sort: { date: -1 } } })
+  userQuery.populate({
+    path: 'stories',
+    populate: [
+      { path: 'user', select: '-_id username' },
+      { path: 'event', select: '_id name' },
+      { path: 'likes', select: '-_id username' },
+      {
+        path: 'comments',
+        populate: [
+          { path: 'user', select: '-_id username' },
+        ],
+        select: '-_id -story',
+        options: { sort: { date: 1 } },
+      },
+    ],
+    options: { sort: { date: -1 } },
+  })
   userQuery.populate('followers following', '-_id').lean()
 
   userQuery.then(users => {
@@ -43,8 +59,8 @@ exports.getUsers = (req, res) => {
 /**
  * GET all the data of the user
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getUserData = (req, res) => {
   const userQuery = User.findOne({ 'username': req.params.username }, '-_id')
@@ -63,7 +79,15 @@ exports.getUserData = (req, res) => {
     populate: [
       { path: 'user', select: '-_id username' },
       { path: 'event', select: '_id name' },
-      { path: 'likes', select: '-_id username'}
+      { path: 'likes', select: '-_id username' },
+      {
+        path: 'comments',
+        populate: [
+          { path: 'user', select: '-_id username' },
+        ],
+        select: '-_id -story',
+        options: { sort: { date: 1 } },
+      },
     ],
     options: { sort: { date: -1 } },
   })
@@ -85,8 +109,8 @@ exports.getUserData = (req, res) => {
 /**
  * POSt Edit the profile of current logged in user
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.editUserProfile = (req, res) => {
   const formJson = req.body
@@ -117,8 +141,8 @@ exports.editUserProfile = (req, res) => {
 
 /**
  * POST follows the given username
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.followUser = (req, res) => {
   // userQueryA: The logged in user

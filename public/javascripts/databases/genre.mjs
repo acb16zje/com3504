@@ -12,7 +12,7 @@ const GENRE_STORE = 'genre_store'
 /**
  * Initialise the genre IndexedDB
  *
- * @param {object} db The DB object
+ * @param {Object} db The DB object
  */
 export function initGenreDatabase (db) {
   if (!db.objectStoreNames.contains(GENRE_STORE)) {
@@ -64,7 +64,7 @@ export async function loadGenresLocal () {
 /**
  * Store the genres into IndexedDB
  *
- * @param {object} genres The genres documents retrieved
+ * @param {Object} genres The genres documents retrieved
  * @return {Promise<void>} The Promise
  */
 async function storeGenres (genres) {

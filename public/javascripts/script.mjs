@@ -31,7 +31,7 @@ export const currentUser = $(document.getElementById('my-account')).data('user')
  * @param {Array} events An array of events object
  */
 function addEvents (events) {
-  for (let i = 0, n = events.length; i < n; i++) {
+  for (let i = events.length; i--;) {
     if (eventSelect) {
       appendEventToSelect(events[i].name, events[i]._id)
     }
@@ -47,10 +47,10 @@ function addEvents (events) {
 /**
  * Add users data to search
  *
- * @param {object} users An array of users object
+ * @param {Object} users An array of users object
  */
 function addUsers (users) {
-  for (let i = 0, n = users.length; i < n; i++) {
+  for (let i = users.length; i--;) {
     // Need to add name because event has name field
     users[i].name = users[i].username
     index.add(users[i])
@@ -67,12 +67,12 @@ function addUsers (users) {
     return events
   }).then(events => storeExplorePage(events).finally()).catch(err => {
 
-    loadExplorePageLocal().then(events => {
-      addEvents(JSON.parse(JSON.stringify(events)))
-    }).catch(err => {
-      console.log(err)
-      console.log('Failed to load events data for search functon')
-    })
+    loadExplorePageLocal().
+      then(events => addEvents(JSON.parse(JSON.stringify(events)))).
+      catch(err => {
+        console.log(err)
+        console.log('Failed to load events data for search functon')
+      })
   })
 })()
 
@@ -83,16 +83,12 @@ function addUsers (users) {
   await loadAllUserProfiles().then(users => {
     addUsers(users)
     return users
-  }).then(users => {
-    storeUserProfile(users).finally()
-
-  }).catch(() => {
-    loadAllUserProfilesLocal().then(users => {
-      addUsers(users)
-    }).catch(() => {
-      console.log('Failed to load user data for search function')
+  }).then(users => storeUserProfile(users).finally()).
+    catch(() => {
+      loadAllUserProfilesLocal().
+        then(users => addUsers(users)).
+        catch((err) => console.log('Failed to load user data for search function'))
     })
-  })
 })()
 
 /************************ Explore page search ************************/
@@ -103,7 +99,7 @@ if (exploreSearchForm) {
   const searchButton = document.getElementById('search-button')
 
   // Location search input
-  initLocationInput()
+  initLocationInput(true)
 
   // Date search input
   const dateInput = document.getElementById('searchDate')
@@ -113,34 +109,32 @@ if (exploreSearchForm) {
       altFormat: 'j F Y',
     })
 
-    document.getElementById('date-clear').onclick = () => {
-      fp.clear()
-    }
-  }
+    document.getElementById('date-clear').onclick = () => fp.clear()
 
-  $(exploreSearchForm).submit(function (e) {
-    e.preventDefault()
+    $(exploreSearchForm).submit(function (e) {
+      e.preventDefault()
 
-    const formJson = convertToJSON($(this).serializeArray())
+      const formJson = convertToJSON($(this).serializeArray())
 
-    searchEvent(formJson).then(events => {
-      storeExplorePage(events).then(() => {
-        console.log('Stored searched events')
-      }).catch(() => console.log('Failed to store searched events'))
+      searchEvent(formJson).then(events => {
+        storeExplorePage(events).
+          then(() => console.log('Stored searched events')).
+          catch(() => console.log('Failed to store searched events'))
 
-      refreshExplorePage(events)
-    }).catch(() => {
-      searchEventLocal(formJson).then(events => {
         refreshExplorePage(events)
-      }).catch(() => showSnackbar('Failed to search events from server'))
+      }).catch(() => {
+        searchEventLocal(formJson).
+          then(events => refreshExplorePage(events)).
+          catch(() => showSnackbar('Failed to search events from server'))
+      })
     })
-  })
+  }
 }
 
 /**
  * Search for events from MongoDB
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<any>} The Promise
  */
 function searchEvent (formJson) {
@@ -156,7 +150,7 @@ function searchEvent (formJson) {
 /**
  * Search for events from IndexedDB
  *
- * @param {object} formJson The form data submitted in JSON format
+ * @param {Object} formJson The form data submitted in JSON format
  * @returns {Promise<* | void>} The Promise
  */
 function searchEventLocal (formJson) {
@@ -208,10 +202,18 @@ function searchEventLocal (formJson) {
 
 if (mapButton) {
   mapButton.onclick = function () {
-    document.getElementById(this.dataset.target).classList.add('is-active')
+    // Show modal
+    const mapModal = document.getElementById(this.dataset.target)
+    mapModal.insertAdjacentHTML(
+      'beforeend',
+      '<div id="map" class="modal-content"></div>'
+    )
+    mapModal.classList.add('is-active')
 
+    // Initialise map
     const map = L.map('map').setView([53.381197, -1.472573], 15)
 
+    // Prevent panning outside of world map
     const southWest = L.latLng(-89.98155760646617, -180)
     const northEast = L.latLng(89.99346179538875, 180)
     const bounds = L.latLngBounds(southWest, northEast)
@@ -235,9 +237,10 @@ if (mapButton) {
     }).addTo(map)
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      minZoom: 2
+      minZoom: 2,
     }).addTo(map)
 
+    // Load events to show on map
     loadExplorePage().then(events => {
       console.log('Loaded events from server [map]')
 
@@ -275,17 +278,26 @@ function refreshExplorePage (events) {
   displayExplorePage(events)
 }
 
+/**
+ * Plot events on map
+ *
+ * @param {Object} map A map object
+ * @param {Array} events An array of events object
+ */
 function addEventsToMap (map, events) {
   for (let i = events.length; i--;) {
-    if (!isPastEvent(events[i])) {
-      const marker = L.marker(
-        [events[i].location.latitude, events[i].location.longitude])
+    const latitude = events[i].location.latitude
+    const longitude = events[i].location.longitude
+
+    // Excluding past events and events that do not have correct location
+    if (!isPastEvent(events[i]) && latitude && longitude) {
+      const marker = L.marker([latitude, longitude])
 
       const popupHTML = `
         <div class="columns">
           <div class="column">
             <figure class="image">
-              <img src="${events[i].image}"  alt="Event image"> 
+              <img src="${events[i].image}"  alt="Event image">
             </figure>
           </div>
           <div class="column">
@@ -303,25 +315,28 @@ function addEventsToMap (map, events) {
 /************************ Helper functions below ************************/
 /**
  * Initialise Google location autocomplete search
+ *
+ * @param isExploreSearch True if for initialising location input in explore search
  */
-export function initLocationInput () {
+export function initLocationInput (isExploreSearch = false) {
   try {
     (function () {
-      const input = document.getElementById('autocomplete')
+      const input = isExploreSearch
+        ? document.getElementById('autocomplete-explore')
+        : document.getElementById('autocomplete')
 
       const autocomplete = new google.maps.places.Autocomplete(input)
 
       autocomplete.addListener('place_changed', function () {
         const place = autocomplete.getPlace()
 
-        if (place) {
+        if (place && !isExploreSearch) {
           document.getElementsByName('latitude')[0].
             setAttribute('value', place.geometry.location.lat())
           document.getElementsByName('longitude')[0].
             setAttribute('value', place.geometry.location.lng())
         }
       })
-
     })()
   } catch (e) {}
 }

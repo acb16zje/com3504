@@ -81,8 +81,8 @@ router.get('/auth/google/callback',
 /**
  * If the user is not logged in, redirect him to login page
  *
- * @param {object} req The request object
- * @param {object} res The response object
+ * @param {Object} req The request object
+ * @param {Object} res The response object
  * @param {function} next The next middleware function
  */
 function checkAuth (req, res, next) {
@@ -96,8 +96,8 @@ function checkAuth (req, res, next) {
 /**
  * If the user is not logged in, response 401 Unauthorized
  *
- * @param {object} req The request object
- * @param {object} res The response object
+ * @param {Object} req The request object
+ * @param {Object} res The response object
  * @param {function} next The next middleware function
  */
 function checkAuthAPI (req, res, next) {

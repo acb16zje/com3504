@@ -581,6 +581,10 @@ div.story-feed figure.story-modal {
   overflow: auto;
 }
 
+#story #comments a {
+  padding-right: 5px;
+}
+
 .story-footer {
   flex-direction: column;
 }

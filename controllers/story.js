@@ -13,14 +13,22 @@ const imageController = require('../controllers/image')
 /**
  * GET all the data of a story
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getStoryData = (req, res) => {
   const storyQuery = Story.findById(req.params.id, '-__v')
   storyQuery.populate('user', '-_id username')
   storyQuery.populate('event', '_id name')
-  storyQuery.populate('likes', '-_id username').lean()
+  storyQuery.populate('likes', '-_id username')
+  storyQuery.populate({
+    path: 'comments',
+    populate: [
+      { path: 'user', select: '-_id username' },
+    ],
+    select: '-_id -story',
+    options: { sort: { date: 1 } },
+  }).lean()
 
   storyQuery.then(story => {
     // 404 error if story is not found
@@ -38,8 +46,8 @@ exports.getStoryData = (req, res) => {
 /**
  * GET all stories related to the user (follow, created)
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.getStoryFeed = (req, res) => {
   const userQuery = User.findById(req.user.id)
@@ -49,6 +57,14 @@ exports.getStoryFeed = (req, res) => {
       const storyQuery = Story.find()
       storyQuery.populate('event', '_id name')
       storyQuery.populate('likes', '-_id username')
+      storyQuery.populate({
+        path: 'comments',
+        populate: [
+          { path: 'user', select: '-_id username' },
+        ],
+        select: '-_id -story',
+        options: { sort: { date: 1 } },
+      })
       storyQuery.populate({
         path: 'user',
         match: { $or: [{ followers: req.user.id }, { _id: req.user.id }] },
@@ -74,8 +90,8 @@ exports.getStoryFeed = (req, res) => {
 /**
  * POST create a story
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.createStory = async (req, res) => {
   const json = req.body
@@ -127,8 +143,8 @@ exports.createStory = async (req, res) => {
 /**
  * POST update a story
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.updateStory = (req, res) => {
   const json = req.body
@@ -152,8 +168,8 @@ exports.updateStory = (req, res) => {
 /**
  * POST delete a story
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.deleteStory = (req, res) => {
   const storyQuery = Story.deleteOne({ _id: req.body.id })
@@ -169,8 +185,8 @@ exports.deleteStory = (req, res) => {
 /**
  * POST like a story
  *
- * @param {object} req The request header
- * @param {object} res The response header
+ * @param {Object} req The request header
+ * @param {Object} res The response header
  */
 exports.likeStory = (req, res) => {
   const userQuery = User.findById(req.user.id)
