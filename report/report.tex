@@ -28,67 +28,57 @@
 Progressive Web App (PWA) allows users to create and add comments to both events and user stories.
 Social media features such as `like', `follow', `interested', and `going' are integrated. Users are
 able to tag an event along with their stories, which will then appear in the event page. Users can
-create a story by taking a picture with their front or environment camera through the implementation
-of WebRTC or upload a picture locally. Each user story can receive likes and comments, for which the
-latter is implemented using Socket.IO \cite{week6, socketio}. Service worker was implemented to
-cache requests for offline usage. MongoDB is used to store and synchronise data between the client
-and server, while IndexedDB is used to store data loaded from MongoDB for offline usage. However,
-data stored in MongoDB can only be retrieved when user is online. The search function (via location)
-was implemented with Google Maps API, allowing auto complete for the location field and ensuring
-that it is a valid location. For security purposes, users can only login with their respective
-Google Account.
+create a story by taking a picture with their front camera through the use of
+of WebRTC or upload a picture locally. Each user story can receive likes and comments, for which
+the latter was implemented using Socket.IO \cite{week6, socketio}. Service worker was implemented
+to cache requests for offline usage. MongoDB is used to store and synchronise data between the
+client and server, while IndexedDB is used to store data loaded from MongoDB for offline usage.
+However, data stored in MongoDB can only be retrieved when user is online. The search function (via
+location) was implemented with Google Maps API, allowing auto complete for the location field and
+ensuring that it is a valid location. For security purposes, users can only login with their
+respective Google Account.
 
 \section{Diagrams}
-\begin{figure}[H]
-  \begin{center}
-    \begin{minipage}[b]{0.4\textwidth}
-      \includegraphics[width=6.5cm]{site_map.jpg}
-      \caption{Demonstrates the flow of each web page in this PWA system along with the respective
-      partial pages and external content pages.}
-      \label{figure:site_map}
-    \end{minipage}
-    %
-    \qquad
-    \begin{minipage}[b]{0.4\textwidth}
-      \includegraphics[width=6.5cm]{uml.jpg}
-      \caption{Displays the structure of the database along with the types of content stored.}
-      \label{figure:uml}
-    \end{minipage}
-  \end{center}
-\end{figure}
-\hyperref[figure:site_map]{\textbf{Figure 1}} and \hyperref[figure:uml]{\textbf{Figure 2}} are the
-detailed description of the PWA system structure with \hyperref[figure:site_map]{\textbf{Figure 1}}
-describing the front-end, data storage, caching and data retrieval, while
-\hyperref[figure:uml]{\textbf{Figure 2}} demonstrates the database model along with the relationship
-between documents.
+Appendix \hyperref[figure:site_map]{\textbf{Figure 1}} and Appendix \hyperref[figure:uml]{
+\textbf{Figure 2}} are the detailed description of the PWA system structure with
+\hyperref[figure:site_map]{\textbf{Figure 1}} describing the front-end, data storage, caching and
+data retrieval, while \hyperref[figure:uml]{\textbf{Figure 2}} demonstrates the database model along
+with the relationship between documents.
 
 \section{Interface to Insert and Search Data via Forms}
-\textbf{Challenges:} The search speed must be efficient, and the search results produced must be
-accurate with respect to the given query. Users must be able to search for events, stories, and the
+\textbf{Challenges:} Search speed must be efficient and search results must be
+accurate with respect to the given query. Users must be able to search for events, stories, and
 profile of other users. Basic text search will allow the user to input any text query and return the
 results sorted by relevance. Advanced search will allow the user to search for events of a specific
 genre or find events between two different dates. Address searching in the event creation page is
 done through Place Autocomplete by Google Maps API \cite{google_maps_api}. \textbf{Solution:}
-FlexSearch.js \cite{flexsearch} was chosen to implement basic text searching task due to its
-efficient, lightweight, and flexible properties \cite{flexsearch_benchmarkk}. It allows multi-field
-search and accepts multiple data format types for its data index, hence it could be used with both
-IndexedDB and MongoDB to provide searching functionality in both online and offline environment.
-Advanced searches are yet to be implemented. \textbf{Requirements:} Users should be able to search
-for events, stories, and user profiles while online and offline. Users should be able to obtain
-results through querying with partial information. The results returned should be sorted according
-to relevance. \textbf{Limitations:} On every page load, the data has to be retrieved from IndexedDB
-to populate the FlexSearch.js's search index. The performance loss might be negligible when the
-total data size is small, but it may cause longer loading time when the size of data exceeds a
-certain size. Google Maps API request could not be cached as it generates a random token for every
-request made, hence it will not work offline.
+ChoicesJS was chosen to implement basic text searching task due to its efficient, lightweight, and
+flexible properties. It allows multi-field search and accepts multiple data format types for its
+data index, hence it could be used with both IndexedDB and MongoDB to provide searching
+functionality in both online and offline environment. \textbf{Requirements:} Users should be able
+to search for events, stories, and user profiles while online and offline. Users should be able to
+obtain results through querying with partial information. The results returned should be sorted
+according to relevance. \textbf{Limitations:} On every page load, the data has to be retrieved from
+IndexedDB to populate the search index. The performance loss might be negligible when the total
+data size is small, but it may cause longer loading time when the size of data exceeds a certain
+size.
 
-\section{Interface to Search Data via Map (Yet to Implement)}
-\textbf{Challenges} and \textbf{Solutions:} Not yet implemented. \textbf{Requirements:} Allow users
-to search for events using a map in both online and offline environment. Past events should not
-appear on the map. Future and ongoing events should be displayed as custom markers on the map with
-different colours. Custom markers should pop-up to display the event information when clicked.
-\textbf{Limitations:} Caching the map tiles consumes more storage than other requests as map tiles
-are stored as images.
+\section{Interface to Search Data via Map}
+\textbf{Challenges:} Allow users to search for ongoing or upcoming events via map, where marker
+containing the image and link to event is placed on the location of the event. \textbf{Solutions:}
+Map was implemented with Leaflet Geocoder, with markers displaying pop-up of image and link of
+ongoing and future events. Offline searches will display marker on cached location of event.
+\textbf{Requirements:} Allow users to search for events using a map in both online and offline
+environment. Past events should not appear on the map. Future and ongoing events should be
+displayed as custom markers on the map. Custom markers should pop-up to display the event
+information when clicked. \textbf{Limitations:} The map takes time to load and does not generate
+immediately. Google Maps API was not chosen to be implemented in this task as request could not be
+cached due to the generation of random token for every request made, hence it will not work offline.
+Caching the map tiles consumes more storage than other requests as map tiles are stored as images.
+If Place Autocomplete by Google Maps API \cite{google_maps_api} was not implemented, users would be
+able to insert invalid locations, hence causing markers of any previously created events with valid
+locations to not show up in the map. Hence, this feature highly replies on the input of valid
+locations.
 
 \section{PWA – Caching of the App Template Using a Web Worker}
 \textbf{Challenges:} Fetching cross-domain response will result in an opaque response, which will
@@ -99,12 +89,14 @@ offline page response when user is offline and visit a page that does not exist 
 template with required data when not connected to the internet. Users should be able to view
 previously loaded events and stories without the ability to make any changes to the events, stories,
 or their profiles. \textbf{Limitations:} Non-static files are not cached in the installation stage
-of the service worker. Page that has never been visited before will not be cached.
+of the service worker. Page that has never been visited before will not be cached. This applies to
+events or stories which were updated, where the cached information, which might not be up-to-date,
+will be displayed when user is offline.
 
 \section{PWA: Caching Data Using IndexedDB}
 \textbf{Challenges:} Retrieving data from MongoDB and store them in IndexedDB. Display page content
 using data loaded from IndexedDB when no internet connection present. \textbf{Solution:} Retrieve
-the data from MongoDB using AJAX. Promise is used for both storing and loading the data from
+the data from MongoDB using AJAX. Promise is used for both storing and loading of data from
 IndexedDB. \textbf{Requirements:} Events and user profile data must be stored locally for offline
 searching. Users should be able to access data retrieved from IndexedDB when they are offline.
 \textbf{Limitations:} A known bug of IndexedDB storage is usage increases with every $put()$
@@ -141,23 +133,41 @@ their profile. Users require a Google Account to login for security purposes. \t
 Users without a Google Account could not sign in into the system and enjoy personalised content.
 User accounts are all public, hence users should be careful when sharing personal information.
 
-\section{Conclusions (To date of first submission)}
+\section{Conclusions}
 This assignment highlights the importance of caching and the importance of usability both during
 online and offline. It taught us to consider other implementations to improve user experience and
-web security. This assignment exposed us to multiple tools ( Google Maps API for address searching,
-WebRTC for photo capturing, etc.) while allowing us to implement the basic knowledge of web building
-at a higher level through the use of promises, service workers and memory caching.
+web security. This assignment exposed us to multiple tools (Google Maps API for address searching,
+WebRTC for photo capturing, Socket.IO for live comment updates, Leaflet Geocoder for map searching
+with markers, etc.) while allowing us to implement the basic knowledge of web building at a higher
+level through the use of promises, service workers and memory caching.
 
-\section{Division of Work (To date of first submission)}
-The workload was divided equally. The solution was designed jointly and then each member lead the
-implementation of one specific part of the code. \textbf{Zer Jun Eng} lead the implementation of all
-PWA caching, MongoDB, and front-end implementation. \textbf{Lim Jia Mei Grace} implementation of
-WebRTC, assisted in the construction of MongoDB database and front-end implementation.
+\section{Division of Work}
+The solution was designed jointly. \textbf{Zer Jun Eng} lead implementation of MongoDB, search
+by map, PWA caching, and front-end implementation while taking part in WebRTC, testing.
+\textbf{Lim Jia Mei Grace (Jia Lim)} lead implementation of WebRTC, testing, and documentation
+while taking part in the construction of MongoDB database, search by map and front-end
+implementation. The final document was jointly edited. 
 
 \section{Extra Information}
-With \textbf{mongod} service started, run \textbf{npm run initdb} to populate the database with
-initial data.
+Run \textbf{npm run initdb} to populate the database with initial data, then run \textbf{npm start}
+to start localhost and MongoDB.
 
 \printbibliography
+
+\appendix
+\section{Appendix}
+\begin{figure}[H]
+  \begin{center}
+      \includegraphics[width=8.7cm]{site_map.jpg}
+      \caption{Demonstrates the flow of each web page in this PWA system along with the respective
+      partial pages and external content pages.}
+      \label{figure:site_map}
+
+      \includegraphics[width=8.7cm]{uml.jpg}
+      \caption{Displays the structure of the database along with the types of content stored.}
+      \label{figure:uml}
+  \end{center}
+\end{figure}
+
 
 \end{document}
