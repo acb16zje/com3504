@@ -25,32 +25,37 @@
 
 \begin{document}
 \section{Introduction}
-Progressive Web App (PWA) allows users to create and add comments to both events and user stories.
+Progressive Web App (PWA) allows users to create and comment on both events and user stories.
 Social media features such as `like', `follow', `interested', and `going' were integrated. Users are
 able to tag an event with their stories, which will then appear in the `Explore' page. Users can
-create a story by taking a picture with their front camera through the use of
-of WebRTC or upload a picture locally. Each user story can receive likes and comments, for which
-the latter was implemented using Socket.IO \cite{week6, socketio}. Service worker was implemented
-to cache requests for offline usage. MongoDB is used to store and synchronise data between the
-client and server, while IndexedDB is used to store data loaded from MongoDB for offline usage.
-However, data stored in MongoDB can only be retrieved when user is online. The search function (via
-location) was implemented with Google Maps API, allowing auto complete for the location field and
-ensuring that it is a valid location. For security purposes, users can only login with their
-respective Google Account.
+create a story by taking a picture with their front camera through the use of WebRTC or upload a
+picture locally. Each user story can receive likes and comments, for which the latter was
+implemented using Socket.IO \cite{week6, socketio}. Socket.IO was also used for posting comments in
+the `Discussion' of each event. Service worker was implemented to cache requests for offline usage.
+MongoDB was used to store and synchronise data between the client and server, while IndexedDB was
+used to store data loaded from MongoDB for offline usage. However, data stored in MongoDB can only
+be retrieved when user is online. The search function (via location) was implemented with Google
+Maps API, allowing autocomplete for the location field and ensuring that a valid location is used.
+For security purposes, users can only login with their respective Google Account.
 
 \section{Diagrams}
 Appendix \hyperref[figure:site_map]{\textbf{Figure 1}} and Appendix \hyperref[figure:uml]{
-\textbf{Figure 2}} are the detailed description of the PWA system structure with
-\hyperref[figure:site_map]{\textbf{Figure 1}} describing the interactions between the front-end,
-data storage, caching and data retrieval, while \hyperref[figure:uml]{\textbf{Figure 2}}
-demonstrates the database model along with the relationship between documents.
+\textbf{Figure 2}} are the detailed description of the PWA system structure.
+\hyperref[figure:site_map]{\textbf{Figure 1}} describes the interactions between the front-end,
+data storage, caching and data retrieval. Functionalities are limited and users are unable to have a
+personalised user experience if sign-in through Google Account is not completed. Data is retrieved
+from MongoDB and stored in IndexedDb when server connection is available. This enables user to
+access preloaded information when they are offline. Caching takes place with the use of service
+workers when users are online. \hyperref[figure:uml]{\textbf{Figure 2}} demonstrates the database
+model along with the relationship between documents. The types of data collected for each document
+and the functions used for data retrieval are also described.
 
 \section{Interface to Insert and Search Data via Forms}
-\textbf{Challenges:} Search speed must be efficient and search results must be
-accurate with respect to the given query. Users must be able to search for events, stories, and
-profile of other users. Basic text search will allow the user to input any text query and return the
-results sorted by relevance. Users can use partial words to search for an event or profiles of other
-users. Advanced search will allow the user to search for events based on event name, venue (address)
+\textbf{Challenges:} Search speed must be efficient and search results must be accurate with respect
+to the given query. Users must be able to search for events, stories, and profile of other users.
+Basic text search will allow users to input any text query and return the results sorted by
+relevance. Users can use partial words to search for an event or profiles of other users.
+Advanced search will allow users to search for events based on event name, genres, venue (address)
 and date. When creating an event, Place Autocomplete by Google Maps API \cite{google_maps_api} is
 used to provide users with valid locations as options. \textbf{Solution:} FlexSearch.js
 \cite{flexsearch} was chosen to implement basic text searching task due to its efficient,
@@ -66,8 +71,8 @@ of data exceeds a certain size. Google Maps API request could not be cached as i
 token for every request made, hence Place Autocomplete will not work offline.
 
 \section{Interface to Search Data via Map}
-\textbf{Challenges:} Allow users to search and locate ongoing or upcoming events via map, where
-marker containing the image and link to event is placed on the location of the event.
+\textbf{Challenges:} The use of map with accurate location where caching is able to take place.
+Custom marker containing the image and link to event is placed on the location of the event.
 \textbf{Solutions:} Map was implemented with Leaflet Geocoder, with markers displaying pop-up of
 image and link of ongoing and future events. Offline searches will display marker on cached location
 of event. \textbf{Requirements:} Allow users to search for events using a map in both online and
@@ -106,7 +111,7 @@ operation \cite{leveldb_593, leveldb_603}.
 
 \section{NodeJS Server Including Non-Blocking Organisation of Multiple Dedicated Servers}
 \textbf{Challenges:} Uses asynchronous functions to handle file upload, data retrieval from server,
-or other function calls that require time to complete. Errors might occurred during the execution
+or other function calls that require time to complete. Errors might occur during the execution
 of asynchronous functions. \textbf{Solution:} Uses the Promise and async/await features of
 JavaScript to handle both successful and failed function operations. Keep the code nesting shallow
 to make code more maintainable and readable. \textbf{Requirements:} Able to use Promise to order the
@@ -128,22 +133,28 @@ Document size has a limit of 16MB, additional configurations were required for s
 features such as user profile, marking events as `Interested' or `Going'. Ensuring that the features
 implemented will work and do not cause system failure. \textbf{Solution:} Used
 passport-google-oauth20 \cite{passport_google} to implement the authentication system. AJAX
-requests are used for a non-page reload form submission. Exhaustively testing the system to
+requests are used for a non-page reload form submission. Socket.IO was used for live update of
+comments on stories and discussion posts on each event. Exhaustively testing the system to
 minimise the probability of bug occurrences. \textbf{Requirements:} Users should be able to select
 events to be tagged to their stories, 'like' and comment on stories, 'follow' other users, and click
 `Interested' or `Going' on events. Events which users attended are recorded in their profile. Events
 which were created by a user is set to be an event the organiser is `Going' to by default. Through
 following others and posting themselves, users are able to view the activity of followed users and
-their own post, be it events or stories, in the `Home' page. Users require a Google Account to login
-for security purposes. In the implementation of WebRTC, a range of filters were made available for
-users to choose from. Another extra feature is in the implementation of map search where users are
-not just able to view the event name but also a link which would lead the user to the page
-displaying details of that specific event. Having Google Maps API Place Autocomplete also helps
-users to quickly and accurately insert a valid location. Users are also able to list their favourite
+themselves, be it events or stories, in the `Home' page. Users require a Google Account to login
+for security purposes. With the implementation of WebRTC, users are able to take pictures at events 
+with a range of filters to choose from. Another extra feature is in the implementation of map search
+where users are able to view the event name as a link which would lead the user to the page
+displaying details of that specific event. Socket.IO is used to have a live update of contents.
+Hence, it was implemented for comments to be added to each posted story. It was also used for the
+creation of stories and posts for each event, allowing other users to view all activities related
+to an event, be it stories or just text. Users are able to post comments on events, have
+discussions with other users, all through live updates on story and post creation in the
+`Discussion' section of each event. Having Google Maps API Place Autocomplete also helps users to 
+quickly and accurately insert a valid location. Users are also able to list their favourite
 genres and write a bios to guide other users in finding those of similar interest, and possibly
-follow them. This in done to increase users' experience to have information of interest displayed
+follow them. This in done to improve users' experience to have information of interest displayed
 on their `Home' page upon login. \textbf{Limitations:} Users without a Google Account could not
-sign in into the system and enjoy personalised functionalities. Users who are not signed-in are
+sign in into the system and experience personalised functionalities. Users who are not signed-in are
 able to view events, stories, and use the search functionalities, but are unable to show their
 interest through clicking on `Interested' or `Going', which would be displayed in their profiles.
 They would not be able to update any information, follow or unfollow other users, or like and
@@ -176,14 +187,17 @@ to start localhost and MongoDB.
 \section{Appendix}
 \begin{figure}[H]
   \begin{center}
-      \includegraphics[width=8.7cm]{site_map.jpg}
-      \caption{Demonstrates the flow of each web page in this PWA system along with the respective
-      partial pages and external content pages.}
-      \label{figure:site_map}
-
-      \includegraphics[width=8.7cm]{uml.jpg}
-      \caption{Displays the structure of the database along with the types of content stored.}
-      \label{figure:uml}
+    \includegraphics[width=8.5cm]{site_map.jpg}
+    \caption{Demonstrates the flow of each web page in this PWA system along with the respective
+    partial pages and external content pages.}
+    \label{figure:site_map}
+  \end{center}
+\end{figure}
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=15cm]{uml.jpg}
+    \caption{Displays the structure of the database along with the types of content stored.}
+    \label{figure:uml}
   \end{center}
 \end{figure}
 
