@@ -42,9 +42,6 @@ router.get('/api/explore', eventController.index)
 /* AJAX GET the details of a specific event */
 router.get('/api/event/:id', eventController.getEventData)
 
-/* AJAX GET the details of a specific event */
-router.get('/api/event/:id/discussion', eventController.getEventDiscussion)
-
 /* AJAX GET all events related to the username */
 router.get('/api/event_feed', auth.checkAuthAPI, eventController.getEventFeed)
 
@@ -62,5 +59,8 @@ router.post('/api/interested', auth.checkAuthAPI, eventController.setEventIntere
 
 /* AJAX POST set the event as going for the user */
 router.post('/api/going', auth.checkAuthAPI, eventController.setEventGoing)
+
+/* AJAX POST reply a comment to an event  */
+router.post('/api/event/comment', auth.checkAuthAPI, eventController.commentEvent)
 
 module.exports = router

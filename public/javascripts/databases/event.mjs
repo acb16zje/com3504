@@ -8,12 +8,28 @@
 import { dbPromise, unableToLoadPage } from './database.mjs'
 import { initGenresInput } from './genre.mjs'
 import { currentUser, initLocationInput } from '../script.mjs'
-import { eventFeedDiv } from './feed.mjs'
+import {
+  addStoryFeedLikeListener,
+  eventFeedDiv,
+  renderStoryFeed,
+} from './feed.mjs'
+import {
+  addEditStoryListener,
+  addStoryModalListener,
+  formatStoryDate,
+  renderStoryModal,
+  storeStories,
+} from './story.mjs'
 
 export const EVENT_STORE = 'event_store'
 const exploreSection = document.getElementById('explore')
 const eventSection = document.getElementById('event')
+const discussionSection = document.getElementById('discussion-section')
 const createEventForm = document.getElementById('create-event')
+const commentEventForm = document.getElementById('event-comment')
+
+// Path will be /event/:id or /event/:id/discussion
+const eventID = window.location.pathname.split('/')[2]
 
 // Loading, storing, and displaying events at /explore
 if (exploreSection) {
@@ -47,14 +63,19 @@ if (exploreSection) {
 
 // Loading, storing, and displaying individual event
 if (eventSection) {
-  const eventID = window.location.pathname.split('/')[2]
-
   loadEventPage(eventID).then(event => {
     console.log('Loaded event from server')
 
     storeExplorePage([event]).
-      then(() => displayEventPage(event)).
-      catch(err => console.log(err))
+      then(() => console.log('Stored event')).
+      catch(() => console.log('Failed to store event'))
+
+    storeStories(event.stories).
+      then(() => console.log('Stored event\'s stories')).
+      catch(err => console.log('Failed to store event\'s stories'))
+
+    displayEventPage(event)
+    if (discussionSection) renderDiscussion(event)
 
   }).catch(() => {
     console.log('Failed to load event from server, loading from local')
@@ -64,6 +85,8 @@ if (eventSection) {
 
       if (event) {
         displayEventPage(event)
+
+        if (discussionSection) renderDiscussion(event)
       } else {
         unableToLoadPage(eventSection)
       }
@@ -93,6 +116,51 @@ if (createEventForm) {
         showSnackbar('Failed to create event')
       }
     })
+  })
+}
+
+// Comment event
+if (commentEventForm) {
+  const postButton = document.getElementById('post-event-comment')
+
+  postButton.onclick = () => {
+    submitComment(eventID, document.getElementById('reply').value).then(res => {
+      // Send message to everyone including sender
+      if (socket) socket.emit('new event comment', eventID, res)
+
+      commentEventForm.reset()
+    }).catch(err => {
+      if (err.status === 401) {
+        showSnackbar('Please sign in to continue')
+      } else {
+        showSnackbar('Failed to process the request')
+      }
+    })
+  }
+}
+
+/************************ Socket.io event listener ************************/
+if (socket && discussionSection) {
+  socket.emit('join event room', eventID)
+
+  socket.on('new event story', story => {
+    // Prepend the story
+    discussionSection.insertAdjacentHTML('afterbegin', renderStoryFeed(story))
+
+    // If this is the first story added, then add modal as well
+    if (!document.getElementById('story')) {
+      eventSection.insertAdjacentHTML('beforeend', renderStoryModal())
+    }
+
+    // Add required listeners for the newly created story
+    addStoryModalListener()
+    addEditStoryListener()
+    closeModalListener()
+  })
+
+  socket.on('new event comment', comment => {
+    // Prepend the comment
+    discussionSection.insertAdjacentHTML('afterbegin', renderEventComment(comment))
   })
 }
 
@@ -252,6 +320,23 @@ function submitGoing (eventID) {
   }))
 }
 
+/**
+ * Comment an event
+ *
+ * @param {string} eventID The ID of the event to comment
+ * @param {string} content The content of the comment
+ * @returns {Promise<any>} The Promise
+ */
+function submitComment (eventID, content) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    data: JSON.stringify({ id: eventID, content: content }),
+    url: '/api/event/comment',
+  }))
+}
+
 /************************ Rendering related ************************/
 /**
  * Display all events data on /explore page
@@ -332,9 +417,7 @@ function displayEventPage (event) {
       interested.children[1].classList.remove('is-hidden')
     }
 
-    if (isUserGoing) {
-      going.classList.add('is-light')
-    }
+    if (isUserGoing) going.classList.add('is-light')
   }
 
   // Time
@@ -373,15 +456,92 @@ function displayEventPage (event) {
   }
 
   // About and discussion link
-  document.getElementById('about').firstElementChild.href = `/event/${event._id}`
-  document.getElementById('discussion').firstElementChild.href = `/event/${event._id}/discussion`
+  document.getElementById(
+    'about').firstElementChild.href = `/event/${event._id}`
+  document.getElementById(
+    'discussion').firstElementChild.href = `/event/${event._id}/discussion`
 
   // Description
-  document.getElementById('description').textContent = event.description
+  const description = document.getElementById('description')
+  if (description) description.textContent = event.description
 
   eventSection.classList.remove('is-hidden')
   addInterestedGoingListener() // click listener for interested and going
   addEditEventListener() // Click listener for edit event buttons
+}
+
+/**
+ * Render the discussion section of the event page
+ *
+ * @param {Object} event The event document to display
+ */
+function renderDiscussion (event) {
+  const commentsAndStories = [...event.comments, ...event.stories].sort(
+    (a, b) => {
+      // Newest date first
+      return new Date(a.date) - new Date(b.date)
+    })
+
+  for (let i = commentsAndStories.length; i--;) {
+    const item = commentsAndStories[i]
+
+    if (item.image) {
+      // It is a story
+      discussionSection.insertAdjacentHTML('beforeend', renderStoryFeed(item))
+      addStoryFeedLikeListener(
+        document.getElementById(`like-button-${item._id}`))
+    } else {
+      // It is a comment only
+      discussionSection.insertAdjacentHTML('beforeend',
+        renderEventComment(item))
+    }
+  }
+
+  // Add event listeners for story like, story modal
+  if (event.stories && event.stories.length) {
+    eventSection.insertAdjacentHTML('beforeend', renderStoryModal())
+    addStoryModalListener()
+    addEditStoryListener()
+    closeModalListener()
+  }
+}
+
+/***
+ *
+ * @param {object} comment The comment object of the event
+ * @returns {string} The HTML fragment for the comment card
+ */
+function renderEventComment (comment) {
+  const username = comment.user.username
+
+  return `
+  <div id="comment-card" class="card">
+    <header class="card-header">
+      <div class="card-header-title">
+        <nav class="level is-mobile is-marginless">
+          <div class="level-item">
+            <a href="/${username}">
+              <figure class="image is-48x48">
+                <img class="is-rounded" src="${comment.user.image}"  alt="User profile image">
+              </figure>
+            </a>
+          </div>
+          <div class="level-item profile-event-link">
+            <a href="/${username}">
+              <p class="title is-6 story-username">${username}</p>
+            </a>
+            <a class="has-text-black">
+              <small class="is-size-7">${formatStoryDate(comment.date)}</small>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="card-content">
+     <p class="subtitle is-5">${comment.content}</p>
+    </div>
+  </div>`
 }
 
 /**

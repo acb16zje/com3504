@@ -5,6 +5,7 @@
  */
 
 'use strict'
+const Comment = require('../models/comment')
 const Event = require('../models/event')
 const User = require('../models/user')
 const imageController = require('../controllers/image')
@@ -19,7 +20,35 @@ exports.index = (req, res) => {
   const eventQuery = Event.find()
   eventQuery.populate('organiser', '-_id')
   eventQuery.populate('genres', '-_id name')
-  eventQuery.populate('interested going', '-_id username image').lean()
+  eventQuery.populate('interested going', '-_id username image')
+  eventQuery.populate({
+    path: 'stories',
+    populate: [
+      { path: 'event', select: '_id name' },
+      { path: 'likes', select: '_id username' },
+      {
+        path: 'comments',
+        populate: [
+          { path: 'user', select: '-_id username' },
+        ],
+        select: '-_id -story',
+        options: { sort: { date: 1 } },
+      },
+      {
+        path: 'user',
+        select: '_id username image',
+        options: { sort: { date: -1 } },
+      },
+    ],
+  })
+  eventQuery.populate({
+    path: 'comments',
+    populate: [
+      { path: 'user', select: '-_id username image' },
+    ],
+    select: '-_id -story -event',
+    options: { sort: { date: -1 } },
+  }).lean()
 
   eventQuery.then(events => {
     // 404 error if no events found
@@ -44,7 +73,35 @@ exports.getEventData = (req, res) => {
   const eventQuery = Event.findById(req.params.id)
   eventQuery.populate('organiser', '-_id')
   eventQuery.populate('genres', '-_id name')
-  eventQuery.populate('interested going', '-_id username image').lean()
+  eventQuery.populate('interested going', '-_id username image')
+  eventQuery.populate({
+    path: 'stories',
+    populate: [
+      { path: 'event', select: '_id name' },
+      { path: 'likes', select: '_id username' },
+      {
+        path: 'comments',
+        populate: [
+          { path: 'user', select: '-_id username' },
+        ],
+        select: '-_id -story',
+        options: { sort: { date: 1 } },
+      },
+      {
+        path: 'user',
+        select: '_id username image',
+        options: { sort: { date: -1 } },
+      },
+    ],
+  })
+  eventQuery.populate({
+    path: 'comments',
+    populate: [
+      { path: 'user', select: '-_id username image' },
+    ],
+    select: '-_id -story -event',
+    options: { sort: { date: -1 } },
+  }).lean()
 
   eventQuery.then(event => {
     // 404 error if event is not found
@@ -57,23 +114,6 @@ exports.getEventData = (req, res) => {
     // Cast to ObjectId failed
     console.log(err)
     res.sendStatus(400)
-  })
-}
-
-/**
- * GET all comments and stories related to the event
- *
- * @param {Object} req The request header
- * @param {Object} res The response header
- */
-exports.getEventDiscussion = (req, res) => {
-  const eventQuery = Event.findById(req.params.id)
-
-  eventQuery.then(event => {
-    res.sendStatus(200)
-  }).catch(err => {
-    console.log(err)
-    res.sendStatus(500)
   })
 }
 
@@ -127,6 +167,12 @@ exports.searchEvent = (req, res) => {
         /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'),
     })
 
+  // If genre is provided
+  if (json.genre) {
+    eventQuery.find({genres: json.genre})
+  }
+
+  // If address is provided
   if (json.address) {
     eventQuery.find({
       'location.address': new RegExp(`^.*${json.address.replace(
@@ -134,6 +180,7 @@ exports.searchEvent = (req, res) => {
     })
   }
 
+  // If date is provided
   if (json.date) {
     const date = new Date(json.date)
 
@@ -143,7 +190,7 @@ exports.searchEvent = (req, res) => {
     const dateTomorrow = new Date(new Date(date).setDate(date.getDate() + 1))
     const startDateQuery = {
       $gte: date,
-      $lt: dateTomorrow
+      $lt: dateTomorrow,
     }
 
     eventQuery.find({
@@ -212,7 +259,7 @@ exports.createEvent = async (req, res) => {
       await user.events.push(event.id)
       await user.going.push(event.id)
       await user.save()
-      res.status(200).json({ eventID: event.id })
+      res.json({ eventID: event.id })
     } else {
       res.sendStatus(500)
     }
@@ -389,6 +436,48 @@ exports.setEventGoing = (req, res) => {
         console.log(err)
         res.sendStatus(500)
       })
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
+ * POST comment an event
+ *
+ * @param {Object} req The request header
+ * @param {Object} res The response header
+ */
+exports.commentEvent = (req, res) => {
+  const eventQuery = Event.findById(req.body.id)
+
+  eventQuery.then(async event => {
+    if (event) {
+      const comment = await new Comment({
+        user: req.user.id,
+        event: event.id,
+        content: req.body.content,
+      }).save().catch(err => {
+        // Bad request
+        console.log(err)
+        res.sendStatus(400)
+      })
+
+      if (comment) {
+        await event.comments.push(comment.id)
+        await event.save()
+
+        // Send the comment back to socket.io
+        Comment.populate(comment, { path: 'user', select: 'username image' },
+          function (err, comment) {
+            res.json(comment)
+          })
+      } else {
+        res.sendStatus(500)
+      }
     } else {
       res.sendStatus(404)
     }

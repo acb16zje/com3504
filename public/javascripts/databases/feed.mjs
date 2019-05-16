@@ -141,6 +141,7 @@ function loadStoryFeedLocal () {
           stories[i].userImage = user.image
         }
 
+        // Only return the stories that the user followed
         return stories.filter(story =>
           story.user === currentUser ||
           loggedInUser.following.includes(story.user))
@@ -223,10 +224,10 @@ function displayEventFeed (feed) {
 /**
  * Return the HTML fragment for a story feed card
  *
- * @param {string} story The story document
+ * @param {Object} story The story document
  * @returns {string} The HTML for a story feed card
  */
-function renderStoryFeed (story) {
+export function renderStoryFeed (story) {
   const storyID = story._id
   const username = story.user.username || story.user
   const userImage = story.user.image || story.userImage
@@ -245,7 +246,7 @@ function renderStoryFeed (story) {
                 </figure>
               </a>
             </div>
-            <div id="profile-event-link" class="level-item">
+            <div class="level-item profile-event-link">
               <a href="/${username}">
                 <p class="title is-6 story-username">${username}</p>
               </a>
@@ -298,8 +299,12 @@ function renderStoryFeed (story) {
 }
 
 /************************ EventListener below ************************/
-
-function addStoryFeedLikeListener (likeButton) {
+/**
+ * Add click listener to
+ *
+ * @param {Element} likeButton The HTML element of like button
+ */
+export function addStoryFeedLikeListener (likeButton) {
   if (likeButton) {
     likeButton.onclick = function () {
       const storyID = this.dataset.id

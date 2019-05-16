@@ -72,14 +72,39 @@
       </div>
     </div>
 
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">Description</p>
-      </header>
-      <div class="card-content">
-        <div id="description" class="content"></div>
+    <% if (tab === 'about') { %>
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Description</p>
+        </header>
+        <div class="card-content">
+          <div id="description" class="content"></div>
+        </div>
       </div>
-    </div>
+    <% } else { %>
+      <% if (authenticated) { %>
+        <div class="card">
+          <div class="card-content">
+            <div class="columns is-vcentered is-mobile">
+              <div class="column is-paddingless">
+                <form id="event-comment" class="is-flex">
+                  <figure class="image is-48x48">
+                    <img class="is-rounded" src="<%= userImgSrc %>"  alt="User profile image">
+                  </figure>
+                  <textarea id="reply" class="textarea has-fixed-size" placeholder="Add a comment" maxlength="100"></textarea>
+                </form>
+              </div>
+
+              <div class="column is-narrow">
+                <a id="post-event-comment">Post</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <div id="discussion-section"></div>
+    <% } %>
 
   </div>
 </section>

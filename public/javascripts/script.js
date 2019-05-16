@@ -62,10 +62,9 @@ function intlFormat (num) {
  * @return {*} The friendly format of the number
  */
 function makeFriendly (num) {
-  if (num >= 1000000)
-    return intlFormat(num / 1000000) + 'M'
-  if (num >= 1000)
-    return intlFormat(num / 1000) + 'k'
+  if (num >= 1000000) return intlFormat(num / 1000000) + 'M'
+  if (num >= 1000) return intlFormat(num / 1000) + 'k'
+
   return intlFormat(num)
 }
 
@@ -143,19 +142,18 @@ function getBase64 (file) {
   })
 }
 
-const eventSelect = document.getElementById('story-event')
-
 /**
- * Create story - append events to select options
+ * Append option to select
  *
+ * @param {Element} select The select element
  * @param {string} text The option text
  * @param {string} value The option value
  */
-function appendEventToSelect (text, value) {
+function appendOptionToSelect (select, text, value) {
   const option = document.createElement('option')
   option.text = text
   option.value = value
-  eventSelect.appendChild(option)
+  select.appendChild(option)
 }
 
 /**
@@ -271,7 +269,7 @@ function closeModalListener () {
 
       for (let i = 0, n = modals.length; i < n; i++) {
         // Specific case: leave story room when modal closed
-        if (modals[i].dataset.id) {
+        if (modals[i].dataset.id && socket) {
           socket.emit('leave story room', modals[i].dataset.id)
         }
 
@@ -587,17 +585,17 @@ function shouldInitSocket () {
   const storyFeed = document.getElementById('story-feed')
   const storiesColumn = document.getElementById('stories')
   const eventSection = document.getElementById('event')
+  const createStoryForm = document.getElementById('create-story')
 
-  return navigator.onLine && (storyFeed || storiesColumn || eventSection)
+  return navigator.onLine &&
+    (storyFeed || storiesColumn || eventSection || createStoryForm)
 }
 
 // Will be used in *.mjs files
 const socket = shouldInitSocket() ? io() : undefined
 
 if (socket) {
-  socket.on('new comment', (username, comment) => {
-    appendComment(username, comment)
-  })
+  socket.on('new comment', (username, comment) => appendComment(username, comment))
 }
 
 /**

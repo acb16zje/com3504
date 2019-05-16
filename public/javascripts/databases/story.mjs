@@ -20,6 +20,8 @@ if (createStoryForm) {
       const formJson = convertToJSON($(this).serializeArray())
 
       createStory(formJson).then(res => {
+        if (socket) socket.emit('new event story', formJson.event, res)
+
         window.location.href = '/'
       }).catch(err => {
         console.log(err)
@@ -109,6 +111,7 @@ function createStory (formJson) {
   return Promise.resolve($.ajax({
     method: 'POST',
     contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
     data: JSON.stringify(formJson),
     url: '/api/story/create',
   }))
@@ -245,7 +248,7 @@ export function renderStoryModal (username = undefined) {
                   </figure>
                 </a>
               </div>
-              <div id="profile-event-link" class="level-item">
+              <div class="level-item profile-event-link">
                 <a class="profile-link">
                   <p class="title is-6 story-username"></p>
                 </a>
@@ -374,7 +377,7 @@ export function addStoryModalListener () {
         const storyID = this.dataset.id
 
         // Join the story room
-        socket.emit('join story room', storyID)
+        if (socket) socket.emit('join story room', storyID)
         document.getElementById('story').dataset.id = storyID
 
         // Edit button
@@ -513,16 +516,16 @@ export function addStoryModalListener () {
             if (socket && replyForm.value) {
               commentStory(story._id, replyForm.value).then(() => {
                 // Emit to everyone looking at the story
-                socket.emit('new comment', currentUser, replyForm.value, storyID)
+                if (socket) socket.emit('new comment', storyID, currentUser,
+                  replyForm.value)
 
                 // Clear textarea
                 replyForm.value = ''
 
-              }).catch(err => {
+              }).catch(() => {
                 if (err.status === 401) {
                   showSnackbar('Please sign in to continue')
                 } else {
-                  console.log(err)
                   showSnackbar('Failed to process the request')
                 }
               })

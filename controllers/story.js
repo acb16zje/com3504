@@ -120,7 +120,17 @@ exports.createStory = async (req, res) => {
             await event.stories.push(story.id)
             await user.save()
             await event.save()
-            res.sendStatus(200)
+
+            // Send created story back to socket.io
+            res.json({
+              user: user,
+              event: event,
+              image: story.image,
+              caption: story.caption,
+              date: story.date,
+              likes: story.likes,
+              comments: story.comments,
+            })
           } else {
             res.sendStatus(500)
           }

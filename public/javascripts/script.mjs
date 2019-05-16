@@ -20,6 +20,7 @@ import {
   storeUserProfile,
 } from './databases/user.mjs'
 import { dbPromise } from './databases/database.mjs'
+import { getGenres } from './databases/genre.mjs'
 
 export const currentUser = $(document.getElementById('my-account')).data('user')
 
@@ -31,9 +32,12 @@ export const currentUser = $(document.getElementById('my-account')).data('user')
  * @param {Array} events An array of events object
  */
 function addEvents (events) {
+  const eventSelect = document.getElementById('story-event')
+
   for (let i = events.length; i--;) {
+    // Create story - append events to select options
     if (eventSelect) {
-      appendEventToSelect(events[i].name, events[i]._id)
+      appendOptionToSelect(eventSelect, events[i].name, events[i]._id)
     }
 
     if (events[i].genres) {
@@ -96,7 +100,13 @@ const exploreSearchForm = document.getElementById('explore-search-form')
 const mapButton = document.getElementById('map-button')
 
 if (exploreSearchForm) {
-  const searchButton = document.getElementById('search-button')
+  // Init genres select
+  const genreSelect = document.getElementById('search-genre')
+  getGenres().then(genres => {
+    for (let i = 0, n = genres.length; i < n; i++) {
+      appendOptionToSelect(genreSelect, genres[i].name, genres[i]._id)
+    }
+  })
 
   // Location search input
   initLocationInput(true)

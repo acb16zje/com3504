@@ -16,22 +16,27 @@ const User = require('../models/user')
  */
 exports.init = function (io) {
   io.on('connection', (socket) => {
-    socket.on('new comment', (username, comment, storyID) => {
+    /* Story-related */
+    socket.on('join story room', storyID => socket.join(storyID))
+
+    socket.on('leave story room', storyID => socket.leave(storyID))
+
+    socket.on('new comment', (storyID, username, comment) => {
       io.in(storyID).emit('new comment', username, comment)
     })
 
-    socket.on('join story room', storyID => {
-      console.log(`joined ${storyID}`)
-      socket.join(storyID)
+    /* Event-related */
+    socket.on('join event room', eventID => {
+      console.log('joined event room')
+      socket.join(eventID)
     })
 
-    socket.on('leave story room', storyID => {
-      console.log(`leaved ${storyID}`)
-      socket.leave(storyID)
+    socket.on('new event story', (eventID, story) => {
+      io.in(eventID).emit('new event story', story)
     })
 
-    socket.on('new story', story => {
-
+    socket.on('new event comment', (eventID, comment) => {
+      io.in(eventID).emit('new event comment', comment)
     })
   });
 }

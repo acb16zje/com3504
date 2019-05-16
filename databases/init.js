@@ -108,7 +108,7 @@ mongoose.connect(URL, {
         latitude: 53.3808188,
         longitude: -1.4803254999999353,
       },
-      genres: pop.id,
+      genres: [blues.id, pop.id, jazz.id, country.id],
       going: [mario.id, luigi.id],
     }).save()
     const marioEvent = await new Event({
@@ -123,7 +123,7 @@ mongoose.connect(URL, {
         latitude: 53.38072,
         longitude: -1.4871329999999716,
       },
-      genres: [classical.id, electronic.id],
+      genres: [classical.id, electronic.id, comedy.id, funk.id],
       interested: [gakki.id],
     }).save()
     const luigiEvent = await new Event({
@@ -137,7 +137,7 @@ mongoose.connect(URL, {
         latitude: 53.3835591,
         longitude: -1.4789316999999755,
       },
-      genres: [classical.id, electronic.id, pop.id],
+      genres: [metal.id, rock.id, pop.id, folk.id],
       interested: [gakki.id],
     }).save()
 

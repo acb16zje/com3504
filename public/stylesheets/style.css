@@ -198,7 +198,7 @@ div.story-feed figure.story-modal {
 
 /* Explore page search box */
 #explore-search-box {
-  background-image: linear-gradient(141deg,var(--primary-color) 0, #895bd9 71%, #9852d9 100%);
+  background-image: linear-gradient(141deg, var(--primary-color) 0, #895bd9 71%, #9852d9 100%);
 }
 
 #explore-search-box .label {
@@ -304,6 +304,40 @@ div.story-feed figure.story-modal {
 
 #event .media {
   align-items: center;
+}
+
+/* Event page discussion */
+#event #event-comment {
+  align-items: center;
+}
+
+#event #event-comment textarea {
+  min-width: initial;
+  min-height: 48px;
+  box-shadow: none;
+  padding: 0.3rem;
+  padding-left: 1rem;
+  border: none;
+}
+
+#event header.card-header {
+  box-shadow: none;
+}
+
+#event .story-feed header.card-header {
+  box-shadow: 0 1px 2px rgba(10,10,10,.1);
+}
+
+#event #comment-card nav {
+  font-weight: normal;
+}
+
+#event #comment-card div.card-content {
+  padding: 0 1rem 1rem;
+}
+
+#event div.story-feed {
+  width: 100%
 }
 
 /* Create story page */
@@ -545,12 +579,16 @@ div.story-feed figure.story-modal {
 }
 
 /* User profile story image modal */
+#story div.card {
+  max-width: 100%;
+}
+
 #story div.modal-content {
   overflow: hidden;
   max-height: initial;
 }
 
-#story header div.card-header-title, #story-feed header div.card-header-title {
+#story header div.card-header-title, .story-feed header div.card-header-title {
   justify-content: space-between;
 }
 
@@ -561,7 +599,7 @@ div.story-feed figure.story-modal {
   max-width: 220px;
 }
 
-#story #profile-event-link, #story-feed #profile-event-link {
+.profile-event-link {
   display: flex;
   flex-direction: column;
   align-items: start;
