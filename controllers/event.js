@@ -61,6 +61,23 @@ exports.getEventData = (req, res) => {
 }
 
 /**
+ * GET all comments and stories related to the event
+ *
+ * @param {Object} req The request header
+ * @param {Object} res The response header
+ */
+exports.getEventDiscussion = (req, res) => {
+  const eventQuery = Event.findById(req.params.id)
+
+  eventQuery.then(event => {
+    res.sendStatus(200)
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * GET all events related to the user (follow, created)
  *
  * @param {Object} req The request header
@@ -119,9 +136,14 @@ exports.searchEvent = (req, res) => {
 
   if (json.date) {
     const date = new Date(json.date)
+
+    // Timezone problem
+    date.setHours(date.getHours() + date.getTimezoneOffset() / 60)
+
+    const dateTomorrow = new Date(new Date(date).setDate(date.getDate() + 1))
     const startDateQuery = {
       $gte: date,
-      $lt: new Date(date).setDate(date.getDate() + 1),
+      $lt: dateTomorrow
     }
 
     eventQuery.find({

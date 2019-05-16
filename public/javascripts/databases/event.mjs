@@ -273,6 +273,7 @@ export function displayExplorePage (events) {
     }
   }
 
+  // Do not show Past Events text when there are none
   if (pastColumns.children.length < 1) {
     document.getElementById('past-text').classList.add('is-hidden')
   } else {
@@ -370,6 +371,10 @@ function displayEventPage (event) {
   } else {
     genre.classList.add('is-hidden')
   }
+
+  // About and discussion link
+  document.getElementById('about').firstElementChild.href = `/event/${event._id}`
+  document.getElementById('discussion').firstElementChild.href = `/event/${event._id}/discussion`
 
   // Description
   document.getElementById('description').textContent = event.description

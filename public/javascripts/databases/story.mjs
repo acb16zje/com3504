@@ -168,6 +168,22 @@ export function likeStory (storyID) {
 }
 
 /**
+ * Comment a story
+ *
+ * @param {string} storyID The ID of the story to comment
+ * @param {string} content The content of the comment
+ * @returns {Promise<any>} The Promise
+ */
+function commentStory (storyID, content) {
+  return Promise.resolve($.ajax({
+    method: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({ id: storyID, content: content }),
+    url: '/api/story/comment',
+  }))
+}
+
+/**
  * Load the story data from Mongo, or IndexedDB
  *
  * @param {story} storyID The ID of the story to load
@@ -251,7 +267,7 @@ export function renderStoryModal (username = undefined) {
           </figure>
         </div>
 
-        <div class="card-content">
+        <div id="comment-container" class="card-content">
           <div class="content">
             <a class="profile-link">
               <p class="title is-6 story-username is-inline"></p>
@@ -276,8 +292,8 @@ export function renderStoryModal (username = undefined) {
             <small id="story-date"></small>
           </div>
           <div id="reply" class="is-flex">
-            <textarea name="reply" class="textarea has-fixed-size" placeholder="Add a comment"></textarea>
-            <a id="post-reply">Post</a>
+            <textarea name="reply" class="textarea has-fixed-size" placeholder="Add a comment" maxlength="100"></textarea>
+            <a id="post-button">Post</a>
           </div>
         </footer>
       </div>
@@ -357,6 +373,10 @@ export function addStoryModalListener () {
       storyModals[i].onclick = function () {
         const storyID = this.dataset.id
 
+        // Join the story room
+        socket.emit('join story room', storyID)
+        document.getElementById('story').dataset.id = storyID
+
         // Edit button
         const editButton = document.getElementsByClassName('edit-button')[0]
         if (editButton) {
@@ -377,7 +397,7 @@ export function addStoryModalListener () {
           : this.children[0].src
 
         // Reset comments scroll to top
-        // document.querySelector('#story div.card-content').scrollTop = 0
+        document.getElementById('comment-container').scrollTop = 0
 
         // AJAX load caption, comments, and like count
         loadStoryData(storyID).then(story => {
@@ -485,6 +505,32 @@ export function addStoryModalListener () {
           // Story date
           document.getElementById('story-date').textContent = formatStoryDate(
             story.date)
+
+          // Reply button
+          const replyButton = document.getElementById('post-button')
+          const replyForm = document.querySelector('#reply textarea')
+          replyButton.onclick = function () {
+            if (socket && replyForm.value) {
+              commentStory(story._id, replyForm.value).then(() => {
+                // Emit to everyone looking at the story
+                socket.emit('new comment', currentUser, replyForm.value, storyID)
+
+                // Clear textarea
+                replyForm.value = ''
+
+              }).catch(err => {
+                if (err.status === 401) {
+                  showSnackbar('Please sign in to continue')
+                } else {
+                  console.log(err)
+                  showSnackbar('Failed to process the request')
+                }
+              })
+
+            } else {
+              showSnackbar('Unable to post comment')
+            }
+          }
 
           document.getElementById('story').classList.add('is-active')
         }).catch((err) => console.log(err))

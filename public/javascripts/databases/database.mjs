@@ -15,19 +15,16 @@ import './feed.mjs'
 const DB_NAME = 'musicbee'
 const VERSION = 1
 
-export let dbPromise
-
 // IndexedDB configuration. this will only be called when VERSION has changed
-if (window.indexedDB) {
-  dbPromise = openDB(DB_NAME, VERSION, {
+export const dbPromise = window.indexedDB
+  ? openDB(DB_NAME, VERSION, {
     upgrade (db, oldVersion, newVersion, transaction) {
       initGenreDatabase(db)
       initUserDatabase(db)
       initStoryDatabase(db)
       initEventDatabase(db)
     },
-  })
-}
+  }) : undefined
 
 /**
  * Display unable to load when error occurred

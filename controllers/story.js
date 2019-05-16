@@ -5,6 +5,7 @@
  */
 
 'use strict'
+const Comment = require('../models/comment')
 const Event = require('../models/event')
 const User = require('../models/user')
 const Story = require('../models/story')
@@ -217,6 +218,44 @@ exports.likeStory = (req, res) => {
         console.log(err)
         res.sendStatus(500)
       })
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
+ * POST comment a story
+ *
+ * @param {Object} req The request header
+ * @param {Object} res The response header
+ */
+exports.commentStory = (req, res) => {
+  const storyQuery = Story.findById(req.body.id)
+
+  storyQuery.then(async story => {
+    if (story) {
+      const comment = await new Comment({
+        user: req.user.id,
+        story: story.id,
+        content: req.body.content,
+      }).save().catch(err => {
+        // Bad request
+        console.log(err)
+        res.status(400).send(err)
+      })
+
+      if (comment) {
+        // Add the created comment to story
+        await story.comments.push(comment.id)
+        await story.save()
+        res.sendStatus(200)
+      } else {
+        res.sendStatus(500)
+      }
     } else {
       res.sendStatus(404)
     }

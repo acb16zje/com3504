@@ -249,26 +249,32 @@ function closeModalListener () {
   const closeModal = () => {
     const modals = document.getElementsByClassName('modal')
 
-    // Specific case: closing edit story modal does not close story modal
+    // Specific case: do not close story modal when closing edit story modal
     const editStoryDiv = document.getElementById('edit-story')
 
     // Specific case for edit event modal
     const editEventDiv = document.getElementById('edit-event')
-
-    // Specific case for map modal
-    const mapDiv = document.getElementById('map')
 
     if (editStoryDiv) {
       editStoryDiv.remove()
     } else if (editEventDiv) {
       editEventDiv.remove()
     } else {
-      // Remove the map, so it can reload when modal is shown again
+      /**
+       * Specific case for map modal: remove the map,
+       * so it can reload when modal is shown again
+       */
+      const mapDiv = document.getElementById('map')
       if (mapDiv) {
         mapDiv.remove()
       }
 
       for (let i = 0, n = modals.length; i < n; i++) {
+        // Specific case: leave story room when modal closed
+        if (modals[i].dataset.id) {
+          socket.emit('leave story room', modals[i].dataset.id)
+        }
+
         modals[i].classList.remove('is-active')
       }
     }
@@ -465,7 +471,7 @@ if (searchInput) {
 
 /************************ WebRTC below ************************/
 /**
- *
+ * Start WebRTC camera
  */
 function startWebRTC () {
   const constraints = {
@@ -572,7 +578,47 @@ function applyFilterEffect (ctx, filterValue) {
 }
 
 /************************ Socket.io below ************************/
-// Prevent socket.io from transport polling things when offline
-if (navigator.onLine) {
-  const socket = io();
+/**
+ * Prevent socket.io from transport polling things when offline
+ *
+ * @returns {boolean} True if in the correct page and online
+ */
+function shouldInitSocket () {
+  const storyFeed = document.getElementById('story-feed')
+  const storiesColumn = document.getElementById('stories')
+  const eventSection = document.getElementById('event')
+
+  return navigator.onLine && (storyFeed || storiesColumn || eventSection)
+}
+
+// Will be used in *.mjs files
+const socket = shouldInitSocket() ? io() : undefined
+
+if (socket) {
+  socket.on('new comment', (username, comment) => {
+    appendComment(username, comment)
+  })
+}
+
+/**
+ * Append new comment to the comment section
+ *
+ * @param {string} username Username of the author
+ * @param {string} comment The comment content
+ */
+function appendComment (username, comment) {
+  const comments = document.getElementById('comments')
+  comments.insertAdjacentHTML(
+    'beforeend',
+    `<p class="subtitle is-6">
+      <a class="title is-6" href="/${username}">
+        ${username}
+      </a>
+      ${comment}
+    </p>`
+  )
+
+  // Scroll to bottom
+  const commentContainer = document.getElementById('comment-container')
+  commentContainer.scrollTop = commentContainer.scrollHeight
 }

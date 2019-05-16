@@ -9,6 +9,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 // Models required for population
+require('../models/event')
 require('../models/user')
 require('../models/story')
 
@@ -21,7 +22,10 @@ const Comment = mongoose.model('Comment', new Schema({
   story: {
     type: Schema.Types.ObjectId,
     ref: 'Story',
-    required: true,
+  },
+  event: {
+    type: Schema.Types.ObjectId,
+    ref: 'event',
   },
   content: {
     type: String,

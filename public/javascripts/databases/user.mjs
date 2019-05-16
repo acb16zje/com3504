@@ -294,6 +294,7 @@ function displayUserProfile (doc) {
   document.getElementById('went-link').href = `/${username}/went`
 
   // Stories, Events, Going, Interested, or Went
+  const today = new Date()
   switch (tab) {
     case 'events':
       renderEventColumns(doc.events)
@@ -302,13 +303,25 @@ function displayUserProfile (doc) {
       renderEventColumns(doc.interested)
       break
     case 'going':
-      const going = doc.going.filter(
-        event => new Date() <= new Date(event.startDate))
+      const going = doc.going.filter(event => {
+        if (event.endDate) {
+          return today <= new Date(event.startDate) ||
+            today >= new Date(event.startDate) &&
+            today <= new Date(event.endDate)
+        } else {
+          return today <= new Date(event.startDate)
+        }
+      })
       renderEventColumns(going)
       break
     case 'went':
-      const went = doc.going.filter(
-        event => new Date(event.startDate) < new Date())
+      const went = doc.going.filter(event => {
+        if (event.endDate) {
+          return today > new Date(event.endDate)
+        } else {
+          return today > new Date(event.startDate)
+        }
+      })
       renderEventColumns(went)
       break
     default:

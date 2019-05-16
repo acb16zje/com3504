@@ -9,6 +9,13 @@
         <a class="navbar-end navbar-item is-hidden-desktop" href="/logout">
           <button class="button">Log Out</button>
         </a>
+      <% } else { %>
+        <a class="navbar-end navbar-item is-hidden-desktop" href="/login">
+          <button class="button">
+            <span>Sign in with</span>
+            <span class="icon iconify" data-icon="flat-color-icons:google"></span>
+          </button>
+        </a>
       <% } %>
     </div>
 

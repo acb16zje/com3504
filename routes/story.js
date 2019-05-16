@@ -29,4 +29,7 @@ router.post('/api/story/delete', auth.checkAuthAPI, storyController.deleteStory)
 /* AJAX POST like a story */
 router.post('/api/story/like', auth.checkAuthAPI, storyController.likeStory)
 
+/* AJAX POST reply a comment to story */
+router.post('/api/story/comment', auth.checkAuthAPI, storyController.commentStory)
+
 module.exports = router

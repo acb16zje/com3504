@@ -19,19 +19,31 @@ router.get('/explore', (req, res) => {
   })
 })
 
-/* AJAX GET explore page */
-router.get('/api/explore', eventController.index)
-
 /* GET the page of specific event */
 router.get('/event/:id?', (req, res) => {
   res.render('event', {
     title: 'Musicbee',
     path: 'explore',
+    tab: 'about',
   })
 })
 
+router.get('/event/:id/discussion', (req, res) => {
+  res.render('event', {
+    title: 'Musicbee',
+    path: 'explore',
+    tab: 'discussion'
+  })
+})
+
+/* AJAX GET explore page */
+router.get('/api/explore', eventController.index)
+
 /* AJAX GET the details of a specific event */
 router.get('/api/event/:id', eventController.getEventData)
+
+/* AJAX GET the details of a specific event */
+router.get('/api/event/:id/discussion', eventController.getEventDiscussion)
 
 /* AJAX GET all events related to the username */
 router.get('/api/event_feed', auth.checkAuthAPI, eventController.getEventFeed)

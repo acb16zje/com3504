@@ -171,7 +171,7 @@ mongoose.connect(URL, {
       caption: 'Join me at Luigi Event',
     }).save()
 
-    // Comment data
+    // Stories Comment data
     const gakkiCommentMario = await new Comment({
       user: gakki.id,
       story: marioStory.id,
@@ -196,6 +196,31 @@ mongoose.connect(URL, {
       content: 'Hi Gakki, I am Luigi!',
     }).save()
 
+    // Events comment data
+    const gakkiCommentMarioEvent = await new Comment({
+      user: gakki.id,
+      event: marioEvent.id,
+      content: 'I am interested in Mario Festival!',
+    }).save()
+
+    const gakkiCommentLuigiEvent = await new Comment({
+      user: gakki.id,
+      event: luigiEvent.id,
+      content: 'I am interested in Luigi Festival!',
+    }).save()
+
+    const marioCommentGakkiEvent = await new Comment({
+      user: mario.id,
+      event: gakkiEvent.id,
+      content: 'I\'m Mario! Gakki Festival is fun!',
+    }).save()
+
+    const luigiCommentGakkiEvent = await new Comment({
+      user: luigi.id,
+      event: luigiEvent.id,
+      content: 'I\'m Luigi! Gakki Festival is exciting!',
+    }).save()
+
     // User: Update the events, followers, and stories details
     gakki.stories = [gakkiStory.id]
     gakki.followers = [mario.id, luigi.id]
@@ -215,14 +240,17 @@ mongoose.connect(URL, {
     luigi.going = [gakkiEvent.id]
     await luigi.save()
 
-    // Event: update the stories
+    // Event: update the stories and comments
     gakkiEvent.stories = [gakkiStory.id]
+    gakkiEvent.comments = [marioCommentGakkiEvent.id, luigiCommentGakkiEvent.id]
     await gakkiEvent.save()
 
     marioEvent.stories = [marioStory.id]
+    marioEvent.comments = [gakkiCommentMarioEvent.id]
     await marioEvent.save()
 
     luigiEvent.stories = [luigiEvent.id]
+    luigiEvent.comments = [gakkiCommentLuigiEvent.id]
     await luigiEvent.save()
 
     // Stories: update the comments

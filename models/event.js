@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 // Models required for population
+require('../models/comment')
 require('../models/genre')
 require('../models/user')
 require('../models/story')
@@ -70,6 +71,13 @@ const Event = mongoose.model('Event', new Schema({
       ref: 'Story',
       default: [],
     }],
+  comments: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: [],
+    },
+  ],
 }))
 
 module.exports = Event

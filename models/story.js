@@ -27,7 +27,10 @@ const Story = mongoose.model('Story', new Schema({
   image: {
     type: String,
   },
-  caption: String,
+  caption: {
+    type: String,
+    maxlength: 100
+  },
   date: {
     type: Date,
     required: true,

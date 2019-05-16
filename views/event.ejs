@@ -9,6 +9,7 @@
           <img id="event-image" src="/images/placeholder.webp" alt="Event image">
         </figure>
       </div>
+
       <div class="card-content">
         <div class="media">
           <div class="media-left">
@@ -61,6 +62,13 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="tabs is-medium is-fullwidth">
+        <ul>
+          <li id="about" <%= tab === 'about' ? "class=is-active" : '' %> ><a>About</a></li>
+          <li id="discussion" <%= tab === 'discussion' ? "class=is-active" : '' %> ><a>Discussion</a></li>
+        </ul>
       </div>
     </div>
 
