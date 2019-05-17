@@ -332,9 +332,9 @@ export function renderStoryModal (username = undefined) {
               </div>
             </nav>
 
-            ${currentUser === username && currentUser ? `
-              <button class="button edit-button is-light">Edit</button>
-            ` : ''}
+            <button id="story-modal-edit" class="button edit-button is-light ${currentUser === username && currentUser ? '' : 'is-hidden'}">
+              Edit
+            </button>
           </div>
         </header>
 
@@ -468,13 +468,6 @@ export function addStoryModalListener () {
         if (socket) socket.emit('join story room', storyID)
         document.getElementById('story').dataset.id = storyID
 
-        // Edit button
-        const editButton = document.getElementsByClassName('edit-button')[0]
-        if (editButton) {
-          editButton.dataset.id = storyID
-          addEditStoryListener() // Click listener for edit story button
-        }
-
         // Add the image source (/explore/stories will require AJAX request)
         if (!exploreStories) {
           const profileImgModal = document.getElementById('user-image-modal')
@@ -509,6 +502,16 @@ export function addStoryModalListener () {
             if (exploreStories) {
               document.getElementById('story-image').src = story.image
               document.getElementById('user-image-modal').src = story.user.image
+            }
+
+            // Edit button
+            const editButton = document.getElementById('story-modal-edit')
+            if (editButton && story.user.username === currentUser) {
+              editButton.dataset.id = storyID
+              editButton.classList.remove('is-hidden')
+              addEditStoryListener() // Click listener for edit story button
+            } else {
+              editButton.classList.add('is-hidden')
             }
           }
 
@@ -704,9 +707,11 @@ export function addEditStoryListener () {
                * If delete action is in story feed, then remove from story feed
                * Else remove from user profile
                */
-              if (captionFeed) {
+              const storiesDiv = document.getElementById('stories')
+              const storyFeedDiv = document.getElementById('story-feed')
+              if (storyFeedDiv) {
                 document.getElementById(`story-feed-${storyID}`).remove()
-              } else {
+              } else if (storiesDiv) {
                 document.getElementById(storyID).remove()
               }
 
