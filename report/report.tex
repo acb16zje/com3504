@@ -61,7 +61,13 @@ used to provide users with valid locations as options. \textbf{Solution:} FlexSe
 \cite{flexsearch} was chosen to implement basic text searching task due to its efficient,
 lightweight, and flexible properties \cite{flexsearch_benchmarkk}. It allows multi-field search and
 accepts multiple data format types as data index. Hence, it is used with both MongoDB and IndexedDB
-to provide searching functionality in both online and offline environment respectively.
+to provide searching functionality in both online and offline environment respectively. This was
+implemented for both searching for events and stories, where user provides relevant input and
+are given resulted options sorted by relevance (most relevant on top) in a drop-down menu.
+Users are able to search for events via event name, location/address, genre, and date of event.
+Users can search for stories via event name, tagged location/address, and date posted. This allows
+users to post stories related to an event from another location (not restricted to the event
+location) and they are able to post throwbacks (not restricted to date and time of event occurrence).
 \textbf{Requirements:} Users should be able to search for events and user profiles while online and
 offline. Users should be able to obtain results through querying with partial information. The
 results returned are sorted by relevance. \textbf{Limitations:} On every page load, the data has to
@@ -72,20 +78,28 @@ token for every request made, hence Place Autocomplete will not work offline.
 
 \section{Interface to Search Data via Map}
 \textbf{Challenges:} The use of map with accurate location where caching is able to take place.
-Custom marker containing the image and link to event is placed on the location of the event.
-\textbf{Solutions:} Map was implemented with Leaflet Geocoder, with markers displaying pop-up of
-image and link of ongoing and future events. Offline searches will display marker on cached location
-of event. \textbf{Requirements:} Allow users to search for events using a map in both online and
-offline environments. Past events should not appear on the map. Future and ongoing events should be
-displayed as custom markers on the map. Custom markers should pop-up to display the event
-information when clicked. \textbf{Limitations:} The map takes time to load and does not generate
-immediately. Google Maps API was not chosen to be implemented in this task as request could not be
-cached due to the generation of random token for every request made, making it unavailable when user
-is offline. Caching the map tiles consumes more storage than other requests as map tiles are stored
-as images. If Place Autocomplete by Google Maps API \cite{google_maps_api} was not implemented,
-users would be able to insert invalid locations, causing markers of any previously created events
-with valid locations to not show up on the map. Hence, heavily relies on the input to be of valid
-locations.
+Custom marker is placed on the location of the event. Multiple markers would cause stacking, leading
+to confusion and poor user experience. \textbf{Solutions:} Map was implemented with Leaflet Geocoder.
+In the implementation of searching for events, markers are placed to display pop-up of image and
+link of ongoing and future events upon clicking, while in the implementation of searching for
+stories, markers are placed to display pop-up of image, username and caption of stories upon clicking.
+Offline searches will display marker on cached location of event. To handle stacking of multiple
+markers (multimarker), Leaflet Marker Cluster was used. This would result in number of markers
+of each cluster to be displayed. Upon clicking, each marker would be displayed. \textbf{Requirements:}
+Allow users to search for events using a map in both online and offline environments. Past events 
+should not appear on the map. Future and ongoing events should be displayed as custom markers on the
+map. Custom markers should pop-up to display the event information when clicked. \textbf{Limitations:}
+The map takes time to load and does not generate immediately. Google Maps API was not chosen to be
+implemented in this task as request could not be cached due to the generation of random token for
+every request made, making it unavailable when user is offline. Caching the map tiles consumes more
+storage than other requests as map tiles are stored as images. If Place Autocomplete by Google Maps
+API \cite{google_maps_api} was not implemented, users would be able to insert invalid locations,
+causing markers of any previously created events with valid locations to not show up on the map.
+Hence, heavily relies on the input to be of valid locations. When there exist multiple markers, E.g.
+20 or more, on the exact same location, stacking of markers will occur. Markers are loaded all at
+once regardsless of whether or not the marker is within the frame of screen. This could be handled
+with the implementation of lazy loading, but is not implemented in the current site due to time
+constraint.
 
 \section{PWA – Caching of the App Template Using a Web Worker}
 \textbf{Challenges:} Fetching cross-domain response will result in an opaque response, which will
@@ -138,7 +152,9 @@ comments on stories and discussion posts on each event. Exhaustively testing the
 minimise the probability of bug occurrences. \textbf{Requirements:} Users should be able to select
 events to be tagged to their stories, 'like' and comment on stories, 'follow' other users, and click
 `Interested' or `Going' on events. Events which users attended are recorded in their profile. Events
-which were created by a user is set to be an event the organiser is `Going' to by default. Through
+which were created by a user is set to be an event the organiser is `Going' to by default. However,
+delete function is not available as in the case where events are cancelled, it should be announced
+in the `Discussion' of the event. Merely deleting an event would cause confusion for users. Through
 following others and posting themselves, users are able to view the activity of followed users and
 themselves, be it events or stories, in the `Home' page. Users require a Google Account to login
 for security purposes. With the implementation of WebRTC, users are able to take pictures at events 
@@ -160,7 +176,20 @@ interest through clicking on `Interested' or `Going', which would be displayed i
 They would not be able to update any information, follow or unfollow other users, or like and
 comment on stories. As mentioned above, Google Maps API do not work offline. However, this is a
 minor limitation here since users are not able to make changes when they are offline. User accounts
-are all public, hence users should be careful when sharing personal information.
+are all public, hence users should be careful when sharing personal information. In the current site,
+lazy loading is not implemented, hence, when multiple comments, stories, events, or discussion posts
+are created, they will all appear in the respective pages, resulting in a cluttered interface. The
+`Discussion' section of each event could not be edited or deleted, and is not limited by time, at
+which users can continue to create discussion posts even after the event has ended. This has its pros
+and cons at which users can still ask about potential future events or express feedbacks, but would
+also clutter the interface. Filters are provided in the implementation of WebRTC but users are unable
+to change the degree of each filter as they please. Due to time constraint, users are able to view
+number of followers, their followed users, number of likes on their created stories, but cannot view
+the names of users involved in all of the stated cases. External sharing of events and stories are
+not made available as well. Due to time constraint, `Notification' page has also been removed from
+the initial design of the site. However, it would be useful to have this function to remind users
+of upcoming events near them, upcoming events which user showed interest in attending, and to notify
+users of events which many from the list of their following users are attending.
 
 \section{Conclusions}
 This assignment highlights the importance of caching and the importance of usability both during
