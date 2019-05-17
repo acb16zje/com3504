@@ -24,7 +24,7 @@
         <a class="navbar-item has-text-weight-bold <%= /home_/.test(path) ? 'is-active' : '' %>" href="/">
           Home
         </a>
-        <a class="navbar-item has-text-weight-bold <%= path === 'explore' ? 'is-active' : '' %>" href="/explore">
+        <a class="navbar-item has-text-weight-bold <%= /explore_/.test(path) ? 'is-active' : '' %>" href="/explore">
           Explore
         </a>
       </div>
@@ -86,9 +86,9 @@
         </a>
       </div>
       <div class="column">
-        <a <%= path === 'explore' ? "class=is-active" : '' %> href="/explore">
+        <a <%= /explore_/.test(path) ? "class=is-active" : '' %> href="/explore">
           <span class="icon is-large">
-            <span class="iconify" data-icon="<%= path === 'explore' ? 'fa-solid:search' : 'ion:ios-search' %>"></span>
+            <span class="iconify" data-icon="<%= /explore_/.test(path) ? 'fa-solid:search' : 'ion:ios-search' %>"></span>
           </span>
         </a>
       </div>

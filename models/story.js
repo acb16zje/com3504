@@ -27,6 +27,14 @@ const Story = mongoose.model('Story', new Schema({
   image: {
     type: String,
   },
+  location: {
+    latitude: Number,
+    longitude: Number,
+    address: {
+      type: String,
+      default: 'No location',
+    },
+  },
   caption: {
     type: String,
     maxlength: 100

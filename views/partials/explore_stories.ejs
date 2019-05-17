@@ -1,0 +1,63 @@
+<div class="container">
+  <div id="explore-search-box" class="box">
+    <form id="explore-search-form">
+      <div class="columns">
+        <div class="column is-narrow">
+          <div class="field">
+            <label class="label">Looking for stories of</label>
+              <div class="select">
+                <select id="search-event" name="event">
+                  <option value="" selected>Event</option>
+                </select>
+              </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">In</label>
+            <div class="control">
+              <input name="address" id="autocomplete-explore" class="input" type="search" placeholder="Location">
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <label class="label">On</label>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input id="searchDate" name="date" class="input flatpickr flatpickr-input" type="text" placeholder="Date">
+            </div>
+            <div class="control">
+              <a id="date-clear" class="button">
+                <span class="icon is-small">
+                  <span class="iconify" data-icon="emojione-v1:cross-mark"></span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div id="explore-search" class="column is-narrow">
+          <div class="field">
+            <label class="label"></label>
+            <div class="control">
+                <button type="submit" class="button is-light">Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <hr>
+    <div class="columns is-centered is-marginless">
+      <div class="column is-narrow has-text-centered">
+        <button id="map-button" class="button is-light" data-target="map-modal">Open Maps</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stories">
+    <div class="columns is-mobile is-multiline"></div>
+  </div>
+</div>

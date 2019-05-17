@@ -11,11 +11,11 @@ const router = express.Router()
 
 const eventController = require('../controllers/event')
 
-/* GET explore page */
+/* GET explore events page */
 router.get('/explore', (req, res) => {
   res.render('explore', {
     title: 'Explore - Musicbee',
-    path: 'explore',
+    path: 'explore_events',
   })
 })
 
@@ -36,7 +36,7 @@ router.get('/event/:id/discussion', (req, res) => {
   })
 })
 
-/* AJAX GET explore page */
+/* AJAX GET explore events page */
 router.get('/api/explore', eventController.index)
 
 /* AJAX GET the details of a specific event */

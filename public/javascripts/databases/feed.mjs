@@ -55,7 +55,7 @@ if (storyFeedDiv) {
 
         if (feed && feed.length) {
           const stories = feed.sort(function (a, b) {
-            // Latest date first
+            // Newest date first
             return new Date(b.date) - new Date(a.date)
           })
 
@@ -136,15 +136,15 @@ function loadStoryFeedLocal () {
       if (stories && stories.length) {
         for (let i = stories.length; i--;) {
           const user = await db.getFromIndex(USER_STORE, 'username',
-            stories[i].user)
+            stories[i].user.username)
 
           stories[i].userImage = user.image
         }
 
         // Only return the stories that the user followed
         return stories.filter(story =>
-          story.user === currentUser ||
-          loggedInUser.following.includes(story.user))
+          story.user.username === currentUser ||
+          loggedInUser.following.includes(story.user.username))
       } else {
         return []
       }
@@ -256,7 +256,7 @@ export function renderStoryFeed (story) {
             </div>
           </nav>
           
-          ${currentUser === username ? `
+          ${currentUser === username && username ? `
             <button class="button edit-button is-light" data-id="${storyID}">Edit</button>
           ` : ''}
         </div>

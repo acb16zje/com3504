@@ -155,6 +155,11 @@ mongoose.connect(URL, {
       image: `/image/${gakkiStoryImage.id}`,
       caption: 'Join me at Gakki Event',
       likes: [mario.id, luigi.id],
+      location: {
+        address: 'Regent Court, Sheffield, UK',
+        latitude: 53.3808188,
+        longitude: -1.4803254999999353,
+      },
     }).save()
 
     const marioStory = await new Story({
@@ -162,6 +167,11 @@ mongoose.connect(URL, {
       event: marioEvent.id,
       image: `/image/${marioImg.id}`,
       caption: 'Join me at Mario Event',
+      location: {
+        address: 'Sheffield Students\' Union, Western Bank, Sheffield, UK',
+        latitude: 53.38072,
+        longitude: -1.4871329999999716,
+      },
     }).save()
 
     const luigiStory = await new Story({
@@ -169,6 +179,11 @@ mongoose.connect(URL, {
       event: luigiEvent.id,
       image: `/image/${luigiImg.id}`,
       caption: 'Join me at Luigi Event',
+      location: {
+        address: 'Kroto Research Institute, Red Hill, Sheffield, UK',
+        latitude: 53.3835591,
+        longitude: -1.4789316999999755,
+      },
     }).save()
 
     // Stories Comment data

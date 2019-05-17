@@ -12,6 +12,40 @@ const Story = require('../models/story')
 const imageController = require('../controllers/image')
 
 /**
+ * GET explore stories page (/explore/stories) with all stories
+ *
+ * @param {Object} req The request header
+ * @param {Object} res The response header
+ */
+exports.index = (req, res) => {
+  const storyQuery = Story.find({}, '-__v')
+  storyQuery.populate('user', '-_id username image')
+  storyQuery.populate('event', '_id name')
+  storyQuery.populate('likes', '-_id username')
+  storyQuery.populate({
+    path: 'comments',
+    populate: [
+      { path: 'user', select: '-_id username' },
+    ],
+    select: '-_id -story',
+    options: { sort: { date: 1 } },
+  })
+  storyQuery.sort({ date: 1 }).lean()
+
+  storyQuery.then(stories => {
+    // 404 error if no stories found
+    if (stories && stories.length) {
+      res.json(stories)
+    } else {
+      res.sendStatus(404)
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * GET all the data of a story
  *
  * @param {Object} req The request header
@@ -19,7 +53,7 @@ const imageController = require('../controllers/image')
  */
 exports.getStoryData = (req, res) => {
   const storyQuery = Story.findById(req.params.id, '-__v')
-  storyQuery.populate('user', '-_id username')
+  storyQuery.populate('user', '-_id username image')
   storyQuery.populate('event', '_id name')
   storyQuery.populate('likes', '-_id username')
   storyQuery.populate({
@@ -55,7 +89,7 @@ exports.getStoryFeed = (req, res) => {
 
   userQuery.then(user => {
     if (user) {
-      const storyQuery = Story.find()
+      const storyQuery = Story.find({}, '-__v')
       storyQuery.populate('event', '_id name')
       storyQuery.populate('likes', '-_id username')
       storyQuery.populate({
@@ -89,6 +123,70 @@ exports.getStoryFeed = (req, res) => {
 }
 
 /**
+ * GET all stories matching the search request
+ *
+ * @param {Object} req The request header
+ * @param {Object} res The response header
+ */
+exports.searchStory = (req, res) => {
+  const json = req.body
+
+  console.log(json)
+
+  const storyQuery = json.event
+    ? Story.find({event: json.event}, '-__v')
+    : Story.find({}, '-__v')
+
+  // If address is provided
+  if (json.address) {
+    storyQuery.find({
+      'location.address': new RegExp(`^.*${json.address.replace(
+        /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'),
+    })
+  }
+
+  // If date is provided
+  if (json.date) {
+    const date = new Date(json.date)
+
+    // Timezone problem
+    date.setHours(date.getHours() + date.getTimezoneOffset() / 60)
+
+    const dateTomorrow = new Date(new Date(date).setDate(date.getDate() + 1))
+    const dateQuery = {
+      $gte: date,
+      $lt: dateTomorrow,
+    }
+
+    storyQuery.find({ date: dateQuery })
+  }
+
+  storyQuery.populate('user', '-_id username image')
+  storyQuery.populate('event', '_id name')
+  storyQuery.populate('likes', '-_id username')
+  storyQuery.populate({
+    path: 'comments',
+    populate: [
+      { path: 'user', select: '-_id username' },
+    ],
+    select: '-_id -story',
+    options: { sort: { date: 1 } },
+  })
+  storyQuery.sort({ date: 1 }).lean()
+
+  storyQuery.then(stories => {
+    if (stories && stories.length) {
+      res.json(stories)
+    } else {
+      res.json([])
+    }
+  }).catch(err => {
+    console.log(err)
+    res.sendStatus(500)
+  })
+}
+
+/**
  * POST create a story
  *
  * @param {Object} req The request header
@@ -109,6 +207,11 @@ exports.createStory = async (req, res) => {
             event: json.event,
             image: storyImage ? `/image/${storyImage.id}` : undefined,
             caption: json.caption,
+            location: {
+              latitude: json.latitude ? json.latitude : undefined,
+              longitude: json.longitude ? json.longitude : undefined,
+              address: json.address ? json.address : 'No location',
+            },
           }).save().catch(err => {
             console.log(err)
             res.status(400).send(err)
@@ -164,6 +267,13 @@ exports.updateStory = (req, res) => {
   storyQuery.then(async story => {
     if (story) {
       story.caption = json.caption
+
+      if (story.location.address !== json.address) {
+        story.location.latitude = json.latitude ? json.latitude : undefined
+        story.location.longitude = json.longitude ? json.longitude : undefined
+        story.location.address = json.address ? json.address : 'No location'
+      }
+
       await story.save()
       res.sendStatus(200)
     } else {

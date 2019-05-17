@@ -22,7 +22,7 @@ import {
 } from './story.mjs'
 
 export const EVENT_STORE = 'event_store'
-const exploreSection = document.getElementById('explore')
+export const exploreEvents = document.getElementById('explore-events')
 const eventSection = document.getElementById('event')
 const discussionSection = document.getElementById('discussion-section')
 const createEventForm = document.getElementById('create-event')
@@ -32,33 +32,31 @@ const commentEventForm = document.getElementById('event-comment')
 const eventID = window.location.pathname.split('/')[2]
 
 // Loading, storing, and displaying events at /explore
-if (exploreSection) {
-  loadExplorePage().
-    then(events => {
-      console.log('Loaded /explore from server')
+if (exploreEvents) {
+  loadExploreEvents().then(events => {
+    console.log('Loaded /explore from server')
 
-      return storeExplorePage(events).then(() => {
-        console.log('Stored /explore')
-        return events
-      }).catch(() => console.log('Failed to store /explore'))
-    }).
-    then(events => displayExplorePage(events)).
-    catch(() => {
-      console.log('Failed to load /explore from server, loading from local')
+    storeExplorePage(events).then(() => {
+      console.log('Stored /explore')
+      displayExplorePage(events)
+    }).catch(() => console.log('Failed to store /explore'))
 
-      loadExplorePageLocal().then(events => {
-        console.log('Loaded /explore page from local')
+  }).catch(() => {
+    console.log('Failed to load /explore from server, loading from local')
 
-        if (events && events.length) {
-          displayExplorePage(events)
-        } else {
-          unableToLoadPage(exploreSection)
-        }
-      }).catch(() => {
-        console.log('Failed to load /explore page from local')
-        unableToLoadPage(exploreSection)
-      })
+    loadExploreEventsLocal().then(events => {
+      console.log('Loaded /explore page from local')
+
+      if (events && events.length) {
+        displayExplorePage(events)
+      } else {
+        unableToLoadPage(exploreEvents)
+      }
+    }).catch(() => {
+      console.log('Failed to load /explore page from local')
+      unableToLoadPage(exploreEvents)
     })
+  })
 }
 
 // Loading, storing, and displaying individual event
@@ -160,7 +158,8 @@ if (socket && discussionSection) {
 
   socket.on('new event comment', comment => {
     // Prepend the comment
-    discussionSection.insertAdjacentHTML('afterbegin', renderEventComment(comment))
+    discussionSection.insertAdjacentHTML('afterbegin',
+      renderEventComment(comment))
   })
 }
 
@@ -185,7 +184,7 @@ export function initEventDatabase (db) {
  *
  * @return {Promise<any>} The Promise
  */
-export function loadExplorePage () {
+export function loadExploreEvents () {
   return Promise.resolve($.ajax({
     method: 'GET',
     dataType: 'json',
@@ -194,11 +193,11 @@ export function loadExplorePage () {
 }
 
 /**
- * Load the /explore page from IndexedDB
+ * Load all events data from IndexedDB
  *
  * @return {Promise<* | void>} The Promise
  */
-export async function loadExplorePageLocal () {
+export async function loadExploreEventsLocal () {
   if (dbPromise) {
     return dbPromise.then(async db => {
       return await db.getAll(EVENT_STORE)
@@ -367,7 +366,7 @@ export function displayExplorePage (events) {
 
   addInterestedGoingListener() // click listener for interested and going
   addEditEventListener() // Click listener for edit event buttons
-  exploreSection.classList.remove('is-hidden')
+  exploreEvents.classList.remove('is-hidden')
 }
 
 /**
@@ -596,12 +595,12 @@ export function renderEventCard (event) {
           <div class="level-right">
             <div class="level-item">
               ${organiser === currentUser ?
-    `<button class="button edit-button" data-id="${eventID}">
+                `<button class="button edit-button" data-id="${eventID}">
                   <span class="icon iconify"data-icon="ic:baseline-edit"></span>
                   <span>Edit</span>
                 </button>`
-    :
-    `<button class=
+              :
+                `<button class=
                 "button interested-button ${isUserInterested ? 'is-light' : ''}"
                 data-id="${eventID}">
 
@@ -615,7 +614,7 @@ export function renderEventCard (event) {
 
                   <span>Interested</span>
                 </button>`
-    }
+              }
             </div>
           </div>
         </nav>
@@ -897,7 +896,7 @@ export function addEditEventListener () {
               if (eventSection) {
                 event.genres = displayForm.genres
                 displayEventPage(event)
-              } else if (exploreSection || eventFeedDiv) {
+              } else if (exploreEvents || eventFeedDiv) {
                 const startDate = new Date(event.startDate)
                 const startDay = startDate.getDate()
                 const startMonth = getStartMonth(startDate)
@@ -926,6 +925,21 @@ export function addEditEventListener () {
 }
 
 /************************ Helper Functions below ************************/
+/**
+ * Get the list of events
+ *
+ * @return {Promise<any>} The Promise
+ */
+export async function getEvents () {
+  return await loadExploreEvents().then(events => {
+    return events
+  }).catch(async () => {
+    return await loadExploreEventsLocal().then(events => {
+      return events
+    })
+  })
+}
+
 /**
  * Initialise create, edit event form
  */

@@ -11,6 +11,7 @@ const FILES = [
   '/events',
   '/event',
   '/explore',
+  '/explore/stories',
   '/create',
   '/create/event',
   '/favicon/favicon-32x32.png',

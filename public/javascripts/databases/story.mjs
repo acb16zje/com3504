@@ -5,13 +5,43 @@
  */
 
 'use strict'
-import { dbPromise } from './database.mjs'
+import { dbPromise, unableToLoadPage } from './database.mjs'
 import { currentUser } from '../script.mjs'
+import { initLocationInput } from '../script.mjs'
 
 export const STORY_STORE = 'story_store'
+export const exploreStories = document.getElementById('explore-stories')
 const createStoryForm = document.getElementById('create-story')
 
+// Loading, storing, and displaying stories at /explore/stories
+if (exploreStories) {
+  loadExploreStories().then(stories => {
+    console.log('Loaded /explore/stories from server')
+
+    storeStories(stories).then(() => {
+      console.log('Stored /explore/stories')
+      displayExploreStories(stories)
+    }).catch(() => console.log('Failed to store /explore/stories'))
+
+  }).catch(() => {
+    console.log('Failed to load /explore/stories from server, loading locally')
+
+    loadExploreStoriesLocal().then(stories => {
+      console.log('Loaded /explore/stories from local')
+
+      if (stories && stories.length) {
+        displayExploreStories(stories)
+      } else {
+        unableToLoadPage(exploreStories)
+      }
+    }).catch(() => console.log('Failed to load /explore/stories from local'))
+  })
+}
+
+// Create story
 if (createStoryForm) {
+  initLocationInput()
+
   $(createStoryForm).submit(function (e) {
     e.preventDefault()
     const imageInput = document.getElementsByName('image')[0]
@@ -47,6 +77,32 @@ export function initStoryDatabase (db) {
     store.createIndex('_id', '_id', { unique: true })
     store.createIndex('user', 'user')
     store.createIndex('event', 'event')
+  }
+}
+
+/**
+ * Load all stories data from MongoDB
+ *
+ * @return {Promise<any>} The Promise
+ */
+export function loadExploreStories () {
+  return Promise.resolve($.ajax({
+    method: 'GET',
+    dataType: 'json',
+    url: '/api/explore/stories',
+  }))
+}
+
+/**
+ * Load all events data from IndexedDB
+ *
+ * @return {Promise<* | void>} The Promise
+ */
+export function loadExploreStoriesLocal () {
+  if (dbPromise) {
+    return dbPromise.then(async db => {
+      return await db.getAll(STORY_STORE)
+    }).catch(err => console.log(err))
   }
 }
 
@@ -92,7 +148,6 @@ export async function storeStories (stories) {
       for (let i = 0, n = stories.length; i < n; i++) {
         (async () => {
           const story = Object.assign({}, stories[i])
-          story.user = story.user.username
           tx.store.put(story)
           await tx.done
         })()
@@ -212,6 +267,25 @@ export async function loadStoryData (storyID) {
 
 /************************ Rendering related ************************/
 /**
+ * Display all stories data on /explore/stories page
+ *
+ * @param {Object} stories The story documents retrieved
+ */
+export function displayExploreStories (stories) {
+  const storyColumns = document.getElementById('stories').firstElementChild
+  for (let i = stories.length; i--;) {
+    storyColumns.insertAdjacentHTML('beforeend', renderStoryColumn(stories[i]))
+  }
+
+  // Add required event listeners
+  storyColumns.insertAdjacentHTML('beforeend', renderStoryModal())
+  closeModalListener()
+  addStoryModalListener()
+
+  exploreStories.classList.remove('is-hidden')
+}
+
+/**
  * Return the HTML fragment for a story column (image card only)
  *
  * @param {Object} story A story document
@@ -258,7 +332,7 @@ export function renderStoryModal (username = undefined) {
               </div>
             </nav>
 
-            ${currentUser === username ? `
+            ${currentUser === username && currentUser ? `
               <button class="button edit-button is-light">Edit</button>
             ` : ''}
           </div>
@@ -309,11 +383,10 @@ export function renderStoryModal (username = undefined) {
 /**
  * Return the HTML fragment for edit story modal
  *
- * @param {string} id The ID of the story
- * @param {string} caption The caption of the story
+ * @param {Object} story The story to edit
  * @returns {string} The HTML fragment
  */
-function renderEditStoryModal (id, caption) {
+function renderEditStoryModal (story) {
   return `
   <div id="edit-story" class="modal is-active">
     <div class="modal-background"></div>
@@ -326,13 +399,28 @@ function renderEditStoryModal (id, caption) {
         <form id="edit-story-form">
           <div class="field is-horizontal">
             <div class="field-label is-normal">
+              <label class="label">Location</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input name="address" id="autocomplete" class="input" type="search" value="${story.location.address}">
+                  <input name="latitude" type="hidden">
+                  <input name="longitude" type="hidden">
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
               <label class="label">Caption</label>
             </div>
             <div class="field-body">
               <div class="field">
                 <div class="control">
-                  <input name="id" type="hidden" value="${id}">
-                  <textarea name="caption" class="textarea has-fixed-size" rows="3">${caption}</textarea>
+                  <input name="id" type="hidden" value="${story._id}">
+                  <textarea name="caption" class="textarea has-fixed-size" rows="3">${story.caption}</textarea>
                 </div>
               </div>
             </div>
@@ -387,17 +475,19 @@ export function addStoryModalListener () {
           addEditStoryListener() // Click listener for edit story button
         }
 
-        // Add the image source
-        const profileImgModal = document.getElementById('user-image-modal')
-        profileImgModal.src =
-          fromStoryFeed ?
-            document.querySelector(`#user-image-${storyID} img`).src
-            : document.querySelector('#user-image img').src
+        // Add the image source (/explore/stories will require AJAX request)
+        if (!exploreStories) {
+          const profileImgModal = document.getElementById('user-image-modal')
+          profileImgModal.src =
+            fromStoryFeed ?
+              document.querySelector(`#user-image-${storyID} img`).src
+              : document.querySelector('#user-image img').src
 
-        const imgChild = document.getElementById('story-image')
-        imgChild.src = fromStoryFeed ?
-          document.getElementById(`story-image-${storyID}`).src
-          : this.children[0].src
+          const imgChild = document.getElementById('story-image')
+          imgChild.src = fromStoryFeed ?
+            document.getElementById(`story-image-${storyID}`).src
+            : this.children[0].src
+        }
 
         // Reset comments scroll to top
         document.getElementById('comment-container').scrollTop = 0
@@ -414,8 +504,15 @@ export function addStoryModalListener () {
             for (let i = 0, n = profileUsernames.length; i < n; i++) {
               profileUsernames[i].textContent = story.user.username
             }
+
+            /* /explore/stories page: Set the image source and check edit button */
+            if (exploreStories) {
+              document.getElementById('story-image').src = story.image
+              document.getElementById('user-image-modal').src = story.user.image
+            }
           }
 
+          // href links of event
           document.getElementById(
             'event-link').href = `/event/${story.event._id}`
           document.getElementById('event-name').textContent = story.event.name
@@ -557,17 +654,19 @@ export function addEditStoryListener () {
         const captionModal = document.getElementById('caption')
         const captionFeed = document.getElementById(`story-caption-${storyID}`)
 
-        if (captionFeed) {
+        await loadStoryData(storyID).then(story => {
           this.parentElement.insertAdjacentHTML(
             'beforeend',
-            renderEditStoryModal(storyID, captionFeed.textContent),
+            renderEditStoryModal(story)
           )
-        } else {
-          this.parentElement.insertAdjacentHTML(
-            'beforeend',
-            renderEditStoryModal(storyID, captionModal.textContent),
-          )
-        }
+          initLocationInput()
+        }).catch(err => {
+          if (err.status === 401) {
+            showSnackbar('Please sign in to continue')
+          } else {
+            showSnackbar('Failed to process the request')
+          }
+        })
 
         closeModalListener()
 
@@ -613,6 +712,7 @@ export function addEditStoryListener () {
 
               document.getElementById('story').classList.remove('is-active')
 
+              // Decrease story count
               const storyCount = document.getElementById('story-count')
               if (storyCount) {
                 storyCount.textContent = parseInt(storyCount.textContent) - 1

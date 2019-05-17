@@ -11,15 +11,15 @@ const User = require('../models/user')
 const imageController = require('../controllers/image')
 
 /**
- * GET Explore page (/explore) with featured and suggested events
+ * GET Explore page (/explore) with all events
  *
  * @param {Object} req The request header
  * @param {Object} res The response header
  */
 exports.index = (req, res) => {
-  const eventQuery = Event.find()
+  const eventQuery = Event.find({}, '-__v')
   eventQuery.populate('organiser', '-_id')
-  eventQuery.populate('genres', '-_id name')
+  eventQuery.populate('genres', '_id name')
   eventQuery.populate('interested going', '-_id username image')
   eventQuery.populate({
     path: 'stories',
@@ -70,9 +70,9 @@ exports.index = (req, res) => {
  * @param {Object} res The response header
  */
 exports.getEventData = (req, res) => {
-  const eventQuery = Event.findById(req.params.id)
+  const eventQuery = Event.findById(req.params.id, '-__v')
   eventQuery.populate('organiser', '-_id')
-  eventQuery.populate('genres', '-_id name')
+  eventQuery.populate('genres', '_id name')
   eventQuery.populate('interested going', '-_id username image')
   eventQuery.populate({
     path: 'stories',
@@ -128,13 +128,13 @@ exports.getEventFeed = (req, res) => {
 
   userQuery.then(user => {
     if (user) {
-      const eventQuery = Event.find()
+      const eventQuery = Event.find({}, '-__v')
       eventQuery.populate({
         path: 'organiser',
         match: { $or: [{ followers: req.user.id }, { _id: req.user.id }] },
         select: '-_id username',
       })
-      eventQuery.populate('genres', '-_id name')
+      eventQuery.populate('genres', '_id name')
       eventQuery.populate('interested going', '-_id username image').lean()
 
       eventQuery.
@@ -165,11 +165,11 @@ exports.searchEvent = (req, res) => {
     Event.find({
       name: new RegExp(`^.*${json.event.replace(
         /[-/\\^$*+?.()|[]{}]/g, '\\$&')}.*$`, 'gi'),
-    })
+    }, '-__v')
 
   // If genre is provided
   if (json.genre) {
-    eventQuery.find({genres: json.genre})
+    eventQuery.find({ genres: json.genre })
   }
 
   // If address is provided
@@ -208,7 +208,7 @@ exports.searchEvent = (req, res) => {
   }
 
   eventQuery.populate('organiser', '-_id')
-  eventQuery.populate('genres', '-_id name')
+  eventQuery.populate('genres', '_id name')
   eventQuery.populate('interested going', '-_id username image').lean()
   eventQuery.lean()
 

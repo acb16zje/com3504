@@ -11,11 +11,25 @@ const router = express.Router()
 
 const storyController = require('../controllers/story')
 
+/* GET explore stories page */
+router.get('/explore/stories', (req, res) => {
+  res.render('explore', {
+    title: 'Explore - Musicbee',
+    path: 'explore_stories',
+  })
+})
+
+/* AJAX GET explore stories page */
+router.get('/api/explore/stories', storyController.index)
+
 /* AJAX GET story data */
 router.get('/api/story/:id', storyController.getStoryData)
 
 /* AJAX GET all stories related to the username */
 router.get('/api/story_feed', auth.checkAuthAPI, storyController.getStoryFeed)
+
+/* AJAX GET all stories  matching the search request */
+router.post('/api/story_search', storyController.searchStory)
 
 /* AJAX POST create a story */
 router.post('/api/story/create', auth.checkAuthAPI, storyController.createStory)
