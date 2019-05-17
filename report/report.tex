@@ -77,6 +77,8 @@ stories related to an event from another location (not restricted to the event l
 are able to post throwbacks (not restricted to date and time of event occurrence).
 \item The location input utilise Google Place Autocomplete plugin \cite{google_maps_api}, which
 allows the user to use a precise existing location as input.
+\item Given a date, it will return all events which has that specific date as its start or end date,
+or within the start and end date (event which is more than a single day)
 \item When online, the search request is processed by server-side NodeJS code. If the search
 parameters are valid, then NodeJS will return status code 200 along with the search results fetched
 from MongoDB in JSON format, otherwise it will return status code 500; When offline, the search
