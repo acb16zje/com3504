@@ -217,10 +217,12 @@ might not be up-to-date, will be displayed when user is offline.
 retrieved from MongoDB when connection is present, data can then be retrieved from IndexedDB when
 internet connection is not present.
 \item Fetching the data from MongoDB and storing them into IndexedDB using Ajax and Promises.
+\item Keeping the IndexedDB compact, storing only required information.
 \end{enumerate*}
 %
 \textbf{Solution:}
 \begin{enumerate*}[label=\textbf{\arabic*})]
+\item The IndexedDB is implemented with 4 object stores: Event, Story, User, and Genre.
 \item When the user is online, the application will automatically retrieve data from MongoDB through
 the use of Ajax and store the retrieved data into IndexedDB.
 \item The GET request is performed over Ajax calls. Promises are used for both storing and loading
@@ -281,13 +283,18 @@ error events, which might result in heavily nested code.
 \begin{enumerate*}[label=\textbf{\arabic*})]
 \item Creating schemas that clearly define the respective models.
 \item Verifying format and correctness of user inputs when creating a new document.
+\item Data fetched from MongoDB should be compatible with IndexedDB.
 \end{enumerate*}
 %
 \textbf{Solution:}
 \begin{enumerate*}[label=\textbf{\arabic*})]
 \item Design UML diagram prior to creation of database as shown in Appendix
 \hyperref[figure:uml]{\textbf{Figure 2}}.
-\item Use of mongoose's validation middleware \cite{validation} to define and check type and format
+\item Uses MVC (Model-view-controller) model in the implementation for better code organisation.
+Models are created with Mongoose's schemas; Views are templates created with EJS files to render the
+data; Controllers are functions to get the requested data from the models, create an HTML page
+displaying the data, and return it to the user to view in the browser
+\item Use of Mongoose's validation middleware \cite{validation} to define and check type and format
 of values allowed for an index.
 \end{enumerate*}
 %
